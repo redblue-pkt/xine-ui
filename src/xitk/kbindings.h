@@ -245,7 +245,7 @@ typedef enum {
    */
 } action_id_t;
 
-kbinding_t *kbindings_init_kbinding (const char *keymap_file);
+kbinding_t *kbindings_init_kbinding (gGui_t *gui, const char *keymap_file);
 
 void kbindings_reset_kbinding (kbinding_t *kbt);
 

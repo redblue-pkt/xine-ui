@@ -1875,7 +1875,7 @@ int main(int argc, char *argv[]) {
 				"line, xine will automatically load previous playlist."),
 			      CONFIG_LEVEL_BEG,
 			      dummy_config_cb,
-			      gGui);
+			      gui);
 
   if(old_playlist_cfg && (!(_argc - optind)) && (!no_old_playlist)) {
     char buffer[XITK_PATH_MAX + XITK_NAME_MAX + 2];
@@ -1890,7 +1890,7 @@ int main(int argc, char *argv[]) {
 			      _("Automatically load subtitles if they exist."),
 			      CONFIG_LEVEL_BEG,
 			      sub_autoload_cb,
-			      gGui);
+			      gui);
 
 
   enable_deinterlace +=
@@ -2070,7 +2070,7 @@ int main(int argc, char *argv[]) {
   gui->logo_mode = 0;
   gui->logo_has_changed = 0;
   gui->logo_mrl = xine_config_register_string (gui->xine, "gui.logo_mrl", USE_XINE_LOGO_MRL,
-    _("Logo MRL"), CONFIG_NO_HELP, CONFIG_LEVEL_EXP, main_change_logo_cb, gGui);
+    _("Logo MRL"), CONFIG_NO_HELP, CONFIG_LEVEL_EXP, main_change_logo_cb, gui);
 
   gui->event_queue = xine_event_new_queue(gui->stream);
   xine_event_create_listener_thread (gui->event_queue, event_listener, gui);

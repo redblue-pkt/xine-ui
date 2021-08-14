@@ -510,6 +510,7 @@ static const struct {
 #define _kbt_entry(kbt,index) ((unsigned int)index < KBT_NUM_BASE ? kbt->base + index : kbt->alias[index - KBT_NUM_BASE])
 
 struct kbinding_s {
+  gGui_t           *gui;
   int               num_entries;
   xine_sarray_t    *action_index, *key_index;
   kbinding_entry_t *last, base[KBT_NUM_BASE], *alias[MAX_ENTRIES - KBT_NUM_BASE];
@@ -804,11 +805,10 @@ static void _kbinding_done (void *data, int state) {
   if (state == 1)
     kbindings_reset_kbinding (kbt);
   else if (state == 2)
-    kbedit_window (gGui);
+    kbedit_window (kbt->gui);
 }
 
 static void _kbindings_check_redundancy(kbinding_t *kbt) {
-  gGui_t *gui = gGui;
   kbinding_entry_t *e1;
   int n, i, found = 0;
   size_t msglen = 0, dnalen = 0;
@@ -856,7 +856,7 @@ static void _kbindings_check_redundancy(kbinding_t *kbt) {
   }
 
   if (found) {
-    if (gui->xitk) {
+    if (kbt->gui && kbt->gui->xitk) {
       xitk_register_key_t key;
       const char *footer = _(".\n\nWhat do you want to do ?\n");
       size_t flen = strlen (footer);
@@ -866,10 +866,10 @@ static void _kbindings_check_redundancy(kbinding_t *kbt) {
         memcpy (kmsg + msglen, footer, flen + 1);
       }
       dump_error (kmsg);
-      key = xitk_window_dialog_3 (gui->xitk, NULL,
-        get_layer_above_video (gui), 450, _("Keybindings error!"), _kbinding_done, kbt,
+      key = xitk_window_dialog_3 (kbt->gui->xitk, NULL,
+        get_layer_above_video (kbt->gui), 450, _("Keybindings error!"), _kbinding_done, kbt,
         _("Reset"), _("Editor"), _("Cancel"), NULL, 0, ALIGN_CENTER, "%s", kmsg);
-      video_window_set_transient_for (gui->vwin, xitk_get_window (gui->xitk, key));
+      video_window_set_transient_for (kbt->gui->vwin, xitk_get_window (kbt->gui->xitk, key));
     } else {
       memcpy (kmsg + msglen, "\n", 2);
       printf ("%s", kmsg);
@@ -883,7 +883,8 @@ static void _kbindings_check_redundancy(kbinding_t *kbt) {
  * Initialize a key binding table from default, then try
  * to remap this one with (system/user) remap files.
  */
-kbinding_t *kbindings_init_kbinding (const char *keymap_file) {
+
+kbinding_t *kbindings_init_kbinding (gGui_t *gui, const char *keymap_file) {
   kbinding_t *kbt;
   int i;
 
@@ -891,6 +892,7 @@ kbinding_t *kbindings_init_kbinding (const char *keymap_file) {
   if (!kbt)
     return NULL;
 
+  kbt->gui = gui;
   kbt->last = NULL;
   kbt->action_index = xine_sarray_new (MAX_ENTRIES, _kbindings_action_cmp);
   kbt->key_index = xine_sarray_new (MAX_ENTRIES, _kbindings_key_cmp);
@@ -991,6 +993,7 @@ kbinding_t *_kbindings_duplicate_kbindings (kbinding_t *kbt) {
   if (!k)
     return NULL;
 
+  k->gui = kbt->gui;
   k->last = NULL;
   k->action_index = xine_sarray_new (MAX_ENTRIES, _kbindings_action_cmp);
   k->key_index = xine_sarray_new (MAX_ENTRIES, _kbindings_key_cmp);
