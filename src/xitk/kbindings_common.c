@@ -675,7 +675,7 @@ static int _kbindings_modifier_from_string (const char *s) {
 /*
  * Return a key binding entry (if available) matching with action string.
  */
-static kbinding_entry_t *_kbindings_lookup_action (kbinding_t *kbt, const char *action) {
+static ATTR_INLINE_ALL_STRINGOPS kbinding_entry_t *_kbindings_lookup_action (kbinding_t *kbt, const char *action) {
   union {
     int32_t i[6];
     char s[6 * 4];
