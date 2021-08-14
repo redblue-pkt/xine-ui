@@ -1436,7 +1436,6 @@ static void _pplugin_move_down (xitk_widget_t *w, void *data) {
 }
 
 static post_object_t *_pplugin_create_filter_object (post_info_t *info) {
-  gGui_t *gui = gGui;
   xitk_combo_widget_t   cmb;
   post_object_t        *pobj;
   xitk_image_widget_t   im;
@@ -1459,11 +1458,11 @@ static post_object_t *_pplugin_create_filter_object (post_info_t *info) {
   pobj->y = info->win->y;
   info->win->object_num++;
 
-  image = xitk_image_new (gui->xitk, NULL, 0, FRAME_WIDTH + 1, FRAME_HEIGHT + 1);
+  image = xitk_image_new (info->gui->xitk, NULL, 0, FRAME_WIDTH + 1, FRAME_HEIGHT + 1);
 
   xitk_image_fill_rectangle(image,
                             0, 0, FRAME_WIDTH + 1, FRAME_HEIGHT + 1,
-                            xitk_get_cfg_num (gui->xitk, XITK_BG_COLOR));
+                            xitk_get_cfg_num (info->gui->xitk, XITK_BG_COLOR));
 
   /* Some decorations */
   xitk_image_draw_outter_frame(image, NULL, NULL,

@@ -401,14 +401,14 @@ void kbindings_display_bindings (gGui_t *gui, kbedit_display_mode_t mode) {
     case KBT_DISPLAY_MODE_DEFAULT:
     case KBT_DISPLAY_MODE_LIRC:
     default:
-      kbt = kbindings_init_kbinding (NULL);
+      kbt = kbindings_init_kbinding (gui, NULL);
       break;
     case KBT_DISPLAY_MODE_CURRENT:
     case KBT_DISPLAY_MODE_MAN:
       f = 0;
       kbt = gui->kbindings;
       if (!kbt) {
-        kbt = kbindings_init_kbinding (gui->keymap_file);
+        kbt = kbindings_init_kbinding (gui, gui->keymap_file);
         f = 1;
       }
       break;
