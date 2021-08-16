@@ -1834,7 +1834,7 @@ void gui_run(gGui_t *gui, char **session_opts) {
     stdctl_start (gui);
 
 #ifdef HAVE_READLINE
-  start_remote_server();
+  start_remote_server (gui);
 #endif
   init_session();
 
