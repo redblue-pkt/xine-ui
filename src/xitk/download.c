@@ -45,16 +45,18 @@
 
 static int progress_callback(void *userdata,
 			     double dltotal, double dlnow, double ultotal, double ulnow) {
-  gGui_t *gui = gGui;
   download_t  *download = (download_t *) userdata;
   char         buffer[1024];
   int          percent = (dltotal > 0.0) ? (int) (dlnow * 100.0 / dltotal) : 0;
 
-  osd_draw_bar (gui, _("Download in progress"), 0, 100, percent, OSD_BAR_POS);
+  (void)ultotal;
+  (void)ulnow;
+
+  osd_draw_bar (download->gui, _("Download in progress"), 0, 100, percent, OSD_BAR_POS);
   /* TRANSLATORS: only ASCII characters (skin) */
   snprintf(buffer, sizeof(buffer), pgettext("skin", "Download progress: %d%%."), percent);
-  gui->mrl_overrided = 3;
-  panel_set_title (gui->panel, buffer);
+  download->gui->mrl_overrided = 3;
+  panel_set_title (download->gui->panel, buffer);
 
   /* return non 0 abort transfert */
   return download->status;
@@ -85,7 +87,12 @@ int network_download(const char *url, download_t *download) {
 #ifdef HAVE_CURL
   CURL        *curl;
 
-  pthread_mutex_lock(&gGui->download_mutex);
+  if (!url || !download)
+    return 0;
+  if (!download->gui)
+    return 0;
+    
+  pthread_mutex_lock (&download->gui->download_mutex);
 
   curl_global_init(CURL_GLOBAL_DEFAULT);
 
@@ -134,7 +141,7 @@ int network_download(const char *url, download_t *download) {
 
   curl_global_cleanup();
 
-  pthread_mutex_unlock(&gGui->download_mutex);
+  pthread_mutex_unlock (&download->gui->download_mutex);
 
   return (download->status == 0);
 #else

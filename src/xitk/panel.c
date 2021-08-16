@@ -935,7 +935,7 @@ void panel_snapshot (xitk_widget_t *w, void *data) {
 
   (void)w;
   pthread_mutex_lock (&panel->gui->mmk_mutex);
-  create_snapshot (panel->gui->mmk.mrl, panel_snapshot_error, panel_snapshot_info, panel->gui);
+  create_snapshot (panel->gui, panel->gui->mmk.mrl, panel_snapshot_error, panel_snapshot_info, panel->gui);
   pthread_mutex_unlock (&panel->gui->mmk_mutex);
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -41,7 +41,7 @@
  *  James Courtier-Dutton <James@superbug.demon.co.uk> for educating the author
  *    in the details of YUV style data formats.
  *
- *  Thomas Östreich
+ *  Thomas Ã–streich
  *    for the yuy2toyv12() function (see below)
  *
  */
@@ -74,7 +74,7 @@ typedef struct {
   void                 *msg_cb_data;
 } msg_cb_t;
 
-static char *snap_build_filename(const char *mrl) {
+static char *snap_build_filename (gGui_t *gui, const char *mrl) {
   char         *buffer;
   char          basename[XITK_NAME_MAX + 1] = "xine_snapshot";
   char         *p = strrchr(mrl, '/');
@@ -94,7 +94,7 @@ static char *snap_build_filename(const char *mrl) {
   }
 
   for(i = 1;; i++) {
-    buffer = xitk_asprintf("%s/%s-%d%s", gGui->snapshot_location, basename, i, ".png");
+    buffer = xitk_asprintf ("%s/%s-%d%s", gui->snapshot_location, basename, i, ".png");
     if(!buffer || ((stat(buffer, &sstat) == -1) && (errno == ENOENT)))
       break;
     free(buffer);
@@ -142,6 +142,9 @@ static void user_warning_fn(png_structp png_ptr, png_const_charp warning_msg)
  */
 static void write_row_callback( png_structp png_ptr, png_uint_32 row, int pass)
 {
+  (void)png_ptr;
+  (void)row;
+  (void) pass;
 }
 
 
@@ -184,8 +187,8 @@ static int _encode(png_structp struct_ptr, png_infop info_ptr, png_bytep *rows, 
     return 0;
 }
 
-void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
-  snapshot_messenger_t info_mcb, void *mcb_data) {
+void create_snapshot (gGui_t *gui, const char *mrl,
+  snapshot_messenger_t error_mcb, snapshot_messenger_t info_mcb, void *mcb_data) {
 
   xine_grab_video_frame_t *xgvf = NULL;
 
@@ -201,7 +204,7 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
   msg_cb_t cbs = { error_mcb, info_mcb, mcb_data };
 
   do {
-    xgvf = xine_new_grab_video_frame (gGui->stream);
+    xgvf = xine_new_grab_video_frame (gui->stream);
     if (!xgvf) {
       if (error_mcb)
         error_mcb (mcb_data, _("xine_grab_video_frame.grab () failed\n"));
@@ -239,7 +242,7 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
     }
 
     /* open file */
-    file_name = snap_build_filename (mrl);
+    file_name = snap_build_filename (gui, mrl);
     if (!file_name || (fp = fopen (file_name, "wb")) == NULL) {
       if (error_mcb) {
         char *umessage;
@@ -340,7 +343,7 @@ struct prvt_image_s {
  *  This function was pinched from filter_yuy2tov12.c, part of
  *  transcode, a linux video stream processing tool
  *
- *  Copyright (C) Thomas Östreich - June 2001
+ *  Copyright (C) Thomas Ã–streich - June 2001
  *
  *  Thanks Thomas
  *
@@ -1050,7 +1053,7 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
     prof_png = xine_profiler_allocate_slot ("snapshot convert to png");
 #endif /* DEBUG */
 
-  err = xine_get_current_frame(gGui->stream, &width, &height, &ratio_code, &format, NULL);
+  err = xine_get_current_frame (gui->stream, &width, &height, &ratio_code, &format, NULL);
 
   if (err == 0) {
     error_mcb(mcb_data, _("xine_get_current_frame() failed\n"));
@@ -1080,7 +1083,7 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
     return;
   }
 
-  err = xine_get_current_frame(gGui->stream,
+  err = xine_get_current_frame (gui->stream,
 			       &image->width, &image->height, &image->ratio_code,
 			       &image->format, image->img);
 
@@ -1192,7 +1195,7 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
 
   /**/
 
-  image->file_name = snap_build_filename(mrl);
+  image->file_name = snap_build_filename (gui, mrl);
 
   if ( !image->file_name || (image->fp = fopen(image->file_name, "wb")) == NULL ) {
 

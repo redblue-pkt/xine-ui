@@ -87,6 +87,7 @@ static slx_entry_t **skins_get_slx_entries(gGui_t *gui, char *url) {
   xml_property_t  *skin_prop;
   download_t       download;
 
+  download.gui    = gui;
   download.buf    = NULL;
   download.error  = NULL;
   download.size   = 0;
@@ -311,6 +312,7 @@ static void download_skin_preview(xitk_widget_t *w, void *data, int selected, in
   if(skd->slxs[selected]->skin.preview == NULL)
     return;
 
+  download.gui    = gui;
   download.buf    = NULL;
   download.error  = NULL;
   download.size   = 0;
@@ -353,6 +355,7 @@ static void download_skin_select (xitk_widget_t *w, void *data, int state) {
   if(selected < 0)
     return;
 
+  download.gui    = gui;
   download.buf    = NULL;
   download.error  = NULL;
   download.size   = 0;
