@@ -92,23 +92,6 @@ static void refs_unref (char **refs) {
   *refs = NULL;
 }
   
-/* used on remapping */
-typedef struct {
-  const char *alias, *action, *key;
-  char *modifier;
-  int is_alias, is_gui;
-} user_kbinding_t;
-
-/*
- * keybinding file object.
- */
-typedef struct {
-  FILE             *fd;
-  char             *bindingfile;
-  char             *ln;
-  char              buf[2048];
-} kbinding_file_t;
-
 /*
  * Default key mapping table.
  */
