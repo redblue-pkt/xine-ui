@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -25,7 +25,7 @@
 #define NETWORK_H
 
 #ifdef HAVE_READLINE
-void start_remote_server(void);
+void start_remote_server (gGui_t *gui);
 #endif
 
 #endif
