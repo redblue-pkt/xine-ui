@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2009 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -24,6 +24,7 @@
 
 
 typedef struct {
+  gGui_t *gui; /** << do set this before the call! */
   char *buf;
   char *error;
   int   size;

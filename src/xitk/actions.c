@@ -519,6 +519,7 @@ int gui_xine_open_and_play (gGui_t *gui, char *_mrl, char *_sub, int start_pos,
     if(!strncasecmp(mrl, "dload:/", 7))
       url = _mrl + 7;
 
+    download.gui    = gui;
     download.buf    = NULL;
     download.error  = NULL;
     download.size   = 0;

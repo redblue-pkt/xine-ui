@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2009 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -25,7 +25,7 @@
 
 typedef void (*snapshot_messenger_t)(void *data, char *message);
 
-void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
-		      snapshot_messenger_t info_mcb, void *mcb_data);
+void create_snapshot (gGui_t *gui, const char *mrl,
+  snapshot_messenger_t error_mcb, snapshot_messenger_t info_mcb, void *mcb_data);
 
 #endif

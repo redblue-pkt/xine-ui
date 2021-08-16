@@ -204,6 +204,7 @@ static _lf_t *_download_file (gGui_t *gui, const char *filename) {
     return NULL;
   }
 
+  download.gui    = gui;
   download.buf    = NULL;
   download.error  = NULL;
   download.size   = 0;
@@ -3202,3 +3203,4 @@ void mmk_edit_mediamark (gGui_t *gui, mediamark_t **mmk, apply_callback_t callba
   raise_window (mmkedit->gui, mmkedit->xwin, 1, 1);
   xitk_window_set_input_focus (mmkedit->xwin);
 }
+
