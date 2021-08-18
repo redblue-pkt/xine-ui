@@ -1214,7 +1214,7 @@ void xitk_add_widget (xitk_widget_list_t *wl, xitk_widget_t *wi, unsigned int fl
   }
 }
 
-int xitk_widget_key_event (xitk_widget_t *w, const char *string, int modifier) {
+int xitk_widget_key_event (xitk_widget_t *w, const char *string, int modifier, int key_up) {
   widget_event_t event;
   int handled;
 
@@ -1226,6 +1226,7 @@ int xitk_widget_key_event (xitk_widget_t *w, const char *string, int modifier) {
   event.type = WIDGET_EVENT_KEY;
   event.string = string;
   event.modifier = modifier;
+  event.button_pressed = !key_up;
   handled = 0;
 
   if (w->type & WIDGET_KEYABLE)

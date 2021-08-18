@@ -164,7 +164,7 @@ static int _button_click (_button_private_t *wp, int button, int bUp, int x, int
   return 0;
 }
 
-static int _button_key (_button_private_t *wp, const char *s, int modifier) {
+static int _button_key (_button_private_t *wp, const char *s, int modifier, int key_up) {
   static const char k[] = {
     XITK_CTRL_KEY_PREFIX, XITK_KEY_RETURN,
     XITK_CTRL_KEY_PREFIX, XITK_KEY_NUMPAD_ENTER,
@@ -190,9 +190,13 @@ static int _button_key (_button_private_t *wp, const char *s, int modifier) {
     return 0;
 
   wp->w.state &= ~XITK_WIDGET_STATE_CLICK;
-
-  if (wp->state_callback)
+  if (wp->state_callback) {
+    if (key_up)
+      return 0;
     wp->w.state ^= XITK_WIDGET_STATE_ON;
+  } else {
+    wp->w.state |= key_up ? 0 : XITK_WIDGET_STATE_CLICK;
+  }
 
   event.x = wp->w.x;
   event.y = wp->w.y;
@@ -204,7 +208,7 @@ static int _button_key (_button_private_t *wp, const char *s, int modifier) {
   if (wp->w.state & XITK_WIDGET_STATE_FOCUS) {
     if (wp->state_callback)
       wp->state_callback (&wp->w, wp->userdata, !!(wp->w.state & XITK_WIDGET_STATE_ON));
-    else if (wp->callback)
+    else if (key_up && wp->callback)
       wp->callback (&wp->w, wp->userdata);
   }
   return 1;
@@ -227,7 +231,7 @@ static int button_event (xitk_widget_t *w, widget_event_t *event, widget_event_r
     case WIDGET_EVENT_CLICK:
       return _button_click (wp, event->button, event->button_pressed, event->x, event->y);
     case WIDGET_EVENT_KEY:
-      return _button_key (wp, event->string, event->modifier);
+      return _button_key (wp, event->string, event->modifier, !event->button_pressed);
     case WIDGET_EVENT_INSIDE:
       return _button_inside (wp, event->x, event->y) ? 1 : 2;
     case WIDGET_EVENT_CHANGE_SKIN:

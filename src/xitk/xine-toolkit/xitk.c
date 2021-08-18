@@ -1297,6 +1297,8 @@ static void xitk_handle_event (__xitk_t *xitk, xitk_be_event_t *event) {
 
     case XITK_EV_KEY_UP:
       gettimeofday (&xitk->keypress, 0);
+      if (fx && fx->wl.widget_focused)
+        handled = xitk_widget_key_event (fx->wl.widget_focused, event->utf8, event->qual, 1);
       break;
 
     case XITK_EV_KEY_DOWN:
@@ -1321,7 +1323,7 @@ static void xitk_handle_event (__xitk_t *xitk, xitk_be_event_t *event) {
 
         xitk_tips_hide_tips (xitk->x.tips);
 
-        w = fx->wl.widget_focused ? fx->wl.widget_focused : NULL;
+        w = fx->wl.widget_focused;
 
         /* hint possible menu location */
         if ((event->utf8[0] == XITK_CTRL_KEY_PREFIX) && (event->utf8[1] == XITK_KEY_MENU) && fx->wl.xwin->bewin) {
@@ -1338,7 +1340,9 @@ static void xitk_handle_event (__xitk_t *xitk, xitk_be_event_t *event) {
           }
         }
 
-        handled = xitk_widget_key_event (w, event->utf8, event->qual);
+        handled = xitk_widget_key_event (w, event->utf8, event->qual, 0);
+        /* this may have changed focus or deleted w. */
+        w = fx->wl.widget_focused;
 
         if (!handled) {
           if (kbuf[0] == ' ')
@@ -1510,7 +1514,7 @@ static void xitk_handle_event (__xitk_t *xitk, xitk_be_event_t *event) {
               xitk_widget_t *w = fx->wl.widget_focused;
               const char sup[3] = {XITK_CTRL_KEY_PREFIX, XITK_MOUSE_WHEEL_UP, 0};
               const char sdown[3] = {XITK_CTRL_KEY_PREFIX, XITK_MOUSE_WHEEL_DOWN, 0};
-              handled = xitk_widget_key_event (w, event->code == 4 ? sup : sdown, event->qual);
+              handled = xitk_widget_key_event (w, event->code == 4 ? sup : sdown, event->qual, 0);
             }
           }
 
@@ -3039,3 +3043,4 @@ uint32_t xitk_get_color_name (const char *color) {
   }
   return ~0u;
 }
+

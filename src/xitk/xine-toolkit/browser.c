@@ -769,7 +769,7 @@ static int browser_notify_event (xitk_widget_t *w, widget_event_t *event, widget
       _browser_paint (wp);
       break;
     case WIDGET_EVENT_KEY:
-      return _browser_key (wp, event->string, event->modifier);
+      return event->button_pressed ? _browser_key (wp, event->string, event->modifier) : 0;
     case WIDGET_EVENT_DESTROY:
       _browser_notify_destroy (wp);
       break;

@@ -574,7 +574,7 @@ static int playlist_event (void *data, const xitk_be_event_t *e) {
             mmk_editor_end (pl->gui);
             w = xitk_get_focused_widget (pl->widget_list);
             if ((!w) || (w && (!((xitk_get_widget_type(w)) & WIDGET_GROUP_BROWSER))))
-              xitk_widget_key_event (pl->w[_W_playlist], e->utf8, e->qual);
+              xitk_widget_key_event (pl->w[_W_playlist], e->utf8, e->qual, 0);
             return 1;
           case XITK_KEY_ESCAPE:
             playlist_exit (pl->gui);
