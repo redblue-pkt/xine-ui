@@ -49,7 +49,7 @@ typedef struct {
   int                   x, y;            /** << PAINT, CLICK, INSIDE */
   int                   width, height;   /** << PAINT */
 
-  int                   button_pressed;  /** << CLICK */
+  int                   button_pressed;  /** << CLICK, KEY */
   int                   button;          /** << CLICK */
 
   int                   modifier;        /** << CLICK, KEY */

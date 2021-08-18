@@ -307,7 +307,7 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
       _tabs_paint (wp, event);
       break;
     case WIDGET_EVENT_KEY:
-      return _tabs_key (wp, event->string, event->modifier);
+      return event->button_pressed ? _tabs_key (wp, event->string, event->modifier) : 0;
     case WIDGET_EVENT_DESTROY:
       _notify_destroy (wp);
       break;

@@ -273,7 +273,7 @@ static int _labelbutton_click (_lbutton_private_t *wp, int button, int bUp, int 
   return 1;
 }
 
-static int _labelbutton_key (_lbutton_private_t *wp, const char *s, int modifier) {
+static int _labelbutton_key (_lbutton_private_t *wp, const char *s, int modifier, int key_up) {
   static const char k[] = {
     XITK_CTRL_KEY_PREFIX, XITK_KEY_RIGHT,
     XITK_CTRL_KEY_PREFIX, XITK_KEY_RETURN,
@@ -302,13 +302,16 @@ static int _labelbutton_key (_lbutton_private_t *wp, const char *s, int modifier
   {
     /* as always, do callback last -- it may modify or even delete us. */
     if ((wp->bType == RADIO_BUTTON) || (wp->bType == TAB_BUTTON)) {
+      if (key_up)
+        return 0;
       wp->w.state ^= XITK_WIDGET_STATE_ON;
       _labelbutton_paint (wp);
       if (wp->state_callback)
         wp->state_callback (&wp->w, wp->userdata, !!(wp->w.state & XITK_WIDGET_STATE_ON), modifier);
     } else if (wp->bType == CLICK_BUTTON) {
+      wp->w.state |= key_up ? 0 : XITK_WIDGET_STATE_CLICK;
       _labelbutton_paint (wp);
-      if (wp->callback)
+      if (key_up && wp->callback)
         wp->callback (&wp->w, wp->userdata, !!(wp->w.state & XITK_WIDGET_STATE_ON));
     }
   }
@@ -459,7 +462,7 @@ static int labelbutton_event (xitk_widget_t *w, widget_event_t *event, widget_ev
     case WIDGET_EVENT_CLICK:
       return _labelbutton_click (wp, event->button, event->button_pressed, event->x, event->y, event->modifier);
     case WIDGET_EVENT_KEY:
-      return _labelbutton_key (wp, event->string, event->modifier);
+      return _labelbutton_key (wp, event->string, event->modifier, !event->button_pressed);
     case WIDGET_EVENT_INSIDE:
       return _labelbutton_inside (wp, event->x, event->y) ? 1 : 2;
     case WIDGET_EVENT_CHANGE_SKIN:

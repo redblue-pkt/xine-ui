@@ -158,7 +158,7 @@ typedef void (*xitk_signal_callback_t)(int, void *);
  */
 typedef int xitk_register_key_t;
 
-int xitk_widget_key_event (xitk_widget_t *w, const char *string, int modifier);
+int xitk_widget_key_event (xitk_widget_t *w, const char *string, int modifier, int key_up);
 
 /*
  *
