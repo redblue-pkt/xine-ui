@@ -788,6 +788,8 @@ static void kbedit_sel(xitk_widget_t *w, void *data, int s, int modifier) {
   _kbr_close (kbedit);
   if(s >= 0)
     kbedit_select (kbedit, s);
+  else
+    kbedit_unset (kbedit);
 }
 
 /*
@@ -919,20 +921,6 @@ static void kbedit_save (xitk_widget_t *w, void *data, int state) {
  */
 void kbedit_end (xui_keyedit_t *kbedit) {
   kbedit_exit (NULL, kbedit, 0);
-}
-
-static void _kbedit_unset (xui_keyedit_t *kbedit) {
-  xitk_widget_t *w;
-
-  if (!kbedit || !kbedit->widget_list)
-    return;
-
-  w = xitk_get_focused_widget(kbedit->widget_list);
-
-  if ((w && (w != kbedit->w[_W_done]) && (w != kbedit->w[_W_save]))
-    && (xitk_browser_get_current_selected (kbedit->w[_W_browser]) < 0)) {
-    kbedit_unset (kbedit);
-  }
 }
 
 static void _kbedit_store_1 (xui_keyedit_t *kbe) {
@@ -1087,10 +1075,6 @@ static void kbedit_grab (xitk_widget_t *w, void *data, int state, int qual) {
 static int kbedit_event (void *data, const xitk_be_event_t *e) {
   xui_keyedit_t *kbedit = data;
 
-  if ((e->type == XITK_EV_BUTTON_UP) || (e->type == XITK_EV_KEY_UP)) {
-    _kbedit_unset (kbedit);
-    return 1;
-  }
   if (((e->type == XITK_EV_KEY_DOWN) && (e->utf8[0] == XITK_CTRL_KEY_PREFIX) && (e->utf8[1] == XITK_KEY_ESCAPE))
     || (e->type == XITK_EV_DEL_WIN)) {
     kbedit_exit (NULL, kbedit, 0);
