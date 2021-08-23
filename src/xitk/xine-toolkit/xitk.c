@@ -2054,15 +2054,36 @@ void xitk_cfg_unload (char *buf) {
  * yes/no, on/off. Case isn't checked.
  */
 int xitk_get_bool_value(const char *val) {
+  union {
+    char b[4];
+    uint32_t v;
+  } _true = {{'t','r','u','e'}},
+    _yes  = {{'y','e','s',' '}},
+    _on   = {{'o','n',' ',' '}},
+    _have;
+
   if (!val)
     return 0;
   if ((*val >= '1') && (*val <= '9'))
     return 1;
-  if (!strcasecmp (val, "true"))
+  _have.v = 0x20202020;
+  if (val[0]) {
+    _have.b[0] = val[0];
+    if (val[1]) {
+      _have.b[1] = val[1];
+      if (val[2]) {
+        _have.b[2] = val[2];
+        if (val[3])
+          _have.b[3] = val[3];
+      }
+    }
+  }
+  _have.v |= 0x20202020;
+  if (_have.v == _true.v)
     return 1;
-  if (!strcasecmp (val, "yes"))
+  if (_have.v == _yes.v)
     return 1;
-  if (!strcasecmp (val, "on"))
+  if (_have.v == _on.v)
     return 1;
   return 0;
 }
@@ -2086,6 +2107,24 @@ static const uint8_t tab_tolower[256] = {
   240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255
 };
 
+size_t ATTR_INLINE_ALL_STRINGOPS xitk_lower_strlcpy (char *dest, const char *src, size_t dlen) {
+  uint8_t *q = (uint8_t *)dest;
+  const uint8_t *p = (const uint8_t *)src;
+  size_t l;
+
+  if (!src)
+    return 0;
+  l = strlen ((const char *)p);
+  if (!dest || !dlen)
+    return l;
+  if (l + 1 < dlen)
+    dlen = l + 1;
+  while (--dlen)
+    *q++ = tab_tolower[*p++];
+  *q = 0;
+  return l;
+}
+    
 /* 0x01 (end), 0x02 (hash), 0x04 (start), 0x08 (stop), 0x10 (space), 0x20 (value_sep), 0x40 (lf), 0x80 (;) */
 static const uint8_t tab_cfg_parse[256] = {
   [0] = 0x01, ['#'] = 0x02, ['{'] = 0x04, ['}'] = 0x08,
@@ -3043,4 +3082,3 @@ uint32_t xitk_get_color_name (const char *color) {
   }
   return ~0u;
 }
-
