@@ -126,8 +126,8 @@ static void xitk_button_list_swap (xitk_widget_t *w, void *ip, int state) {
 static void xitk_button_list_delete (xitk_button_list_t *bl) {
   xitk_widgets_delete (bl->widgets + bl->first + bl->visible, bl->last - (bl->first + bl->visible));
   xitk_widgets_delete (bl->widgets, bl->first);
-  if (bl->swap && (bl->num <= bl->visible))
-    xitk_destroy_widget (bl->swap);
+  if (bl->num <= bl->visible)
+    xitk_widgets_delete (&bl->swap, 1);
 
   xitk_short_string_deinit (&bl->skin_element_name);
   bl->swap = NULL;

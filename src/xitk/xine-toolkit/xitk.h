@@ -258,14 +258,6 @@ typedef struct {
 #define MODIFIER_BUTTON5            0x00001000
 
 /*
- * See
- */
-#define DIRECTION_UP                1
-#define DIRECTION_DOWN              2
-#define DIRECTION_LEFT              3
-#define DIRECTION_RIGHT             4
-
-/*
  * Result of dialog window
  */
 #define XITK_WINDOW_ANSWER_UNKNOWN  0
@@ -542,29 +534,6 @@ int xitk_partial_paint_widget_list (xitk_widget_list_t *wl, xitk_hull_t *hull);
 void xitk_change_skins_widget_list(xitk_widget_list_t *wl, xitk_skin_config_t *skonfig);
 
 /**
- * Boolean function, if x and y coords is in widget.
- */
-#ifdef YET_UNUSED
-int xitk_is_inside_widget (xitk_widget_t *widget, int x, int y);
-#endif
-
-/**
- * Return widget from widget list 'wl' localted at x,y coords.
- */
-xitk_widget_t *xitk_get_widget_at (xitk_widget_list_t *wl, int x, int y);
-
-// XXX move next to widget.h ??? and rename _widget_ ... ?
-/**
- * Notify widget (if enabled) if motion happend at x, y coords.
- */
-void xitk_motion_notify_widget_list (xitk_widget_list_t *wl, int x, int y, unsigned int state);
-
-/**
- * Notify widget (if enabled) if click event happend at x, y coords.
- */
-int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int button, int bUp, int modifier);
-
-/**
  * Return the focused widget.
  */
 xitk_widget_t *xitk_get_focused_widget(xitk_widget_list_t *);
@@ -578,11 +547,6 @@ void xitk_widget_set_focus_redirect (xitk_widget_t *w, xitk_widget_t *focus_redi
  * Force the focus to given widget.
  */
 void xitk_set_focus_to_widget(xitk_widget_t *);
-
-/**
- * Return the pressed widget.
- */
-xitk_widget_t *xitk_get_pressed_widget(xitk_widget_list_t *);
 
 /**
  * Return width (in pixel) of widget.
@@ -610,21 +574,6 @@ int xitk_get_widget_pos(xitk_widget_t *w, int *x, int *y);
 uint32_t xitk_get_widget_type(xitk_widget_t *w);
 
 /**
- * Boolean, return 1 if widget 'w' have focus.
- */
-int xitk_is_widget_focused(xitk_widget_t *);
-
-/**
- * Boolean, enable state of widget.
- */
-int xitk_is_widget_enabled(xitk_widget_t *);
-
-/**
- * Destroy widgets from widget list.
- */
-void xitk_destroy_widgets(xitk_widget_list_t *wl);
-
-/**
  * Set widgets of widget list visible.
  */
 void xitk_show_widgets(xitk_widget_list_t *);
@@ -639,13 +588,6 @@ void xitk_hide_widgets(xitk_widget_list_t *);
  */
 xitk_image_t *xitk_get_widget_foreground_skin(xitk_widget_t *w);
 
-/**
- *
- */
-#ifdef YET_UNUSED
-xitk_image_t *xitk_get_widget_background_skin(xitk_widget_t *w);
-#endif
-
 /* xitk_add_widget (): keep state as is */
 #define XITK_WIDGET_STATE_KEEP (~0u)
 /* widget responds to user input */
@@ -659,6 +601,7 @@ xitk_image_t *xitk_get_widget_background_skin(xitk_widget_t *w);
 void xitk_add_widget (xitk_widget_list_t *wl, xitk_widget_t *wi, unsigned int flags);
 /* returns the new state of last done widget. */
 unsigned int xitk_widgets_state (xitk_widget_t * const *w, unsigned int n, unsigned int mask, unsigned int state);
+#define xitk_is_widget_enabled(_w) (!!(xitk_widgets_state (&(_w), 1, 0, 0) & XITK_WIDGET_STATE_ENABLE))
 void xitk_widgets_delete (xitk_widget_t **w, unsigned int n);
 #define xitk_destroy_widget(w) do {xitk_widget_t *__w = w; xitk_widgets_delete (&(__w), 1); } while (0)
 
@@ -998,3 +941,4 @@ void xitk_window_restore_window_cursor(xitk_window_t *w);
 int xitk_clipboard_set_text (xitk_widget_t *w, const char *text, int text_len);
 
 #endif
+
