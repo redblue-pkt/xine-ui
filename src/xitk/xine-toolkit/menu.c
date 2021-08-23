@@ -294,6 +294,8 @@ static void _menu_click_cb (xitk_widget_t *w, void *data, int state) {
       }
     }
   } else if (!(me->type & (_MENU_NODE_TITLE | _MENU_NODE_SEP))) {
+    xitk_widget_t *ww;
+
     _menu_close_subs_in (wp, NULL);
     /* 핵: detach from parent window. it may go away in user callback,
      * eg when switching fullscreen mode. */
@@ -307,7 +309,8 @@ static void _menu_click_cb (xitk_widget_t *w, void *data, int state) {
       me->wp->cb (&wp->w, &me->menu_entry, me->wp->user_data);
       wp->after_cb = xitk_get_focus_key (wp->xitk);
     }
-    xitk_destroy_widget (&wp->w);
+    ww = &wp->w;
+    xitk_widgets_delete (&ww, 1);
   }
 }
 

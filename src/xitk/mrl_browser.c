@@ -123,8 +123,7 @@ void destroy_mrl_browser (xui_mrlb_t *mrlb) {
         config_update_num ("gui.mrl_browser_x", wi.x);
         config_update_num ("gui.mrl_browser_y", wi.y);
       }
-      xitk_destroy_widget (mrlb->w);
-      mrlb->w = NULL;
+      xitk_widgets_delete (&mrlb->w, 1);
     }
     mrlb->gui->mrlb = NULL;
     video_window_set_input_focus (mrlb->gui->vwin);
@@ -456,8 +455,6 @@ void open_mrlbrowser(xitk_widget_t *w, void *data) {
   (void)w;
   if (gui) {
     mrl_browser (gui, mrl_add, mrl_play, NULL, gui_dndcallback);
-    if (gui->mrlb)
-      xitk_mrlbrowser_set_tips_timeout (gui->mrlb->w, 1, XITK_TIPS_TIMEOUT_AUTO);
   }
 }
 
@@ -467,8 +464,6 @@ void open_mrlbrowser_from_playlist(xitk_widget_t *w, void *data) {
   (void)w;
   if (gui) {
     mrl_browser (gui, mrl_add_noautoplay, mrl_play, NULL, gui_dndcallback);
-    if (gui->mrlb)
-      xitk_mrlbrowser_set_tips_timeout (gui->mrlb->w, 1, XITK_TIPS_TIMEOUT_AUTO);
   }
 }
 

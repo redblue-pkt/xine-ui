@@ -767,6 +767,7 @@ xitk_widget_t *xitk_get_focused_widget(xitk_widget_list_t *wl) {
   return NULL;
 }
 
+#ifdef YET_UNUSED
 /*
  * Return the pressed widget.
  */
@@ -778,6 +779,7 @@ xitk_widget_t *xitk_get_pressed_widget(xitk_widget_list_t *wl) {
   XITK_WARNING("widget list is NULL\n");
   return NULL;
 }
+#endif
 
 /*
  * Return widget width.
@@ -845,18 +847,7 @@ uint32_t xitk_get_widget_type(xitk_widget_t *w) {
   return w->type;
 }
 
-/*
- * Return 1 if widget is enabled.
- */
-int xitk_is_widget_enabled(xitk_widget_t *w) {
-
-  if(!w) {
-    XITK_WARNING("widget is NULL\n");
-    return 0;
-  }
-  return !!(w->state & XITK_WIDGET_STATE_ENABLE);
-}
-
+#ifdef YET_UNUSED
 /*
  * Return 1 if widget have focus.
  */
@@ -868,6 +859,7 @@ int xitk_is_widget_focused(xitk_widget_t *w) {
   }
   return !!(w->state & XITK_WIDGET_STATE_FOCUS);
 }
+#endif
 
 static void xitk_widget_paint (xitk_widget_t *w) {
   widget_event_t  event;
@@ -916,15 +908,6 @@ void xitk_widgets_delete (xitk_widget_t **w, unsigned int n) {
       if (_w) {
         widget_event_t event;
 
-        xitk_clipboard_unregister_widget (_w);
-        _w->state &= ~(XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
-        _xitk_widget_able (_w);
-        if ((_w->state ^ _w->shown_state) & XITK_WIDGET_STATE_PAINT)
-          xitk_widget_paint (_w);
-
-        xitk_widget_rel_deinit (&_w->parent);
-        xitk_widget_rel_deinit (&_w->focus_redirect);
-
         if (_w->wl) {
           if (_w == _w->wl->widget_focused)
             _w->wl->widget_focused = NULL;
@@ -935,6 +918,18 @@ void xitk_widgets_delete (xitk_widget_t **w, unsigned int n) {
           if (_w == _w->wl->widget_pressed)
             _w->wl->widget_pressed = NULL;
         }
+
+        xitk_clipboard_unregister_widget (_w);
+        _w->state &= ~(XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
+        if (_w->type & WIDGET_GROUP) {
+          event.type = WIDGET_EVENT_ENABLE;
+          _w->event (_w, &event, NULL);
+        }
+        if ((_w->state ^ _w->shown_state) & XITK_WIDGET_STATE_PAINT)
+          _xitk_widget_paint (_w, &event);
+
+        xitk_widget_rel_deinit (&_w->parent);
+        xitk_widget_rel_deinit (&_w->focus_redirect);
 
         xitk_dnode_remove (&_w->node);
 
@@ -966,7 +961,7 @@ void xitk_destroy_widgets(xitk_widget_list_t *wl) {
     again = 0;
     while (w->node.prev) {
       if (w->type & WIDGET_GROUP) {
-        xitk_destroy_widget (w);
+        xitk_widgets_delete (&w, 1);
         again = 1;
         break;
       }
@@ -975,45 +970,12 @@ void xitk_destroy_widgets(xitk_widget_list_t *wl) {
   } while (again);
 
   while (1) {
-    xitk_widget_t *mywidget = (xitk_widget_t *)wl->list.tail.prev;
-    if (!mywidget->node.prev)
+    xitk_widget_t *w = (xitk_widget_t *)wl->list.tail.prev;
+    if (!w->node.prev)
       break;
-    xitk_destroy_widget(mywidget);
+    xitk_widgets_delete (&w, 1);
   }
 }
-
-#if 0
-/*
- * Return the struct of color names/values.
- */
-xitk_color_names_t *gui_get_color_names(void) {
-
-  return xitk_color_names;
-}
-#endif
-
-/*
- * Stop widgets from widget list.
- */
-#ifdef YET_UNUSED
-void xitk_stop_widgets(xitk_widget_list_t *wl) {
-  xitk_widget_t *mywidget;
-
-  if(!wl) {
-    XITK_WARNING("widget list was NULL.\n");
-    return;
-  }
-
-  mywidget = (xitk_widget_t *)wl->list.head.next;
-
-  while (mywidget->node.next) {
-
-    xitk_stop_widget(mywidget);
-
-    mywidget = (xitk_widget_t *)mywidget->node.next;
-  }
-}
-#endif
 
 /*
  * Show widgets from widget list.

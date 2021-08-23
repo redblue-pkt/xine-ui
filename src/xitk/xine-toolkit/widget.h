@@ -128,10 +128,22 @@ struct xitk_widget_list_s {
 
 xitk_widget_t *xitk_widget_new (xitk_widget_list_t *wl, size_t size);
 void xitk_widget_set_parent (xitk_widget_t *w, xitk_widget_t *parent);
+void xitk_destroy_widgets (xitk_widget_list_t *wl);
+
+xitk_widget_t *xitk_get_widget_at (xitk_widget_list_t *wl, int x, int y);
+#ifdef YET_UNUSED
+int xitk_is_widget_focused (xitk_widget_t *w);
+int xitk_is_inside_widget (xitk_widget_t *widget, int x, int y);
+xitk_widget_t *xitk_get_pressed_widget (xitk_widget_list_t *);
+xitk_image_t *xitk_get_widget_background_skin (xitk_widget_t *w);
+#endif
 
 /**
  *
  */
 void xitk_set_focus_to_next_widget(xitk_widget_list_t *wl, int backward, int modifier);
+
+void xitk_motion_notify_widget_list (xitk_widget_list_t *wl, int x, int y, unsigned int state);
+int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int button, int bUp, int modifier);
 
 #endif

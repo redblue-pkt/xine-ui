@@ -620,8 +620,7 @@ void xitk_set_current_menu(xitk_t *_xitk, xitk_widget_t *menu) {
   __xitk_t *xitk;
 
   xitk_container (xitk, _xitk, x);
-  if (xitk->menu)
-    xitk_destroy_widget (xitk->menu);
+  xitk_widgets_delete (&xitk->menu, 1);
   xitk->menu = menu;
 }
 
@@ -1355,7 +1354,8 @@ static void xitk_handle_event (__xitk_t *xitk, xitk_be_event_t *event) {
               if (w && (w->type & WIDGET_GROUP_MENU)) {
                 /* close menu */
                 handled = 1;
-                xitk_destroy_widget (xitk_menu_get_menu (w));
+                w = xitk_menu_get_menu (w);
+                xitk_widgets_delete (&w, 1);
               }
             } else if ((kbuf[1] == XITK_KEY_LEFT) && w && (w->type & WIDGET_GROUP_MENU)) {
               /* close menu branch */

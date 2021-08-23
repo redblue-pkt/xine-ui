@@ -698,6 +698,7 @@ void xitk_mrlbrowser_show(xitk_widget_t *w) {
  */
 static void xitk_mrlbrowser_exit (xitk_widget_t *w, void *data, int state) {
   _mrlbrowser_private_t *wp = (_mrlbrowser_private_t *)data;
+  xitk_widget_t *ww;
 
   if (!wp)
     return;
@@ -709,7 +710,8 @@ static void xitk_mrlbrowser_exit (xitk_widget_t *w, void *data, int state) {
   if (wp->kill_callback)
     wp->kill_callback (&wp->w, wp->kill_userdata);
 
-  xitk_destroy_widget (&wp->w);
+  ww = &wp->w;
+  xitk_widgets_delete (&ww, 1);
 }
 
 
