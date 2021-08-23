@@ -932,7 +932,7 @@ typedef enum {
   _XITK_IMG_STATE_LAST
 } _xitk_img_state_t;
 
-xitk_img_state_t xitk_image_find_state (xitk_img_state_t max, int enable, int focus, int click, int selected) {
+xitk_img_state_t xitk_image_find_state (xitk_img_state_t max, uint32_t state) {
   static const uint8_t want[16] = {
     _XITK_IMG_STATE_DISABLED_NORMAL,
     _XITK_IMG_STATE_DISABLED_SELECTED,
@@ -1014,8 +1014,15 @@ xitk_img_state_t xitk_image_find_state (xitk_img_state_t max, int enable, int fo
         [_XITK_IMG_STATE_DISABLED_SELECTED] = XITK_IMG_STATE_DISABLED_SELECTED
     }
   };
-  uint32_t u = (enable ? 8 : 0) + (focus ? 4 : 0) + (click ? 2 : 0) + (selected ? 1 : 0);
+  uint32_t u = ((state & XITK_WIDGET_STATE_ENABLE) ? 8 : 0)
+             + ((state & (XITK_WIDGET_STATE_MOUSE | XITK_WIDGET_STATE_FOCUS)) ? 4 : 0)
+             + ((state & XITK_WIDGET_STATE_CLICK) ? 2 : 0)
+             + ((state & XITK_WIDGET_STATE_ON) ? 1 : 0);
 
+  /* revert early (de)selection */
+  if ((state & (XITK_WIDGET_STATE_TOGGLE | XITK_WIDGET_STATE_CLICK | XITK_WIDGET_STATE_IMMEDIATE))
+    == (XITK_WIDGET_STATE_TOGGLE | XITK_WIDGET_STATE_CLICK | XITK_WIDGET_STATE_IMMEDIATE))
+    u ^= 1;
   if (max > XITK_IMG_STATE_LAST - 1)
     max = XITK_IMG_STATE_LAST - 1;
   return have[max][want[u]];

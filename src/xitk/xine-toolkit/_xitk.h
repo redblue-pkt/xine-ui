@@ -175,7 +175,7 @@ typedef enum {
   XITK_IMG_STATE_LAST
 } xitk_img_state_t;
 
-xitk_img_state_t xitk_image_find_state (xitk_img_state_t max, int enable, int focus, int click, int selected);
+xitk_img_state_t xitk_image_find_state (xitk_img_state_t max, uint32_t state);
 
 struct xitk_image_s {
   xitk_be_image_t *beimg;

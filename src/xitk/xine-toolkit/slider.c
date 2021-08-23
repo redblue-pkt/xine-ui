@@ -766,9 +766,9 @@ static int xitk_slider_event (xitk_widget_t *w, widget_event_t *event, widget_ev
       wp->paint (wp, event);
       return 0;
     case WIDGET_EVENT_KEY:
-      return event->button_pressed ? _xitk_slider_key (wp, event->string, event->modifier) : 0;
+      return event->pressed ? _xitk_slider_key (wp, event->string, event->modifier) : 0;
     case WIDGET_EVENT_CLICK:
-      return _xitk_slider_click (wp, event->button, event->button_pressed, event->x, event->y);
+      return _xitk_slider_click (wp, event->button, !event->pressed, event->x, event->y);
     case WIDGET_EVENT_INSIDE:
       return _xitk_slider_inside (wp, event->x, event->y) ? 1 : 2;
     case WIDGET_EVENT_CHANGE_SKIN:

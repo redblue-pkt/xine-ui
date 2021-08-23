@@ -388,15 +388,15 @@ void xitk_motion_notify_widget_list (xitk_widget_list_t *wl, int x, int y, unsig
       event.type           = WIDGET_EVENT_CLICK;
       event.x              = x;
       event.y              = y;
-      event.button_pressed = LBUTTON_DOWN;
+      event.pressed        = 1;
       event.button         = 1;
       event.modifier       = state;
       w->event (w, &event, NULL);
     } else {
       /* For others, just (un)focus as needed. */
-      uint32_t new_state = w->state & ~(XITK_WIDGET_STATE_MOUSE | XITK_WIDGET_STATE_FOCUS);
+      uint32_t new_state = w->state & ~(XITK_WIDGET_STATE_CLICK | XITK_WIDGET_STATE_MOUSE | XITK_WIDGET_STATE_FOCUS);
       if (xitk_widget_test_focus_redirect (w, x, y)) {
-        new_state |= XITK_WIDGET_STATE_MOUSE | XITK_WIDGET_STATE_FOCUS;
+        new_state |= XITK_WIDGET_STATE_CLICK | XITK_WIDGET_STATE_MOUSE | XITK_WIDGET_STATE_FOCUS;
         wl->widget_under_mouse = w;
       } else {
         wl->widget_under_mouse = NULL;
@@ -566,7 +566,7 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int but
 	event.type           = WIDGET_EVENT_CLICK;
 	event.x              = x;
 	event.y              = y;
-	event.button_pressed = LBUTTON_DOWN;
+        event.pressed        = 1;
 	event.button         = button;
         event.modifier       = modifier;
 
@@ -582,7 +582,7 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int but
 	event.type           = WIDGET_EVENT_CLICK;
 	event.x              = x;
 	event.y              = y;
-	event.button_pressed = LBUTTON_UP;
+        event.pressed        = 0;
 	event.button         = button;
         event.modifier       = modifier;
 
@@ -1018,7 +1018,7 @@ void xitk_hide_widgets (xitk_widget_list_t *wl) {
 unsigned int xitk_widgets_state (xitk_widget_t * const *w, unsigned int n, unsigned int mask, unsigned int state) {
   uint32_t _and, _or, _new = 0;
 
-  mask &= XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE | XITK_WIDGET_STATE_ON |
+  mask &= XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE | XITK_WIDGET_STATE_ON | XITK_WIDGET_STATE_IMMEDIATE |
     XITK_WIDGET_STATE_MOUSE | XITK_WIDGET_STATE_FOCUS;
   /* disable implies lose focus. */
   if (mask & ~state & XITK_WIDGET_STATE_ENABLE) {
@@ -1167,8 +1167,8 @@ void xitk_add_widget (xitk_widget_list_t *wl, xitk_widget_t *wi, unsigned int fl
   if (wl && wi) {
     xitk_dlist_add_tail (&wl->list, &wi->node);
     if (flags != XITK_WIDGET_STATE_KEEP) {
-      wi->state &= ~(XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
-      wi->state |= flags & (XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
+      wi->state &= ~(XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE | XITK_WIDGET_STATE_IMMEDIATE);
+      wi->state |= flags & (XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE | XITK_WIDGET_STATE_IMMEDIATE);
       _xitk_widget_able (wi);
       if ((wi->state ^ wi->shown_state) & XITK_WIDGET_STATE_PAINT)
         xitk_widget_paint (wi);
@@ -1188,7 +1188,7 @@ int xitk_widget_key_event (xitk_widget_t *w, const char *string, int modifier, i
   event.type = WIDGET_EVENT_KEY;
   event.string = string;
   event.modifier = modifier;
-  event.button_pressed = !key_up;
+  event.pressed = !key_up;
   handled = 0;
 
   if (w->type & WIDGET_KEYABLE)
