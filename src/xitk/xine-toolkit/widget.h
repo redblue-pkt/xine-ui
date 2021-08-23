@@ -26,11 +26,6 @@
 
 #include <xine/sorted_array.h>
 
-#define LBUTTON_DOWN   0
-#define LBUTTON_UP     1
-
-#define WIDGET_ENABLE  1
-
 typedef struct {
   enum {
     WIDGET_EVENT_NONE = 0,
@@ -49,7 +44,7 @@ typedef struct {
   int                   x, y;            /** << PAINT, CLICK, INSIDE */
   int                   width, height;   /** << PAINT */
 
-  int                   button_pressed;  /** << CLICK, KEY */
+  int                   pressed;         /** << CLICK, KEY */
   int                   button;          /** << CLICK */
 
   int                   modifier;        /** << CLICK, KEY */

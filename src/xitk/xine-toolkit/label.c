@@ -512,7 +512,7 @@ static int notify_event (xitk_widget_t *w, widget_event_t *event, widget_event_r
       }
       break;
     case WIDGET_EVENT_CLICK:
-      return _label_click (wp, event->button, event->button_pressed, event->x, event->y);
+      return _label_click (wp, event->button, !event->pressed, event->x, event->y);
     case WIDGET_EVENT_CHANGE_SKIN:
       _label_new_skin (wp, event->skonfig);
       break;

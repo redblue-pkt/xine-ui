@@ -213,10 +213,7 @@ static void _labelbutton_partial_paint (_lbutton_private_t *wp, widget_event_t *
   if ((wp->bType != RADIO_BUTTON) && (wp->bType != TAB_BUTTON))
     wp->w.state &= ~XITK_WIDGET_STATE_ON;
   if ((wp->w.state & XITK_WIDGET_STATE_VISIBLE) && wp->skin.width) {
-    xitk_img_state_t state = xitk_image_find_state (XITK_IMG_STATE_SEL_FOCUS,
-      (wp->w.state & XITK_WIDGET_STATE_ENABLE),
-      (wp->w.state & (XITK_WIDGET_STATE_MOUSE | XITK_WIDGET_STATE_FOCUS)),
-      (wp->w.state & XITK_WIDGET_STATE_CLICK), (wp->w.state & XITK_WIDGET_STATE_ON));
+    xitk_img_state_t state = xitk_image_find_state (XITK_IMG_STATE_SEL_FOCUS, wp->w.state);
 
     xitk_part_image_copy (wp->w.wl, &wp->skin, &wp->temp_image,
       ((int)state >= wp->num_gfx ? wp->num_gfx - 1 : (int)state) * wp->skin.width / wp->num_gfx,
@@ -247,73 +244,52 @@ static void _labelbutton_paint (_lbutton_private_t *wp) {
 /*
  * Handle click events
  */
-static int _labelbutton_click (_lbutton_private_t *wp, int button, int bUp, int x, int y, int modifier) {
-  (void)x;
-  (void)y;
-  if (button != 1)
-    return 0;
-  wp->w.state &= ~XITK_WIDGET_STATE_CLICK;
-  wp->w.state |= bUp ? 0 : XITK_WIDGET_STATE_CLICK;
-  if (bUp && (wp->w.state & XITK_WIDGET_STATE_FOCUS)) {
-    if ((wp->bType == RADIO_BUTTON) || (wp->bType == TAB_BUTTON)) {
-      wp->w.state ^= XITK_WIDGET_STATE_ON;
-      _labelbutton_paint (wp);
-      if (wp->state_callback)
-        wp->state_callback (&wp->w, wp->userdata, !!(wp->w.state & XITK_WIDGET_STATE_ON), modifier);
-      return 1;
-    }
-    if (wp->bType == CLICK_BUTTON) {
-      _labelbutton_paint (wp);
-      if (wp->callback)
-        wp->callback (&wp->w, wp->userdata, !!(wp->w.state & XITK_WIDGET_STATE_ON));
-      return 1;
-    }
-  }
-  _labelbutton_paint (wp);
-  return 1;
-}
-
-static int _labelbutton_key (_lbutton_private_t *wp, const char *s, int modifier, int key_up) {
-  static const char k[] = {
-    XITK_CTRL_KEY_PREFIX, XITK_KEY_RIGHT,
-    XITK_CTRL_KEY_PREFIX, XITK_KEY_RETURN,
-    XITK_CTRL_KEY_PREFIX, XITK_KEY_NUMPAD_ENTER,
-    XITK_CTRL_KEY_PREFIX, XITK_KEY_ISO_ENTER,
-    ' ', 0
-  };
-  int i, n = sizeof (k) / sizeof (k[0]);
+static int _labelbutton_input (_lbutton_private_t *wp, const widget_event_t *event) {
+  int fire;
 
   if (!(wp->w.state & XITK_WIDGET_STATE_FOCUS))
     return 0;
-  if (!s)
-    return 0;
 
-  if (modifier & ~(MODIFIER_SHIFT | MODIFIER_NUML))
-    return 0;
+  if (event->type == WIDGET_EVENT_KEY) {
+    static const char k[] = {
+      XITK_CTRL_KEY_PREFIX, XITK_KEY_RIGHT,
+      XITK_CTRL_KEY_PREFIX, XITK_KEY_RETURN,
+      XITK_CTRL_KEY_PREFIX, XITK_KEY_NUMPAD_ENTER,
+      XITK_CTRL_KEY_PREFIX, XITK_KEY_ISO_ENTER,
+      ' ', 0
+    };
+    int i, n = sizeof (k) / sizeof (k[0]);
 
-  for (i = (wp->w.type & WIDGET_GROUP_MENU) ? 0 : 2; i < n; i += 2) {
-    if (!memcmp (s, k + i, 2))
+    if (event->modifier & ~(MODIFIER_SHIFT | MODIFIER_NUML))
+      return 0;
+    if (!event->string)
+      return 0;
+
+    for (i = (wp->w.type & WIDGET_GROUP_MENU) ? 0 : 2; i < n; i += 2) {
+      if (!memcmp (event->string, k + i, 2))
       break;
-  }
-  if (i >= n)
-    return 0;
-
-  wp->w.state &= ~XITK_WIDGET_STATE_CLICK;
-  {
-    /* as always, do callback last -- it may modify or even delete us. */
-    if ((wp->bType == RADIO_BUTTON) || (wp->bType == TAB_BUTTON)) {
-      if (key_up)
-        return 0;
-      wp->w.state ^= XITK_WIDGET_STATE_ON;
-      _labelbutton_paint (wp);
-      if (wp->state_callback)
-        wp->state_callback (&wp->w, wp->userdata, !!(wp->w.state & XITK_WIDGET_STATE_ON), modifier);
-    } else if (wp->bType == CLICK_BUTTON) {
-      wp->w.state |= key_up ? 0 : XITK_WIDGET_STATE_CLICK;
-      _labelbutton_paint (wp);
-      if (key_up && wp->callback)
-        wp->callback (&wp->w, wp->userdata, !!(wp->w.state & XITK_WIDGET_STATE_ON));
     }
+    if (i >= n)
+      return 0;
+  } else { /* WIDGET_EVENT_CLICK */
+    if (event->button != 1)
+      return 0;
+  }
+
+  fire = (wp->w.state ^ (event->pressed ? 0 : ~0u)) & XITK_WIDGET_STATE_IMMEDIATE;
+  wp->w.state &= ~XITK_WIDGET_STATE_CLICK;
+  if (event->pressed)
+    wp->w.state |= XITK_WIDGET_STATE_CLICK;
+  if (fire && (wp->w.state & XITK_WIDGET_STATE_TOGGLE))
+    wp->w.state ^= XITK_WIDGET_STATE_ON;
+
+  _labelbutton_paint (wp);
+
+  if (fire) {
+    if (wp->state_callback)
+      wp->state_callback (&wp->w, wp->userdata, !!(wp->w.state & XITK_WIDGET_STATE_ON), event->modifier);
+    else if (wp->callback)
+      wp->callback (&wp->w, wp->userdata, !!(wp->w.state & XITK_WIDGET_STATE_ON));
   }
   return 1;
 }
@@ -460,9 +436,8 @@ static int labelbutton_event (xitk_widget_t *w, widget_event_t *event, widget_ev
       _labelbutton_partial_paint (wp, event);
       break;
     case WIDGET_EVENT_CLICK:
-      return _labelbutton_click (wp, event->button, event->button_pressed, event->x, event->y, event->modifier);
     case WIDGET_EVENT_KEY:
-      return _labelbutton_key (wp, event->string, event->modifier, !event->button_pressed);
+      return _labelbutton_input (wp, event);
     case WIDGET_EVENT_INSIDE:
       return _labelbutton_inside (wp, event->x, event->y) ? 1 : 2;
     case WIDGET_EVENT_CHANGE_SKIN:
@@ -606,6 +581,8 @@ xitk_widget_t *xitk_info_labelbutton_create (xitk_widget_list_t *wl,
                         ? info->label_y - (wp->skin.height >> 1) : 0;
 
   xitk_widget_state_from_info (&wp->w, info);
+  wp->w.state          |= (wp->bType == RADIO_BUTTON) || (wp->bType== TAB_BUTTON)
+                        ? XITK_WIDGET_STATE_TOGGLE : 0;
   wp->w.x               = info->x;
   wp->w.y               = info->y;
   wp->w.width           = wp->skin.width / 3;
@@ -720,6 +697,8 @@ xitk_widget_t *xitk_noskin_labelbutton_create (xitk_widget_list_t *wl,
   wp->label_dy          = 0;
 
   wp->w.state          &= ~(XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
+  wp->w.state          |= (wp->bType == RADIO_BUTTON) || (wp->bType == TAB_BUTTON)
+                        ? XITK_WIDGET_STATE_TOGGLE : 0;
   wp->w.x               = x;
   wp->w.y               = y;
   wp->w.width           = wp->skin.width / 4;

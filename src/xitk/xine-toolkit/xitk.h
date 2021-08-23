@@ -598,6 +598,10 @@ xitk_image_t *xitk_get_widget_foreground_skin(xitk_widget_t *w);
 #define XITK_WIDGET_STATE_CLICK 4
 /* widget is "on" (radio button etc.) */
 #define XITK_WIDGET_STATE_ON 8
+/* fire on mouse/enter/space press instead of release. */
+#define XITK_WIDGET_STATE_IMMEDIATE 16
+/* widget can be "on". */
+#define XITK_WIDGET_STATE_TOGGLE 32
 void xitk_add_widget (xitk_widget_list_t *wl, xitk_widget_t *wi, unsigned int flags);
 /* returns the new state of last done widget. */
 unsigned int xitk_widgets_state (xitk_widget_t * const *w, unsigned int n, unsigned int mask, unsigned int state);

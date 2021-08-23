@@ -1415,7 +1415,8 @@ xui_panel_t *panel_init (gGui_t *gui) {
     b.state_callback    = gui_pause;
     b.userdata          = panel->gui;
     panel->w[_W_pause] = xitk_button_create (panel->widget_list, panel->gui->skin_config, &b);
-    xitk_add_widget (panel->widget_list, panel->w[_W_pause], XITK_WIDGET_STATE_KEEP);
+    xitk_add_widget (panel->widget_list, panel->w[_W_pause],
+      XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE | XITK_WIDGET_STATE_IMMEDIATE);
     xitk_set_widget_tips (panel->w[_W_pause], _("Pause/Resume playback"));
 
     b.skin_element_name = "Mute";
@@ -1473,4 +1474,3 @@ void panel_set_title (xui_panel_t *panel, char *title) {
   if(panel && panel->title_label)
     xitk_label_change_label(panel->title_label, title);
 }
-

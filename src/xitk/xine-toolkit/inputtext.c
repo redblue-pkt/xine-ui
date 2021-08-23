@@ -1003,9 +1003,9 @@ static int notify_event (xitk_widget_t *w, widget_event_t *event, widget_event_r
       _paint_partial_inputtext (wp, event);
       return 0;
     case WIDGET_EVENT_CLICK:
-      return _notify_click_inputtext (wp, event->button, event->button_pressed, event->x, event->y);
+      return _notify_click_inputtext (wp, event->button, !event->pressed, event->x, event->y);
     case WIDGET_EVENT_KEY:
-      return event->button_pressed ? _inputtext_key (wp, event->string, event->modifier) : 0;
+      return event->pressed ? _inputtext_key (wp, event->string, event->modifier) : 0;
     case WIDGET_EVENT_INSIDE:
       return _notify_inside (wp, event->x, event->y) ? 1 : 2;
     case WIDGET_EVENT_CHANGE_SKIN:
