@@ -383,51 +383,47 @@ static void _nullify_me(xitk_skin_element_t *s) {
 /*
  * Return alignement value.
  */
-static int skin_get_align_value(const char *val) {
-  static struct {
-    const char *str;
-    int value;
-  } aligns[] = {
-    { "left",   ALIGN_LEFT   },
-    { "center", ALIGN_CENTER },
-    { "right",  ALIGN_RIGHT  },
-    { NULL,     0 }
-  };
-  int i;
+static int skin_get_align_value (const char *val) {
+  union {
+    char b[4];
+    uint32_t v;
+  } _left = {{'l','e','f','t'}},
+    _right = {{'r','i','g','h'}},
+    _have;
 
-  ABORT_IF_NULL(val);
-
-  for(i = 0; aligns[i].str != NULL; i++) {
-    if(!(strcasecmp(aligns[i].str, val)))
-      return aligns[i].value;
-  }
-
+  /* _not_ an overread here. */
+  memcpy (_have.b, val, 4);
+  _have.v |= 0x20202020;
+  if (_have.v == _left.v)
+    return ALIGN_LEFT;
+  if (_have.v == _right.v)
+    return ALIGN_RIGHT;
   return ALIGN_CENTER;
 }
 
 /*
  * Return direction
  */
-static int skin_get_direction(const char *val) {
-  static struct {
-    const char *str;
-    int         value;
-  } directions[] = {
-    { "left",   DIRECTION_LEFT   },
-    { "right",  DIRECTION_RIGHT  },
-    { "up",     DIRECTION_UP     },
-    { "down",   DIRECTION_DOWN   },
-    { NULL,     0 }
-  };
-  int   i;
+static int skin_get_direction (const char *val) {
+  union {
+    char b[4];
+    uint32_t v;
+  } _down  = {{'d','o','w','n'}},
+    _right = {{'r','i','g','h'}},
+    _up    = {{'u','p',' ',' '}},
+    _have;
 
-  ABORT_IF_NULL(val);
-
-  for(i = 0; directions[i].str != NULL; i++) {
-    if(!(strcasecmp(directions[i].str, val)))
-      return directions[i].value;
-  }
-
+  /* _not_ an overread here. */
+  memcpy (_have.b, val, 4);
+  if (!_have.b[2])
+    _have.b[3] = 0;
+  _have.v |= 0x20202020;
+  if (_have.v == _right.v)
+    return DIRECTION_RIGHT;
+  if (_have.v == _down.v)
+    return DIRECTION_DOWN;
+  if (_have.v == _up.v)
+    return DIRECTION_UP;
   return DIRECTION_LEFT;
 }
 
@@ -508,13 +504,15 @@ static void check_skonfig(xitk_skin_config_t *skonfig) {
 #endif
 
 static xitk_skin_element_t *skin_lookup_section(xitk_skin_config_t *skonfig, const char *str) {
+  char name[64];
   xitk_skin_element_t *s;
   int r;
 
   if (!skonfig || !str)
     return NULL;
 
-  r = xine_sarray_binary_search (skonfig->elements, (char *)str);
+  xitk_lower_strlcpy (name, str, sizeof (name));
+  r = xine_sarray_binary_search (skonfig->elements, name);
   if (r < 0) {
     if (skonfig->xitk->verbosity >= 1)
       printf ("xitk.skin.section.missing (%s, %s).\n", skonfig->name, str);
@@ -558,7 +556,7 @@ xitk_skin_config_t *xitk_skin_init_config(xitk_t *xitk) {
 
   pthread_mutex_init (&skonfig->skin_mutex, NULL);
 
-  skonfig->elements = xine_sarray_new (128, (xine_sarray_comparator_t)strcasecmp);
+  skonfig->elements = xine_sarray_new (128, (xine_sarray_comparator_t)strcmp);
   skonfig->imgs     = xine_sarray_new (128, xitk_simg_cmp);
 
   skonfig->xitk     = xitk;
@@ -813,6 +811,7 @@ static void _skin_parse_1 (xitk_skin_config_t *skonfig, char *text, xitk_cfg_par
 
       _nullify_me (s);
       skonfig->celement = s;
+      /* xitk_cfg_parse () already lowercased this key. */
       strlcpy (s->section, key, sizeof (s->section));
       s->info.visibility = s->info.enability = 1;
       xine_sarray_add (skonfig->elements, s);
@@ -1003,4 +1002,3 @@ void xitk_skin_unlock(xitk_skin_config_t *skonfig) {
   if (skonfig)
     pthread_mutex_unlock (&skonfig->skin_mutex);
 }
-

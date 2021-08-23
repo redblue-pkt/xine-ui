@@ -67,6 +67,8 @@
   cont_ptr = (elem_ptr) ? (typeof (cont_ptr))(void *)((uint8_t *)(elem_ptr) - (uintptr_t)xc_dummy) : NULL; \
 } while (0)
 
+size_t xitk_lower_strlcpy (char *dest, const char *src, size_t dlen);
+
 typedef struct {
   char *s, buf[64];
 } xitk_short_string_t;
