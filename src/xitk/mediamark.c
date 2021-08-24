@@ -796,7 +796,7 @@ static mediamark_t **guess_toxine_playlist (_lf_t *lf) {
           for (elem = entry->first_child ? tree + entry->first_child : NULL;
             elem; elem = elem->next ? tree + elem->next : NULL) {
             const char *key = elem->key >= 0 ? text + elem->key : "";
-            char *val = elem->value >= 0 ? text + elem->value : path;
+            const char *val = elem->value >= 0 ? text + elem->value : path;
 
             path[0] = 0;
             if (!strcmp (key, "identifier")) {
@@ -815,22 +815,22 @@ static mediamark_t **guess_toxine_playlist (_lf_t *lf) {
             } else if (!strcmp (key, "spu_offset")) {
               if (!(mmkf_members & 0x20)) {
                 mmkf_members |= 0x20;
-                mmkf.spu_offset = strtol (val, &val, 10);
+                mmkf.spu_offset = xitk_str2int32 (&val);
               }
             } else if (!strcmp (key, "av_offset")) {
               if (!(mmkf_members & 0x10)) {
                 mmkf_members |= 0x10;
-                mmkf.av_offset = strtol (val, &val, 10);
+                mmkf.av_offset = xitk_str2int32 (&val);
               }
             } else if (!strcmp (key, "start")) {
               if (!(mmkf_members & 0x04)) {
                 mmkf_members |= 0x04;
-                mmkf.start = strtol (val, &val, 10);
+                mmkf.start = xitk_str2int32 (&val);
               }
             } else if (!strcmp (key, "end")) {
               if (!(mmkf_members & 0x08)) {
                 mmkf_members |= 0x08;
-                mmkf.end = strtol (val, &val, 10);
+                mmkf.end = xitk_str2int32 (&val);
               }
             } else if (!strcmp (key, "mrl")) {
               if (!(mmkf_members & 0x02)) {

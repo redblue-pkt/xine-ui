@@ -25,7 +25,7 @@ struct xitk_skin_element_info_s {
   /* all */
   int x, y;
   int visibility, enability;
-  char *pixmap_name;
+  const char *pixmap_name;
   xitk_part_image_t pixmap_img;
   /* button list */
   int max_buttons, direction;
@@ -36,13 +36,13 @@ struct xitk_skin_element_info_s {
   int label_animation, label_animation_step;
   unsigned long int label_animation_timer;
   uint32_t label_color, label_color_focus, label_color_click;
-  char *label_fontname;
-  char *label_pixmap_font_name, *label_pixmap_highlight_font_name;
-  char *label_pixmap_font_format;
+  const char *label_fontname;
+  const char *label_pixmap_font_name, *label_pixmap_highlight_font_name;
+  const char *label_pixmap_font_format;
   xitk_image_t *label_pixmap_font_img, *label_pixmap_highlight_font_img;
   /* slider */
   int slider_type, slider_radius;
-  char *slider_pixmap_pad_name;
+  const char *slider_pixmap_pad_name;
   xitk_part_image_t slider_pixmap_pad_img;
 };
 

@@ -2994,45 +2994,53 @@ static const xitk_color_names_t xitk_sorted_color_names[] = {
   { "yellowgreen",            154, 205,  50 }
 };
 
-uint32_t xitk_str2uint32 (const char **str) {
+int32_t xitk_str2int32 (const char **str) {
   const uint8_t *p;
-  uint32_t v = 0;
+  uint32_t v = 0, sign = 0;
+  int32_t w;
   uint8_t z;
 
   if (!str)
     return 0;
   p = (const uint8_t *)*str;
-  if (!p)
-    return 0;
+  if (*p == '~')
+    sign |= 2, p++;
+  while (*p == '-')
+    sign ^= 1, p++;
 
   do {
     if (*p == '#') {
       p++;
+      /* hex */
+      while ((z = tab_unhex[*p]) < 16u)
+        v = (v << 4) + z, p++;
       break;
     }
     if (*p == '0') {
       p++;
       if ((*p | 0x20) == 'x') {
         p++;
+        /* hex */
+        while ((z = tab_unhex[*p]) < 16u)
+          v = (v << 4) + z, p++;
         break;
       }
       /* octal */
       while ((z = *p ^ '0') < 8u)
         v = (v << 3) + z, p++;
-      *str = (const char *)p;
-      return v;
+      break;
     }
     /* decimal */
     while ((z = *p ^ '0') < 10u)
       v = v * 10u + z, p++;
-    *str = (const char *)p;
-    return v;
   } while (0);
-  /* hex */
-  while ((z = tab_unhex[*p]) < 16u)
-    v = (v << 4) + z, p++;
   *str = (const char *)p;
-  return v;
+  w = (int32_t)v;
+  if (sign & 1)
+    w = -w;
+  if (sign & 2)
+    w = ~w;
+  return w;
 }
 
 /* Return a rgb color from a string color. */
@@ -3048,7 +3056,7 @@ uint32_t xitk_get_color_name (const char *color) {
 
   /* try plain int */
   s = color;
-  v = xitk_str2uint32 (&s);
+  v = xitk_str2int32 (&s);
   if (s > color)
     return v;
 

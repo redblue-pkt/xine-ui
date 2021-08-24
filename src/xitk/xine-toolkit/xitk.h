@@ -105,7 +105,8 @@ typedef struct {
 xitk_cfg_parse_t *xitk_cfg_parse (char *contents, int flags);
 void xitk_cfg_unparse (xitk_cfg_parse_t *tree);
 
-uint32_t xitk_str2uint32 (const char **str);
+/* supports "#<hex>", "0x<hex>". "0<octal", "<decimal>". */
+int32_t xitk_str2int32 (const char **str);
 
 /* supports some real names, "#rrggbb", "0xrrggbb".
  * returns (red << 16) | (green << 8) | blue, or ~0u. */
