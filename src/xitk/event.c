@@ -1777,7 +1777,7 @@ void gui_run(gGui_t *gui, char **session_opts) {
   gui->logo_has_changed++;
 
   panel_add_autoplay_buttons (gui->panel);
-  panel_show_tips (gui->panel);
+/*panel_show_tips (gui->panel);*/
   panel_add_mixer_control (gui->panel);
   panel_update_channel_display (gui->panel);
   panel_update_mrl_display (gui->panel);
