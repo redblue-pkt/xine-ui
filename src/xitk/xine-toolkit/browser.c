@@ -53,7 +53,7 @@ typedef enum {
 typedef struct _browser_private_s {
   xitk_widget_t           w;
   xitk_skin_config_t     *skonfig;
-  xitk_short_string_t     skin_element_name;
+  char                    skin_element_name[64];
   struct {
     const char * const   *names;
     const char * const   *shortcuts;
@@ -164,7 +164,7 @@ static void _browser_set_hslider (_browser_private_t *wp, int reset) {
                    : 0;
 
     pos = reset ? wp->visible.x0 : xitk_slider_get_pos (wp->visible.btns[_W_hor]);
-    if (wp->skin_element_name.s) {
+    if (wp->skin_element_name[0]) {
       xitk_slider_set_min (wp->visible.btns[_W_hor], 0);
       xitk_slider_set_max (wp->visible.btns[_W_hor], dw);
       if (pos > dw)
@@ -213,7 +213,7 @@ static void _browser_set_vslider (_browser_private_t *wp) {
   } else {
     able = ~0u;
   }
-  if (wp->skin_element_name.s) {
+  if (wp->skin_element_name[0]) {
     xitk_slider_set_min (wp->visible.btns[_W_vert], 0);
     xitk_slider_set_max (wp->visible.btns[_W_vert], wp->visible.ymax);
     xitk_widgets_state (wp->visible.btns + _W_up, 3, XITK_WIDGET_STATE_ENABLE, able);
@@ -336,7 +336,7 @@ static void browser_select(xitk_widget_t *w, void *data, int state, int modifier
 }
 
 static void _browser_hide_set_pos (_browser_private_t *wp) {
-  int h = xitk_get_widget_height (wp->visible.btns[_W_items]) + (wp->skin_element_name.s ? 1 : 0);
+  int h = xitk_get_widget_height (wp->visible.btns[_W_items]) + (wp->skin_element_name ? 1 : 0);
   int i, y = wp->visible.y;
   for (i = 0; i < wp->visible.max; i++) {
     int v = wp->visible.i2v[i];
@@ -523,7 +523,7 @@ static void _browser_item_btns (_browser_private_t *wp, const xitk_skin_element_
     lb.button_type       = RADIO_BUTTON;
     lb.align             = ALIGN_DEFAULT;
     lb.state_callback    = browser_select;
-    lb.skin_element_name = wp->skin_element_name.s;
+    lb.skin_element_name = wp->skin_element_name;
     lb.callback          = NULL;
 
     for (i = keep; i < n; i++) {
@@ -575,11 +575,11 @@ static void _browser_item_btns (_browser_private_t *wp, const xitk_skin_element_
 }
 
 static void _browser_new_skin (_browser_private_t *wp, xitk_skin_config_t *skonfig) {
-  if (wp->skin_element_name.s) {
+  if (wp->skin_element_name[0]) {
     const xitk_skin_element_info_t *info;
 
     xitk_skin_lock (skonfig);
-    info = xitk_skin_get_info (skonfig, wp->skin_element_name.s);
+    info = xitk_skin_get_info (skonfig, wp->skin_element_name);
 
     wp->skonfig = skonfig;
     xitk_widget_state_from_info (&wp->w, info);
@@ -598,7 +598,6 @@ static void _browser_new_skin (_browser_private_t *wp, xitk_skin_config_t *skonf
 
 static void _browser_notify_destroy (_browser_private_t *wp) {
   xitk_short_string_deinit (&wp->visible.fontname);
-  xitk_short_string_deinit (&wp->skin_element_name);
 }
 
 static void _browser_enability (_browser_private_t *wp) {
@@ -1059,10 +1058,10 @@ xitk_widget_t *xitk_browser_create(xitk_widget_list_t *wl,
   wp->slider_width = 1;
   wp->with_hslider = 1;
   wp->with_vslider = 1;
-
-  xitk_short_string_init (&wp->skin_element_name);
-  xitk_short_string_set (&wp->skin_element_name, br->browser.skin_element_name);
-  info = xitk_skin_get_info (skonfig, wp->skin_element_name.s);
+  strlcpy (wp->skin_element_name,
+    br->browser.skin_element_name && br->browser.skin_element_name[0] ? br->browser.skin_element_name : "-",
+    sizeof (wp->skin_element_name));
+  info = xitk_skin_get_info (skonfig, wp->skin_element_name);
   xitk_short_string_init (&wp->visible.fontname);
   xitk_short_string_set (&wp->visible.fontname, info ? info->label_fontname : NULL);
   _browser_set_items (wp, br->browser.entries, NULL, br->browser.num_entries);
@@ -1135,7 +1134,7 @@ xitk_widget_t *xitk_noskin_browser_create (xitk_widget_list_t *wl, const xitk_br
 
   wp->w.x = wp->visible.x = x;
   wp->w.y = wp->visible.y = y;
-  wp->skin_element_name.s = NULL;
+  wp->skin_element_name[0] = 0;
   xitk_short_string_init (&wp->visible.fontname);
   xitk_short_string_set (&wp->visible.fontname, fontname);
 
@@ -1260,7 +1259,7 @@ xitk_widget_t *xitk_noskin_browser_create (xitk_widget_list_t *wl, const xitk_br
   }
 
   wp->w.state &= ~(XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
-  wp->skin_element_name.s = NULL;
+  wp->skin_element_name[0] = 0;
   wp->skonfig = NULL;
   return _xitk_browser_create (wp, br);
 }

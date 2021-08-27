@@ -45,7 +45,7 @@ typedef enum {
 typedef struct {
   xitk_widget_t           w;
 
-  xitk_short_string_t     skin_element_name;
+  char                    skin_element_name[64];
 
   xitk_window_t          *xwin;
 
@@ -275,7 +275,6 @@ static void _combo_destroy (_combo_private_t *wp) {
     _combo_rollunroll (wp->iw[_W_button], (void *)wp, 0);
   xitk_widgets_delete (wp->iw + _W_label, 2);
   XITK_FREE (wp->entries);
-  xitk_short_string_deinit (&wp->skin_element_name);
 }
 
 /*
@@ -304,8 +303,8 @@ static void _combo_paint (_combo_private_t *wp) {
  *
  */
 static void _combo_new_skin (_combo_private_t *wp, xitk_skin_config_t *skonfig) {
-  if (wp->skin_element_name.s) {
-    const xitk_skin_element_info_t *info = xitk_skin_get_info (skonfig, wp->skin_element_name.s);
+  if (wp->skin_element_name[0]) {
+    const xitk_skin_element_info_t *info = xitk_skin_get_info (skonfig, wp->skin_element_name);
     int x, y;
 
     xitk_skin_lock (skonfig);
@@ -488,10 +487,11 @@ static xitk_widget_t *_combo_create (xitk_widget_list_t *wl, xitk_combo_widget_t
   wp->xwin = NULL;
 
   if (skin_element_name) {
-    xitk_short_string_init (&wp->skin_element_name);
-    xitk_short_string_set (&wp->skin_element_name, skin_element_name);
+    strlcpy (wp->skin_element_name,
+      skin_element_name && skin_element_name[0] ? skin_element_name : "-",
+      sizeof (wp->skin_element_name));
   } else {
-    wp->skin_element_name.s = NULL;
+    wp->skin_element_name[0] = 0;
   }
   wp->iw[_W_combo]      = &wp->w;
   wp->parent_wlist      = wl;
