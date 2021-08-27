@@ -54,7 +54,8 @@ typedef enum {
 typedef struct {
   xitk_widget_t           w;
 
-  xitk_short_string_t     skin_element_name, fontname;
+  char                    skin_element_name[64];
+  xitk_short_string_t     fontname;
   uint32_t                color[_IT_END];
 
   xitk_part_image_t       skin;
@@ -319,10 +320,9 @@ static void _cursor_focus (_inputtext_private_t *wp, int focus) {
 static void _notify_destroy (_inputtext_private_t *wp) {
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
     xitk_image_free_image (&wp->text.temp_img.image);
-    if (!wp->skin_element_name.s)
+    if (!wp->skin_element_name[0])
       xitk_image_free_image (&wp->skin.image);
 
-    xitk_short_string_deinit (&wp->skin_element_name);
     _inputtext_sbuf_unset (wp);
     xitk_short_string_deinit (&wp->fontname);
   }
@@ -607,7 +607,7 @@ static int _notify_click_inputtext (_inputtext_private_t *wp, int button, int bU
  *
  */
 static void _xitk_inputtext_apply_skin (_inputtext_private_t *wp, xitk_skin_config_t *skonfig) {
-  const xitk_skin_element_info_t *s = xitk_skin_get_info (skonfig, wp->skin_element_name.s);
+  const xitk_skin_element_info_t *s = xitk_skin_get_info (skonfig, wp->skin_element_name);
   if (s) {
     wp->w.x = s->x;
     wp->w.y = s->y;
@@ -621,7 +621,7 @@ static void _xitk_inputtext_apply_skin (_inputtext_private_t *wp, xitk_skin_conf
 
 static void _notify_change_skin (_inputtext_private_t *wp, xitk_skin_config_t *skonfig) {
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
-    if (wp->skin_element_name.s) {
+    if (wp->skin_element_name[0]) {
       xitk_image_free_image (&wp->text.temp_img.image);
 
       xitk_skin_lock(skonfig);
@@ -1086,7 +1086,7 @@ static xitk_widget_t *_xitk_inputtext_create (_inputtext_private_t *wp, xitk_inp
 
   wp->text.box_width    = wp->w.width - 2 * 2;
   wp->text.box_start    = 2;
-  if (!wp->skin_element_name.s) {
+  if (!wp->skin_element_name[0]) {
     wp->text.box_width -= 2 * 1;
     wp->text.box_start += 1;
   }
@@ -1119,9 +1119,9 @@ xitk_widget_t *xitk_inputtext_create (xitk_widget_list_t *wl,
   wp = (_inputtext_private_t *)xitk_widget_new (wl, sizeof (*wp));
   if (!wp)
     return NULL;
-
-  xitk_short_string_init (&wp->skin_element_name);
-  xitk_short_string_set (&wp->skin_element_name, it->skin_element_name);
+  strlcpy (wp->skin_element_name,
+    it->skin_element_name && it->skin_element_name[0] ? it->skin_element_name : "-",
+    sizeof (wp->skin_element_name));
   xitk_short_string_init (&wp->fontname);
 
   _xitk_inputtext_apply_skin (wp, skonfig);
@@ -1156,7 +1156,7 @@ xitk_widget_t *xitk_noskin_inputtext_create (xitk_widget_list_t *wl,
   wp->color[_IT_NORMAL] = ncolor;
   wp->color[_IT_FOCUS] = fcolor;
 
-  wp->skin_element_name.s = NULL;
+  wp->skin_element_name[0] = 0;
   if (xitk_shared_image (wl, "xitk_inputtext", width * 2, height, &wp->skin.image) == 1)
     xitk_image_draw_bevel_two_state (wp->skin.image);
   wp->skin.x = 0;

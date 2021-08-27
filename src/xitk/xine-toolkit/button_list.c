@@ -50,7 +50,7 @@ typedef struct {
   xitk_widget_t       w;
   xitk_skin_config_t *skin_config;
   xitk_widget_list_t *widget_list;
-  xitk_short_string_t skin_element_name;
+  char                skin_element_name[64];
   int                 flags, num, visible, first, last;
   int                 x, y, dx, dy;
   uint32_t            widget_type_flags;
@@ -128,8 +128,6 @@ static void xitk_button_list_delete (xitk_button_list_t *bl) {
   xitk_widgets_delete (bl->widgets, bl->first);
   if (bl->num <= bl->visible)
     xitk_widgets_delete (&bl->swap, 1);
-
-  xitk_short_string_deinit (&bl->skin_element_name);
   bl->swap = NULL;
 }
 
@@ -184,7 +182,7 @@ static void xitk_button_list_new_skin (xitk_button_list_t *bl, xitk_skin_config_
   }
 
   bl->skin_config = skin_config;
-  info = xitk_skin_get_info (bl->skin_config, bl->skin_element_name.s);
+  info = xitk_skin_get_info (bl->skin_config, bl->skin_element_name);
   max = info ? info->max_buttons : 0;
   if (max <= 0)
     max = 10000;
@@ -202,7 +200,7 @@ static void xitk_button_list_new_skin (xitk_button_list_t *bl, xitk_skin_config_
     /* more "   " */
     xitk_labelbutton_widget_t lb;
     XITK_WIDGET_INIT (&lb);
-    lb.skin_element_name = bl->skin_element_name.s;
+    lb.skin_element_name = bl->skin_element_name;
     lb.button_type       = CLICK_BUTTON;
     lb.align             = ALIGN_DEFAULT;
     lb.callback          = NULL;
@@ -315,8 +313,7 @@ xitk_widget_t *xitk_button_list_new (
   if (!bl)
     return NULL;
   bl->skin_config = skin_config;
-  xitk_short_string_init (&bl->skin_element_name);
-  xitk_short_string_set (&bl->skin_element_name, skin_element_name);
+  strlcpy (bl->skin_element_name, skin_element_name, sizeof (bl->skin_element_name));
   bl->flags = 1;
 
   bl->widget_type_flags = widget_type_flags | WIDGET_GROUP_BUTTON_LIST;
@@ -350,7 +347,7 @@ xitk_widget_t *xitk_button_list_new (
   bl->add_here = (xitk_widget_t *)widget_list->list.tail.prev;
 
   XITK_WIDGET_INIT (&lb);
-  lb.skin_element_name = bl->skin_element_name.s;
+  lb.skin_element_name = bl->skin_element_name;
   lb.button_type       = CLICK_BUTTON;
   lb.align             = ALIGN_DEFAULT;
   lb.callback          = callback;

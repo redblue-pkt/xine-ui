@@ -51,7 +51,8 @@ typedef struct {
   int                     label_static;
   int                     shortcut_pos;
 
-  xitk_short_string_t     label, shortcut_label, font, shortcut_font, skin_element_name;
+  char                    skin_element_name[64];
+  xitk_short_string_t     label, shortcut_label, font, shortcut_font;
   uint32_t                color[XITK_IMG_STATE_SELECTED + 1];
 } _lbutton_private_t;
 
@@ -88,10 +89,9 @@ size_t xitk_short_string_set (xitk_short_string_t *s, const char *v) {
  */
 static void _labelbutton_destroy (_lbutton_private_t *wp) {
   xitk_image_free_image (&wp->temp_image.image);
-  if (!wp->skin_element_name.s)
+  if (!wp->skin_element_name[0])
     xitk_image_free_image (&wp->skin.image);
 
-  xitk_short_string_deinit (&wp->skin_element_name);
   xitk_short_string_deinit (&wp->label);
   xitk_short_string_deinit (&wp->shortcut_label);
   xitk_short_string_deinit (&wp->font);
@@ -364,11 +364,11 @@ const char *xitk_labelbutton_get_shortcut_label (xitk_widget_t *w) {
  *
  */
 static void _labelbutton_new_skin (_lbutton_private_t *wp, xitk_skin_config_t *skonfig) {
-  if (wp->skin_element_name.s) {
+  if (wp->skin_element_name[0]) {
     const xitk_skin_element_info_t *info;
 
     xitk_skin_lock (skonfig);
-    info = xitk_skin_get_info (skonfig, wp->skin_element_name.s);
+    info = xitk_skin_get_info (skonfig, wp->skin_element_name);
     if (info) {
       wp->skin = info->pixmap_img;
       wp->color[XITK_IMG_STATE_NORMAL] = info->label_color;
@@ -567,9 +567,9 @@ xitk_widget_t *xitk_info_labelbutton_create (xitk_widget_list_t *wl,
   wp->temp_image.y = 0;
   wp->temp_image.width = wp->skin.width / 3;
   wp->temp_image.height = wp->skin.height;
-
-  xitk_short_string_init (&wp->skin_element_name);
-  xitk_short_string_set (&wp->skin_element_name, b->skin_element_name);
+  strlcpy (wp->skin_element_name,
+    b->skin_element_name && b->skin_element_name[0] ? b->skin_element_name : "-",
+    sizeof (wp->skin_element_name));
 
   wp->color[XITK_IMG_STATE_NORMAL] = info->label_color;
   wp->color[XITK_IMG_STATE_FOCUS] = info->label_color_focus;
@@ -687,7 +687,7 @@ xitk_widget_t *xitk_noskin_labelbutton_create (xitk_widget_list_t *wl,
   wp->temp_image.width = wp->skin.width / 4;
   wp->temp_image.height = wp->skin.height;
 
-  wp->skin_element_name.s = NULL;
+  wp->skin_element_name[0] = 0;
   wp->color[XITK_IMG_STATE_NORMAL] = ncolor;
   wp->color[XITK_IMG_STATE_FOCUS] = fcolor;
   wp->color[XITK_IMG_STATE_SELECTED] = ccolor;

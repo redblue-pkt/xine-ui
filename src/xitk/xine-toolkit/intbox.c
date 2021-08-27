@@ -44,7 +44,7 @@ typedef struct {
   xitk_widget_t        w;
 
   xitk_intbox_widget_t info;
-  xitk_short_string_t  skin_element_name;
+  char                    skin_element_name[64];
 
   int                  input_width, slider_width, pm_width;
   xitk_slider_hv_t     hv;
@@ -159,7 +159,6 @@ static void _ib_enability (_intbox_private_t *wp) {
  */
 static void _ib_destroy (_intbox_private_t *wp) {
   xitk_widgets_delete (wp->iw + _W_input, 4);
-  xitk_short_string_deinit (&wp->skin_element_name);
 }
 
 /*
@@ -181,7 +180,7 @@ static void _ib_paint (_intbox_private_t *wp) {
  *
  */
 static void _ib_new_skin (_intbox_private_t *wp, xitk_skin_config_t *skonfig) {
-  if (wp->skin_element_name.s) {
+  if (wp->skin_element_name[0]) {
 #if 0
     int x, y;
     xitk_skin_lock (skonfig);
@@ -401,7 +400,7 @@ xitk_widget_t *xitk_noskin_intbox_create (xitk_widget_list_t *wl,
   wp->w.event    = notify_event;
 
   wp->info = *ib;
-  wp->skin_element_name.s = NULL;
+  wp->skin_element_name[0] = 0;
 
   if (wp->info.min >= wp->info.max) {
     int v = ~(unsigned int)0 >> 1;

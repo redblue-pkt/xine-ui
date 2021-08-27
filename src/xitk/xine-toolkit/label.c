@@ -35,7 +35,8 @@
 typedef struct {
   xitk_widget_t           w;
 
-  xitk_short_string_t     skin_element_name, fontname, label;
+  char                    skin_element_name[64];
+  xitk_short_string_t     fontname, label;
 
   xitk_image_t           *labelpix;
 
@@ -215,14 +216,13 @@ static void _label_destroy (_label_private_t *wp) {
 
     xitk_image_free_image (&(wp->labelpix));
 
-    if (!wp->skin_element_name.s) {
+    if (!wp->skin_element_name[0]) {
       xitk_image_free_image (&(wp->font));
       xitk_image_free_image (&(wp->highlight_font));
     }
 
     xitk_short_string_deinit (&wp->label);
     xitk_short_string_deinit (&wp->fontname);
-    xitk_short_string_deinit (&wp->skin_element_name);
 
     pthread_mutex_unlock (&wp->change_mutex);
     pthread_mutex_destroy (&wp->change_mutex);
@@ -264,7 +264,7 @@ static void _label_paint (_label_private_t *wp, widget_event_t *event) {
     xitk_image_t *font = (xitk_image_t *) wp->font;
 
     /* non skinable widget */
-    if (!(wp->skin_element_name.s)) {
+    if (!wp->skin_element_name[0]) {
       xitk_font_t *fs = xitk_font_load_font (wp->w.wl->xitk, wp->fontname.s);
       xitk_image_t *bg = xitk_image_new (wp->w.wl->xitk, NULL, 0, wp->w.width, wp->w.height);
 
@@ -344,7 +344,7 @@ static void _label_setup_label (_label_private_t *wp, int paint) {
   /* Inform animation thread to not paint the label */
   pthread_mutex_lock (&wp->change_mutex);
 
-  if (wp->skin_element_name.s) {
+  if (wp->skin_element_name[0]) {
     _create_label_pixmap (wp);
   } else {
     xitk_image_free_image (&(wp->labelpix));
@@ -399,11 +399,11 @@ static void _label_setup_label (_label_private_t *wp, int paint) {
  */
 static void _label_new_skin (_label_private_t *wp, xitk_skin_config_t *skonfig) {
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL)) {
-    if (wp->skin_element_name.s) {
+    if (wp->skin_element_name[0]) {
       const xitk_skin_element_info_t *info;
 
       xitk_skin_lock(skonfig);
-      info = xitk_skin_get_info (skonfig, wp->skin_element_name.s);
+      info = xitk_skin_get_info (skonfig, wp->skin_element_name);
       if (info && info->label_pixmap_font_img) {
         wp->font          = info->label_pixmap_font_img;
         wp->highlight_font = info->label_pixmap_highlight_font_img;
@@ -570,9 +570,9 @@ xitk_widget_t *xitk_label_create (xitk_widget_list_t *wl, xitk_skin_config_t *sk
   wp = (_label_private_t *)xitk_widget_new (wl, sizeof (*wp));
   if (!wp)
     return NULL;
-
-  xitk_short_string_init (&wp->skin_element_name);
-  xitk_short_string_set (&wp->skin_element_name, l->skin_element_name);
+  strlcpy (wp->skin_element_name,
+    l->skin_element_name && l->skin_element_name[0] ? l->skin_element_name : "-",
+    sizeof (wp->skin_element_name));
   xitk_short_string_init (&wp->fontname);
 
   info = xitk_skin_get_info (skonfig, l->skin_element_name);
@@ -635,7 +635,7 @@ xitk_widget_t *xitk_noskin_label_create (xitk_widget_list_t *wl,
   if (!wp)
     return NULL;
 
-  wp->skin_element_name.s = NULL;
+  wp->skin_element_name[0] = 0;
   wp->w.state    &= ~(XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
   wp->w.x       = x;
   wp->w.y       = y;
@@ -665,3 +665,4 @@ xitk_widget_t *xitk_noskin_label_create (xitk_widget_list_t *wl,
 
   return _label_create (wp, l);
 }
+

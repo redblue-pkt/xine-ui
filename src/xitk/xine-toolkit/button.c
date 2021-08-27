@@ -31,7 +31,7 @@
 typedef struct {
   xitk_widget_t       w;
 
-  xitk_short_string_t skin_element_name;
+  char                    skin_element_name[64];
   int                 s5;
   xitk_part_image_t   skin;
 
@@ -45,9 +45,8 @@ typedef struct {
  *
  */
 static void _button_destroy (_button_private_t *wp) {
-  if (!wp->skin_element_name.s)
+  if (!wp->skin_element_name[0])
     xitk_image_free_image (&wp->skin.image);
-  xitk_short_string_deinit (&wp->skin_element_name);
 }
 
 /*
@@ -99,7 +98,7 @@ static void _button_paint (_button_private_t *wp, widget_event_t *event) {
 }
 
 static void _button_read_skin (_button_private_t *wp, xitk_skin_config_t *skonfig) {
-  const xitk_skin_element_info_t *s = xitk_skin_get_info (skonfig, wp->skin_element_name.s);
+  const xitk_skin_element_info_t *s = xitk_skin_get_info (skonfig, wp->skin_element_name);
 
   xitk_widget_state_from_info (&wp->w, s);
   if (s) {
@@ -121,7 +120,7 @@ static void _button_read_skin (_button_private_t *wp, xitk_skin_config_t *skonfi
  *
  */
 static void _button_new_skin (_button_private_t *wp, xitk_skin_config_t *skonfig) {
-  if (wp->skin_element_name.s) {
+  if (wp->skin_element_name[0]) {
     xitk_skin_lock (skonfig);
     _button_read_skin (wp, skonfig);
     xitk_skin_unlock (skonfig);
@@ -254,9 +253,9 @@ xitk_widget_t *xitk_button_create (xitk_widget_list_t *wl,
   if (!wp)
     return NULL;
 
-  wp->s5 = 0;
-  xitk_short_string_init (&wp->skin_element_name);
-  xitk_short_string_set (&wp->skin_element_name, b->skin_element_name);
+  wp->s5 = 0;  strlcpy (wp->skin_element_name,
+    b->skin_element_name && b->skin_element_name[0] ? b->skin_element_name : "-",
+    sizeof (wp->skin_element_name));
   _button_read_skin (wp, skonfig);
 
   return _xitk_button_create (wp, b);
@@ -333,7 +332,7 @@ xitk_widget_t *xitk_noskin_button_create (xitk_widget_list_t *wl,
 
   wp->w.x = x;
   wp->w.y = y;
-  wp->skin_element_name.s = NULL;
+  wp->skin_element_name[0] = 0;
   wp->skin.image = i;
   wp->skin.x        = 0;
   wp->skin.y        = 0;
