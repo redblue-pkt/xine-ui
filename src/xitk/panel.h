@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -30,9 +30,11 @@ void panel_update_nextprev_tips (xui_panel_t *panel);
 int is_playback_widgets_enabled (xui_panel_t *panel);
 void enable_playback_controls (xui_panel_t *panel, int enable);
 
+/*
 void panel_show_tips (xui_panel_t *panel);
 int panel_get_tips_enable (xui_panel_t *panel);
 unsigned long panel_get_tips_timeout (xui_panel_t *panel);
+*/
 void panel_raise_window(xui_panel_t *panel);
 void panel_get_window_position(xui_panel_t *panel, int *px, int *py, int *pw, int *ph);
 
@@ -56,9 +58,9 @@ void panel_toggle_audio_mute(xitk_widget_t *w, void *data, int status);
 void panel_snapshot(xitk_widget_t *w, void *data);
 
 void panel_check_pause (xui_panel_t *panel);
-void panel_check_mute (xui_panel_t *panel);
+/* void panel_check_mute (xui_panel_t *panel); */
 
-void panel_reset_runtime_label (xui_panel_t *panel);
+/* void panel_reset_runtime_label (xui_panel_t *panel); */
 void panel_reset_slider (xui_panel_t *panel);
 
 void panel_update_slider (xui_panel_t *panel, int pos);
@@ -68,6 +70,5 @@ void panel_update_mrl_display (xui_panel_t *panel);
 void panel_update_mixer_display (xui_panel_t *panel);
 
 void panel_set_title (xui_panel_t *panel, char*);
-
 
 #endif
