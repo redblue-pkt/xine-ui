@@ -2088,24 +2088,58 @@ int xitk_get_bool_value(const char *val) {
   return 0;
 }
 
-static const uint8_t tab_tolower[256] = {
-    0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
-   16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
-   32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,
-   48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63,
-   64,'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o',
-  'p','q','r','s','t','u','v','w','x','y','z', 91, 92, 93, 94, 95,
-   96,'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o',
-  'p','q','r','s','t','u','v','w','x','y','z',123,124,125,126,127,
-  128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,
-  144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,
-  160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,
-  176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,191,
-  192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,
-  208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,
-  224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,
-  240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255
-};
+static void _xitk_lower (uint8_t *s, size_t l) {
+  static const union {
+    uint8_t b[4];
+    uint32_t w;
+  } bmask[8] = {
+    {{  0,  0,  0,  0}},
+    {{128,  0,  0,  0}},
+    {{128,128,  0,  0}},
+    {{128,128,128,  0}},
+    {{128,128,128,128}},
+    {{  0,128,128,128}},
+    {{  0,  0,128,128}},
+    {{  0,  0,  0,128}}
+  };
+  uint32_t *p = (uint32_t *)((uintptr_t)s & ~(uintptr_t)3);
+  size_t n = s - (uint8_t *)p;
+
+  l += n;
+  {
+    uint32_t v, mask;
+    mask = bmask[4 + n].w;
+    mask &= ~*p;
+    v = *p | 0x80808080;
+    mask &= v - 0x41414141; /* 4 * 'A' */
+    mask &= ~(v - 0x5b5b5b5b); /* 4 * ('Z' + 1) */
+    if (l <= 4) {
+      mask &= bmask[l].w;
+      *p |= mask >> 2;
+      return;
+    }
+    *p++ |= mask >> 2;
+    l -= 4;
+  }
+  while (l >= 4) {
+    uint32_t v, mask;
+    mask = ~*p & 0x80808080;
+    v = *p | 0x80808080;
+    mask &= v - 0x41414141; /* 4 * 'A' */
+    mask &= ~(v - 0x5b5b5b5b); /* 4 * ('Z' + 1) */
+    *p++ |= mask >> 2;
+    l -= 4;
+  }
+  if (l) {
+    uint32_t v, mask;
+    mask = bmask[l].w;
+    mask &= ~*p;
+    v = *p | 0x80808080;
+    mask &= v - 0x41414141; /* 4 * 'A' */
+    mask &= ~(v - 0x5b5b5b5b); /* 4 * ('Z' + 1) */
+    *p++ |= mask >> 2;
+  }
+}
 
 size_t ATTR_INLINE_ALL_STRINGOPS xitk_lower_strlcpy (char *dest, const char *src, size_t dlen) {
   uint8_t *q = (uint8_t *)dest;
@@ -2119,9 +2153,9 @@ size_t ATTR_INLINE_ALL_STRINGOPS xitk_lower_strlcpy (char *dest, const char *src
     return l;
   if (l + 1 < dlen)
     dlen = l + 1;
-  while (--dlen)
-    *q++ = tab_tolower[*p++];
-  *q = 0;
+  memcpy (q, p, dlen);
+  _xitk_lower (q, dlen);
+  q[dlen] = 0;
   return l;
 }
     
@@ -2206,17 +2240,13 @@ xitk_cfg_parse_t *xitk_cfg_parse (char *contents, int flags) {
           oldstate = state;
           state = XCP_NEW_NODE;
         } else {
+          uint8_t *key = p;
           item->key = p - start;
           item = NULL;
-          if (flags & XITK_CFG_PARSE_CASE) {
-            while (!((z = tab_cfg_parse[*p]) & 0xfd))
-              p++;
-          } else {
-            while (!((z = tab_cfg_parse[*p]) & 0xfd)) {
-              *p = tab_tolower[*p];
-              p++;
-            }
-          }
+          while (!((z = tab_cfg_parse[*p]) & 0xfd))
+            p++;
+          if (!(flags & XITK_CFG_PARSE_CASE))
+            _xitk_lower (key, p - key);
           *e = 0;
           e = p;
           oldstate = XCP_FIND_VALUE;
@@ -3061,14 +3091,7 @@ uint32_t xitk_get_color_name (const char *color) {
     return v;
 
   /* convert copied color to lowercase */
-  {
-    const uint8_t *p = (const uint8_t *)color;
-    char *q = lname, *e = q + sizeof (lname) - 1;
-
-    while (*p && (q < e))
-      *q++ = tab_tolower[*p++];
-    *q = 0;
-  }
+  xitk_lower_strlcpy (lname, color, sizeof (lname));
   {
     unsigned int b = 0, m, e = sizeof (xitk_sorted_color_names) / sizeof (xitk_sorted_color_names[0]);
     int d;
@@ -3090,3 +3113,4 @@ uint32_t xitk_get_color_name (const char *color) {
   }
   return ~0u;
 }
+
