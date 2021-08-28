@@ -144,9 +144,9 @@ void xitk_set_xmb_enability(xitk_t *, int value);
 
 void xitk_set_current_menu(xitk_t *, xitk_widget_t *menu);
 void xitk_unset_current_menu(xitk_t *);
-
-void *labelbutton_get_user_data(xitk_widget_t *w);
-void menu_auto_pop(xitk_widget_t *w);
+void *labelbutton_get_user_data (xitk_widget_t *w);
+xitk_widget_t *xitk_menu_get_menu (xitk_widget_t *w);
+void xitk_menu_auto_pop (xitk_widget_t *w);
 
 int xitk_get_bool_value(const char *val);
 

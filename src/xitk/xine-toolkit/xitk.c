@@ -1350,21 +1350,6 @@ static void xitk_handle_event (__xitk_t *xitk, xitk_be_event_t *event) {
             if ((t[kbuf[1]] == 1) || (w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT) && (t[kbuf[1]] & 34))) {
               handled = 1;
               xitk_set_focus_to_next_widget (&fx->wl, (modifier & MODIFIER_SHIFT), modifier);
-            } else if (kbuf[1] == XITK_KEY_ESCAPE) {
-              if (w && (w->type & WIDGET_GROUP_MENU)) {
-                /* close menu */
-                handled = 1;
-                w = xitk_menu_get_menu (w);
-                xitk_widgets_delete (&w, 1);
-              }
-            } else if ((kbuf[1] == XITK_KEY_LEFT) && w && (w->type & WIDGET_GROUP_MENU)) {
-              /* close menu branch */
-              handled = 1;
-              xitk_menu_destroy_branch (w);
-            } else if ((t[kbuf[1]] & 24) && w && (w->type & WIDGET_GROUP_MENU)) {
-              /* next/previous menu item */
-              handled = 1;
-              xitk_set_focus_to_next_widget (&fx->wl, (t[kbuf[1]] & 8), modifier);
             }
           }
         }
@@ -1437,12 +1422,6 @@ static void xitk_handle_event (__xitk_t *xitk, xitk_be_event_t *event) {
         xitk_tagitem_t tags[] = {
           {XITK_TAG_X, 0}, {XITK_TAG_Y, 0}, {XITK_TAG_END, 0}
         };
-
-        if (fx->wl.widget_under_mouse && (fx->wl.widget_under_mouse->type & WIDGET_GROUP_MENU)) {
-          xitk_widget_t *menu = xitk_menu_get_menu(fx->wl.widget_focused);
-          if (xitk_menu_show_sub_branchs (menu))
-            xitk_menu_destroy_sub_branchs (menu);
-        }
 
         fx->new_pos.x = fx->old_pos.x + event->w - fx->move.offset_x;
         fx->new_pos.y = fx->old_pos.y + event->h - fx->move.offset_y;
@@ -3113,4 +3092,3 @@ uint32_t xitk_get_color_name (const char *color) {
   }
   return ~0u;
 }
-
