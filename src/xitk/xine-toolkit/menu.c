@@ -665,19 +665,6 @@ static int menu_notify_event(xitk_widget_t *w, widget_event_t *event, widget_eve
   return 0;
 }
 
-xitk_widget_t *xitk_menu_get_menu (xitk_widget_t *w) {
-  if (!w)
-    return NULL;
-  if ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_MENU)
-    return w;
-  if ((w->type & (WIDGET_GROUP_MENU | WIDGET_TYPE_MASK)) == (WIDGET_GROUP_MENU | WIDGET_TYPE_LABELBUTTON)) {
-    _menu_node_t *me = (_menu_node_t *)labelbutton_get_user_data (w);
-    if (me)
-      return &me->wp->w;
-  }
-  return NULL;
-}
-
 void xitk_menu_auto_pop (xitk_widget_t *w) {
   _menu_node_t *me;
 

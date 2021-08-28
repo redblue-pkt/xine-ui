@@ -495,7 +495,7 @@ void xitk_motion_notify_widget_list (xitk_widget_list_t *wl, int x, int y, unsig
  */
 int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int button, int bUp, int modifier) {
   int                    bRepaint = 0;
-  xitk_widget_t         *w, *menu = NULL;
+  xitk_widget_t         *w;
   widget_event_t         event;
 
   if(!wl) {
@@ -534,8 +534,6 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int but
         xitk_tips_hide_tips (wl->xitk->tips);
         if ((wl->widget_focused->type & WIDGET_FOCUSABLE) &&
           (wl->widget_focused->state & XITK_WIDGET_STATE_ENABLE)) {
-          if (wl->widget_focused->type & WIDGET_GROUP_MENU)
-            menu = xitk_menu_get_menu (wl->widget_focused);
           wl->widget_focused->state &= ~(XITK_WIDGET_STATE_MOUSE | XITK_WIDGET_STATE_FOCUS);
         }
         _xitk_widget_paint (wl->widget_focused, &event);
@@ -609,9 +607,6 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int but
         wl->widget_pressed = NULL;
     }
   }
-
-  if(!(wl->widget_focused) && menu)
-    wl->widget_focused = menu;
 
   return((bRepaint == 1));
 }
