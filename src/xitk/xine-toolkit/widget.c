@@ -474,12 +474,18 @@ void xitk_motion_notify_widget_list (xitk_widget_list_t *wl, int x, int y, unsig
 #if 0
     dump_widget_type(mywidget);
 #endif
-    /* If widget still marked pressed or focus received, it shall receive the focus again. */
-    w->state |= (w == wl->widget_pressed) || (w == wl->widget_focused)
-      ? (XITK_WIDGET_STATE_MOUSE | XITK_WIDGET_STATE_FOCUS) : XITK_WIDGET_STATE_MOUSE;
-    _xitk_widget_paint (w, &event);
-    if (w->type & WIDGET_GROUP_MENU)
-      menu_auto_pop (w);
+    if (w->type & WIDGET_GROUP_MENU) {
+      /* for menu, the latest of keyboard and mouse focuses shall take effect. */
+      wl->widget_focused = w;
+      w->state |= XITK_WIDGET_STATE_MOUSE | XITK_WIDGET_STATE_FOCUS;
+      _xitk_widget_paint (w, &event);
+      xitk_menu_auto_pop (w);
+    } else {
+      /* If widget still marked pressed or focus received, it shall receive the focus again. */
+      w->state |= (w == wl->widget_pressed) || (w == wl->widget_focused)
+        ? (XITK_WIDGET_STATE_MOUSE | XITK_WIDGET_STATE_FOCUS) : XITK_WIDGET_STATE_MOUSE;
+      _xitk_widget_paint (w, &event);
+    }
   }
 }
 
@@ -686,6 +692,16 @@ void xitk_set_focus_to_next_widget(xitk_widget_list_t *wl, int backward, int mod
   if (!w || (w == wl->widget_focused))
     return;
 
+  if (wl->widget_under_mouse && (wl->widget_under_mouse != w)) {
+    /* we navigate by keyboard now. dont confuse user with leftover mouse focus.
+     * switch back by simply moving the mouse again. */
+    wl->widget_under_mouse->state &= ~XITK_WIDGET_STATE_MOUSE;
+    if (wl->widget_under_mouse != wl->widget_focused) {
+      if (wl->widget_under_mouse->state != wl->widget_under_mouse->shown_state)
+        _xitk_widget_paint (wl->widget_under_mouse, &event);
+    }
+    wl->widget_under_mouse = NULL;
+  }
   if (wl->widget_focused) {
     if ((wl->widget_focused->type & (WIDGET_FOCUSABLE | WIDGET_TABABLE)) &&
       (wl->widget_focused->state & XITK_WIDGET_STATE_ENABLE)) {
@@ -873,11 +889,16 @@ static void _xitk_widget_able (xitk_widget_t *w) {
   if ((w->state ^ w->shown_state) & (XITK_WIDGET_STATE_UNSET | XITK_WIDGET_STATE_ENABLE)) {
     if (w->wl) {
       if (w->state & XITK_WIDGET_STATE_ENABLE) {
+#if 0
         int dx = w->wl->mouse.x - w->x, dy = w->wl->mouse.y - w->y;
         if ((dx >= 0) && (dx < w->width) && (dy >= 0) && (dy < w->height)) {
-          /* enabling the widget under mouse. how often does this happen ?? */
+          /* enabling the widget under mouse. this may happen when opening menu or
+           * switching tabs by keyboard. better dont grab focus here now, and
+           * wait for user moving the mouse again. */
           xitk_motion_notify_widget_list (w->wl, w->wl->mouse.x, w->wl->mouse.y, w->wl->qual);
         }
+#endif
+        ;
       } else {
         if (w == w->wl->widget_under_mouse)
           xitk_tips_hide_tips (w->wl->xitk->tips);

@@ -314,6 +314,43 @@ static void _menu_click_cb (xitk_widget_t *w, void *data, int state) {
   }
 }
 
+static int _menu_event (void *data, const xitk_be_event_t *e) {
+  _menu_window_t *mw = data;
+  _menu_private_t *wp = mw->wp;
+  int level = mw - wp->open_windows;
+
+  switch (e->type) {
+    case XITK_EV_KEY_DOWN:
+      if (e->utf8[0] != XITK_CTRL_KEY_PREFIX)
+        break;
+      switch (e->utf8[1]) {
+        case XITK_KEY_LEFT:
+          if (!level)
+            break;
+          /* fall through */
+        case XITK_KEY_ESCAPE:
+          if (level) {
+            xitk_set_focus_to_widget (mw->node->button);
+            _menu_close_subs_in (wp, mw->node);
+          } else {
+            xitk_widget_t *w = &wp->w;
+            xitk_widgets_delete (&w, 1);
+          }
+          return 1;
+        case XITK_KEY_UP:
+          xitk_set_focus_to_next_widget (xitk_window_widget_list (mw->xwin), 1, e->qual);
+          return 1;
+        case XITK_KEY_DOWN:
+          xitk_set_focus_to_next_widget (xitk_window_widget_list (mw->xwin), 0, e->qual);
+          return 1;
+        default: ;
+      }
+      break;
+    default: ;
+  }
+  return 0;
+}
+
 static void _menu_open (_menu_node_t *node, int x, int y) {
   _menu_private_t *wp = node->wp;
   xitk_skin_element_info_t    info;
@@ -584,7 +621,7 @@ static void _menu_open (_menu_node_t *node, int x, int y) {
   {
     char name[32] = "xitk_menu_0";
     name[10] += wp->num_open;
-    mw->key = xitk_be_register_event_handler (name, mw->xwin, NULL, mw, NULL, NULL);
+    mw->key = xitk_be_register_event_handler (name, mw->xwin, _menu_event, mw, NULL, NULL);
   }
 
   xitk_window_flags (xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_VISIBLE);
@@ -641,49 +678,7 @@ xitk_widget_t *xitk_menu_get_menu (xitk_widget_t *w) {
   return NULL;
 }
 
-int xitk_menu_show_sub_branchs(xitk_widget_t *w) {
-  _menu_private_t *wp;
-
-  xitk_container (wp, w, w);
-  if (!wp)
-    return 0;
-  if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_MENU)
-    return 0;
-  if (wp->num_open > 1)
-    return 1;
-  return 0;
-}
-
-void xitk_menu_destroy_sub_branchs (xitk_widget_t *w) {
-  _menu_private_t *wp;
-
-  xitk_container (wp, w, w);
-  if (!wp)
-    return;
-  if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_MENU)
-    return;
-  if (wp->num_open < 2)
-    return;
-  _menu_close_subs_ex (wp, &wp->root);
-}
-
-void xitk_menu_destroy_branch (xitk_widget_t *w) {
-  _menu_node_t *me;
-
-  if (!w)
-    return;
-  if ((w->type & (WIDGET_GROUP_MENU | WIDGET_TYPE_MASK)) != (WIDGET_GROUP_MENU | WIDGET_TYPE_LABELBUTTON))
-    return;
-
-  me = labelbutton_get_user_data (w);
-  if (!me->parent)
-    return;
-  if (_menu_show_subs (me->wp, me->parent)) {
-    _menu_close_subs_in (me->wp, me->parent);
-  }
-}
-
-void menu_auto_pop (xitk_widget_t *w) {
+void xitk_menu_auto_pop (xitk_widget_t *w) {
   _menu_node_t *me;
 
   if (!w)
