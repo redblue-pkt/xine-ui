@@ -211,8 +211,8 @@ void xitk_window_reparent_window (xitk_window_t *xwin, xitk_window_t *parent, in
 /*
  * Get (safely) window pos.
  */
-void xitk_window_get_window_position (xitk_window_t *xwin, int *x, int *y, int *w, int *h) {
-  if (xwin && xwin->bewin) {
+void xitk_window_get_window_position (xitk_window_t *xwin, xitk_rect_t *r) {
+  if (xwin && xwin->bewin && r) {
     xitk_tagitem_t tags[] = {
       {XITK_TAG_X, 0},
       {XITK_TAG_Y, 0},
@@ -221,41 +221,30 @@ void xitk_window_get_window_position (xitk_window_t *xwin, int *x, int *y, int *
       {XITK_TAG_END, 0}
     };
     xwin->bewin->get_props (xwin->bewin, tags);
-    if (x)
-      *x = tags[0].value;
-    if (y)
-      *y = tags[1].value;
-    if (w)
-      *w = tags[2].value;
-    if (h)
-      *h = tags[3].value;
+    r->x = tags[0].value;
+    r->y = tags[1].value;
+    r->width = xwin->width = tags[2].value;
+    r->height = xwin->height = tags[3].value;
   }
 }
 
-/*
- * Center a window in root window.
- */
-void xitk_window_move_window (xitk_window_t *xwin, int x, int y) {
-  if (xwin && xwin->bewin) {
-    xitk_tagitem_t tags[] = {
-      {XITK_TAG_X, x},
-      {XITK_TAG_Y, y},
-      {XITK_TAG_END, 0}
-    };
+void xitk_window_move_resize (xitk_window_t *xwin, const xitk_rect_t *r) {
+  if (xwin && xwin->bewin && r) {
+    xitk_tagitem_t tags[5], *p = tags;
+    if (r->x != XITK_INT_KEEP) {
+      p->type = XITK_TAG_X; p->value = r->x; p++;
+    }
+    if (r->y != XITK_INT_KEEP) {
+      p->type = XITK_TAG_Y; p->value = r->y; p++;
+    }
+    if (r->width != XITK_INT_KEEP) {
+      p->type = XITK_TAG_WIDTH; p->value = r->width; p++;
+    }
+    if (r->height != XITK_INT_KEEP) {
+      p->type = XITK_TAG_HEIGHT; p->value = r->height; p++;
+    }
+    p->type = XITK_TAG_END; p->value = 0;
     xwin->bewin->set_props (xwin->bewin, tags);
-  }
-}
-
-void xitk_window_resize_window (xitk_window_t *xwin, int x, int y, int w, int h) {
-  if (xwin && xwin->bewin) {
-    xitk_tagitem_t tags[] = {
-      {XITK_TAG_X,      x},
-      {XITK_TAG_Y,      y},
-      {XITK_TAG_WIDTH,  w},
-      {XITK_TAG_HEIGHT, h},
-      {XITK_TAG_END,    0}
-    };
-    xwin->bewin->set_props (xwin->bewin, (x>=0 && y>=0) ? tags : &tags[2]);
   }
 }
 
@@ -460,21 +449,6 @@ xitk_window_t *xitk_window_create_dialog_window(xitk_t *xitk, const char *title,
 }
 
 /*
- * Get window sizes.
- */
-void xitk_window_get_window_size(xitk_window_t *w, int *width, int *height) {
-
-  if (w == NULL) {
-    *width = 0;
-    *height = 0;
-    return;
-  }
-
-  *width = w->width;
-  *height = w->height;
-}
-
-/*
  * Apply (draw) window background.
  */
 void xitk_window_apply_background (xitk_window_t *xwin) {
@@ -628,4 +602,3 @@ void xitk_window_set_role (xitk_window_t *xwin, xitk_window_role_t role) {
   xwin->role = role;
   xitk_window_update_tree (xwin, 0);
 }
-

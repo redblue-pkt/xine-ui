@@ -101,11 +101,13 @@ void event_sender_sticky_cb(void *data, xine_cfg_entry_t *cfg) {
   gui->eventer_sticky = cfg->num_value;
   if (gui->eventer) {
     if ((!old_sticky_value) && gui->eventer_sticky) {
-      int  px, py, pw;
-      panel_get_window_position (gui->panel, &px, &py, &pw, NULL);
-      gui->eventer->x = px + pw;
-      gui->eventer->y = py;
-      xitk_window_move_window (gui->eventer->xwin, gui->eventer->x, gui->eventer->y);
+      xitk_rect_t pr = {0, 0, 0, 0};
+
+      panel_get_window_position (gui->panel, &pr);
+      pr.x += pr.width; pr.width = XITK_INT_KEEP; pr.height = XITK_INT_KEEP;
+      gui->eventer->x = pr.x;
+      gui->eventer->y = pr.y;
+      xitk_window_move_resize (gui->eventer->xwin, &pr);
     }
   }
 }
@@ -156,11 +158,13 @@ static int event_sender_event (void *data, const xitk_be_event_t *e) {
       /* If we tried to move sticky window, move it back to stored position. */
       if (es->gui->eventer_sticky) {
         if (panel_is_visible (es->gui->panel) > 1) {
-          int  x, y;
+          xitk_rect_t wr = {0, 0, 0, 0};
 
-          xitk_window_get_window_position (es->xwin, &x, &y, NULL, NULL);
-          if ((x != es->x) || (y != es->y))
-            xitk_window_move_window (es->xwin, es->x, es->y);
+          xitk_window_get_window_position (es->xwin, &wr);
+          if ((wr.x != es->x) || (wr.y != es->y)) {
+            wr.x = es->x, wr.y = es->y, wr.width = XITK_INT_KEEP, wr.height = XITK_INT_KEEP;
+            xitk_window_move_resize (es->xwin, &wr);
+          }
         }
       }
       return 1;
@@ -287,11 +291,13 @@ void event_sender_toggle_visibility (gGui_t *gui) {
 void event_sender_move (gGui_t *gui, int x, int y) {
   if (gui && gui->eventer) {
     if (gui->eventer_sticky) {
+      xitk_rect_t wr = {x, y, XITK_INT_KEEP, XITK_INT_KEEP};
+
       gui->eventer->x = x;
       gui->eventer->y = y;
       config_update_num ("gui.eventer_x", x);
       config_update_num ("gui.eventer_y", y);
-      xitk_window_move_window (gui->eventer->xwin, x, y);
+      xitk_window_move_resize (gui->eventer->xwin, &wr);
     }
   }
 }
@@ -324,10 +330,10 @@ void event_sender_panel (gGui_t *gui) {
   gui_load_window_pos (es->gui, "eventer", &es->x, &es->y);
 
   if (es->gui->eventer_sticky && panel_is_visible (es->gui->panel) > 1) {
-    int  px, py, pw;
-    panel_get_window_position (es->gui->panel, &px, &py, &pw, NULL);
-    es->x = px + pw;
-    es->y = py;
+    xitk_rect_t pr = {0, 0, 0, 0};
+    panel_get_window_position (es->gui->panel, &pr);
+    es->x = pr.x + pr.width;
+    es->y = pr.y;
   }
 
   /* Create window */

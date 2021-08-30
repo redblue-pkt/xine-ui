@@ -120,7 +120,7 @@ static void *_tips_loop_thread (void *data) {
     switch (state) {
       case TIPS_SHOW:
         if (tips->widget && tips->widget->tips_timeout && tips->widget->tips_string && tips->widget->tips_string[0]) {
-          int x, y, w, h;
+          xitk_rect_t r = {0, 0, 0, 0};
           unsigned int cfore, cback;
           int disp_w, disp_h;
           int x_margin = 12, y_margin = 6;
@@ -130,10 +130,10 @@ static void *_tips_loop_thread (void *data) {
           xitk_get_display_size (xitk, &disp_w, &disp_h);
 
           /* Get parent window position */
-          xitk_window_get_window_position (tips->widget->wl->xwin, &x, &y, NULL, NULL);
+          xitk_window_get_window_position (tips->widget->wl->xwin, &r);
 
-          x += tips->widget->x;
-          y += tips->widget->y;
+          r.x += tips->widget->x;
+          r.y += tips->widget->y;
 
           cfore = xitk_get_cfg_num (xitk, XITK_BLACK_COLOR);
           cback = xitk_get_cfg_num (xitk, XITK_FOCUS_COLOR);
@@ -146,8 +146,8 @@ static void *_tips_loop_thread (void *data) {
             tips->widget = tips->new_widget = NULL;
             break;
           }
-          w = image->width;
-          h = image->height;
+          r.width = image->width;
+          r.height = image->height;
 
           /* Tips may be extensive help texts that user wants more time to read.
            * We used to implement this by per widget timeout values, but this
@@ -157,7 +157,7 @@ static void *_tips_loop_thread (void *data) {
            * to broadcast config changes to all widgets. This should be fine since
            * tips are killed when the widget goes away or loses focus. */
           if (tips->widget->tips_timeout == XITK_TIPS_TIMEOUT_AUTO) {
-            timeout = xitk->tips_timeout * (h - 8) / 11;
+            timeout = xitk->tips_timeout * (r.height - 8) / 11;
             if (timeout < xitk->tips_timeout)
               timeout = xitk->tips_timeout;
             else if (timeout > xitk->tips_timeout * 8)
@@ -168,20 +168,20 @@ static void *_tips_loop_thread (void *data) {
 
           /* Create the tips window, horizontally centered from parent widget */
           /* If necessary, adjust position to display it fully on screen      */
-          xitk_image_draw_rectangle (image, 0, 0, w, h, cfore);
-          x -= (w - tips->widget->width) >> 1;
-          y += tips->widget->height + bottom_gap;
-          if (x > disp_w - w)
-            x = disp_w - w;
-          else if (x < 0)
-            x = 0;
-          if (y > disp_h - h)
+          xitk_image_draw_rectangle (image, 0, 0, r.width, r.height, cfore);
+          r.x -= (r.width - tips->widget->width) >> 1;
+          r.y += tips->widget->height + bottom_gap;
+          if (r.x > disp_w - r.width)
+            r.x = disp_w - r.width;
+          else if (r.x < 0)
+            r.x = 0;
+          if (r.y > disp_h - r.height)
             /* 1 px dist to widget prevents odd behavior of mouse pointer when  */
             /* pointer is moved slowly from widget to tips, at least under FVWM */
             /*                                           v                      */
-            y -= tips->widget->height + h + bottom_gap + 1;
+            r.y -= tips->widget->height + r.height + bottom_gap + 1;
           /* No further alternative to y-position the tips (just either below or above widget) */
-          xwin = xitk_window_create_window_ext (xitk, x, y, w, h, "tips", NULL, NULL, 1, 0, NULL, image);
+          xwin = xitk_window_create_window_ext (xitk, r.x, r.y, r.width, r.height, "tips", NULL, NULL, 1, 0, NULL, image);
           if (!xwin) {
             xitk_image_free_image (&image);
             state = TIPS_IDLE;

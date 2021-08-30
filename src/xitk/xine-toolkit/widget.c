@@ -1261,3 +1261,14 @@ void xitk_widget_set_focus_redirect (xitk_widget_t *w, xitk_widget_t *focus_redi
   xitk_widget_rel_join (&w->focus_redirect,
     focus_redirect && (focus_redirect->wl == w->wl) ? &focus_redirect->focus_redirect : NULL);
 }
+
+void xitk_widget_register_win_pos (xitk_widget_t *w, int set) {
+  if (w && w->wl) {
+    if (set) {
+      w->wl->widget_win_pos = w;
+    } else {
+      if (w->wl->widget_win_pos == w)
+        w->wl->widget_win_pos = NULL;
+    }
+  }
+}

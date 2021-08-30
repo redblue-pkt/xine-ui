@@ -166,20 +166,18 @@ static void panel_timeout_tips_cb(void *data, xine_cfg_entry_t *cfg) {
  * Toolkit event handler will call this function with new
  * coords of panel window.
  */
-static void panel_store_new_position (void *data, int x, int y, int w, int h) {
+static void panel_store_new_position (void *data, const xitk_rect_t *wr) {
   xui_panel_t *panel = data;
-
-  (void)h;
 
   if(panel->skin_on_change == 0) {
 
-    panel->x = x;
-    panel->y = y;
+    panel->x = wr->x;
+    panel->y = wr->y;
     /*
-    config_update_num ("gui.panel_x", x);
-    config_update_num ("gui.panel_y", y); */
+    config_update_num ("gui.panel_x", wr->x);
+    config_update_num ("gui.panel_y", wr->y); */
 
-    event_sender_move (panel->gui, x + w, y);
+    event_sender_move (panel->gui, wr->x + wr->width, wr->y);
   }
   else
     panel->skin_on_change--;
@@ -656,21 +654,19 @@ static void _panel_toggle_visibility (xui_panel_t *panel) {
 
     if ((video_window_get_fullscreen_mode (panel->gui->vwin) & (WINDOWED_MODE | FULLSCR_MODE))
         && (!((video_window_get_fullscreen_mode (panel->gui->vwin)) & FULLSCR_XI_MODE))) {
-      int x, y, w, h, desktopw, desktoph;
+      xitk_rect_t wr = {0, 0, 0, 0};
+      int desktopw, desktoph;
 
-      xitk_window_get_window_position (panel->xwin, &x, &y, &w, &h);
+      xitk_window_get_window_position (panel->xwin, &wr);
 
       xitk_get_display_size (panel->gui->xitk, &desktopw, &desktoph);
 
-      if(((x + w) <= 0) || ((y + h) <= 0) || (x >= desktopw) || (y >= desktoph)) {
-	int newx, newy;
-
-	newx = (desktopw - w) >> 1;
-	newy = (desktoph - h) >> 1;
-
-        xitk_window_move_window(panel->xwin, newx, newy);
-
-        panel_store_new_position (panel, newx, newy, w, h);
+      if (((wr.x + wr.width) <= 0) || ((wr.y + wr.height) <= 0) || (wr.x >= desktopw) || (wr.y >= desktoph)) {
+        wr.x = (desktopw - wr.width) >> 1;
+        wr.y = (desktoph - wr.height) >> 1;
+        panel_store_new_position (panel, &wr);
+        wr.width = wr.height = XITK_INT_KEEP;
+        xitk_window_move_resize (panel->xwin, &wr);
       }
     }
 
@@ -704,9 +700,9 @@ void panel_raise_window (xui_panel_t *panel) {
     xitk_window_raise_window (panel->xwin);
 }
 
-void panel_get_window_position (xui_panel_t *panel, int *px, int *py, int *pw, int *ph) {
+void panel_get_window_position (xui_panel_t *panel, xitk_rect_t *r) {
   if (panel)
-    xitk_window_get_window_position (panel->xwin, px, py, pw, ph);
+    xitk_window_get_window_position (panel->xwin, r);
 }
 
 /*
@@ -818,26 +814,26 @@ void panel_update_channel_display (xui_panel_t *panel) {
 static void panel_audio_lang_list(xitk_widget_t *w, void *data) {
   xui_panel_t *panel = data;
   int x, y;
-  int wx, wy;
+  xitk_rect_t wr = {0, 0, 0, 0};
 
   (void)w;
-  xitk_window_get_window_position (panel->xwin, &wx, &wy, NULL, NULL);
+  xitk_window_get_window_position (panel->xwin, &wr);
   xitk_get_widget_pos(panel->audiochan_label, &x, &y);
-  x += wx;
-  y += (wy + xitk_get_widget_height(panel->audiochan_label));
+  x += wr.x;
+  y += (wr.y + xitk_get_widget_height(panel->audiochan_label));
   audio_lang_menu (panel->gui, panel->widget_list, x, y);
 }
 
 static void panel_spu_lang_list(xitk_widget_t *w, void *data) {
   xui_panel_t *panel = data;
+  xitk_rect_t wr = {0, 0, 0, 0};
   int x, y;
-  int wx, wy;
 
   (void)w;
-  xitk_window_get_window_position (panel->xwin, &wx, &wy, NULL, NULL);
+  xitk_window_get_window_position (panel->xwin, &wr);
   xitk_get_widget_pos(panel->spuid_label, &x, &y);
-  x += wx;
-  y += (wy + xitk_get_widget_height(panel->spuid_label));
+  x += wr.x;
+  y += (wr.y + xitk_get_widget_height(panel->spuid_label));
   spu_lang_menu (panel->gui, panel->widget_list, x, y);
 }
 
