@@ -274,13 +274,14 @@ static void _menu_click_cb (xitk_widget_t *w, void *data, int state) {
   if (me->type & _MENU_NODE_BRANCH) {
     if (me->num > 0) {
       if (!me->menu_window) {
-        int wx = 0, wy = 0, x = 0, y = 0;
+        xitk_rect_t wr = {0, 0, 0, 0};
+        int x = 0, y = 0;
 
-        xitk_window_get_window_position (me->parent->menu_window->xwin, &wx, &wy, NULL, NULL);
+        xitk_window_get_window_position (me->parent->menu_window->xwin, &wr);
         xitk_get_widget_pos (me->button, &x, &y);
 
-        x += xitk_get_widget_width (me->button) + wx;
-        y += wy;
+        x += xitk_get_widget_width (me->button) + wr.x;
+        y += wr.y;
 
         _menu_close_subs_ex (wp, me->parent);
         _menu_open (me, x, y);

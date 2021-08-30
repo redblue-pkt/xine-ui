@@ -1056,10 +1056,10 @@ static void kbedit_grab (xitk_widget_t *w, void *data, int state, int qual) {
   kbe->grabbing = 1;
   /* xitk_labelbutton_change_label (kbe->w[_W_grab], _("Press Keyboard Keys...")); */
   {
-    int x, y, w, h;
-    xitk_window_get_window_position (kbe->xwin, &x, &y, &w, &h);
+    xitk_rect_t wr = {0, 0, 0, 0};
+    xitk_window_get_window_position (kbe->xwin, &wr);
     kbe->kbr.xwin = xitk_window_create_dialog_window (kbe->gui->xitk,
-      _("Press keyboard keys to bind..."), x, y + h, w, 50);
+      _("Press keyboard keys to bind..."), wr.x, wr.y + wr.height, wr.width, 50);
   }
   set_window_states_start (kbe->gui, kbe->kbr.xwin);
   xitk_window_flags (kbe->kbr.xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_VISIBLE);

@@ -107,6 +107,7 @@ static char **_combo_copy_string_list (const char * const *s, int *n) {
 
 static void _combo_close (_combo_private_t *wp, int focus) {
   if (wp->xwin) {
+    xitk_widget_register_win_pos (&wp->w, 0);
     if (focus)
       xitk_window_set_input_focus (wp->parent_wlist->xwin);
     wp->iw[_W_browser] = NULL;
@@ -139,15 +140,18 @@ static int combo_event (void *data, const xitk_be_event_t *e) {
         return 1;
       }
       break;
+#if 0
     case XITK_EV_BUTTON_UP:
-      /* If we try to move the combo window, move it back to right position (under label). */
+      /* If we try to move the combo window, move it back to right position (under label).
+       * XXX: cannot happen anymore because combo win drag is blocked by XITK_WINF_FIXED_POS */
       {
-        int  x, y;
-        xitk_window_get_window_position (wp->xwin, &x, &y, NULL, NULL);
-        if ((x != wp->win_x) || (y != wp->win_y))
+	xitk_rect_t wr = {0, 0, 0, 0};
+        xitk_window_get_window_position (wp->xwin, &wr);
+        if ((wr.x != wp->win_x) || (wr.y != wp->win_y))
           xitk_combo_update_pos (wp->iw[_W_combo]);
       }
       return 1;
+#endif
     default: ;
   }
   return 0;
@@ -186,11 +190,23 @@ static void _combo_open (_combo_private_t *wp) {
   itemw += xitk_get_widget_width (wp->iw[_W_button]);
   itemw -= 2; /* space for border */
 
+  {
+    window_info_t wi;
+
+    xitk_get_widget_pos (wp->iw[_W_label], &wp->win_x, &wp->win_y);
+    wp->win_y += xitk_get_widget_height (wp->iw[_W_label]);
+    if ((xitk_get_window_info (wp->w.wl->xitk, *(wp->parent_wkey), &wi)))
+      wp->win_x += wi.x, wp->win_y += wi.y;
+  }
+
   wp->xwin = xitk_window_create_simple_window_ext (wp->w.wl->xitk,
-    0, 0, itemw + 2, itemh * 5 + 2,
+    wp->win_x, wp->win_y, itemw + 2, itemh * 5 + 2,
     NULL, "Xitk Combo", "Xitk", 1, 0, NULL);
   if (!wp->xwin)
     return;
+
+  if (wp->iw[_W_button])
+    wp->iw[_W_button]->type |= WIDGET_KEEP_FOCUS;
 
   xitk_window_flags (wp->xwin, XITK_WINF_FIXED_POS, XITK_WINF_FIXED_POS);
   xitk_window_set_transient_for_win (wp->xwin, wp->parent_wlist->xwin);
@@ -228,8 +244,15 @@ static void _combo_open (_combo_private_t *wp) {
 
   wp->widget_key = xitk_be_register_event_handler ("xitk combo", wp->xwin, combo_event, wp, NULL, NULL);
 
-  if (wp->iw[_W_button])
-    wp->iw[_W_button]->type |= WIDGET_KEEP_FOCUS;
+  xitk_window_flags (wp->xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_VISIBLE);
+  xitk_window_raise_window (wp->xwin);
+  xitk_window_set_input_focus (wp->xwin);
+
+  /* No widget focused, give focus to the first one */
+  if (wp->widget_list->widget_focused == NULL)
+    xitk_set_focus_to_next_widget (wp->widget_list, 0, 0);
+
+  xitk_widget_register_win_pos (&wp->w, 1);
 }
 
 /*
@@ -246,7 +269,6 @@ static void _combo_rollunroll (xitk_widget_t *w, void *data, int state) {
     /* no typo, thats what it reports with state ^ */
     if (state && !wp->xwin) {
       _combo_open (wp);
-      xitk_combo_update_pos (&wp->w);
     } else {
       _combo_close (wp, 0);
     }
@@ -356,6 +378,24 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
     case WIDGET_EVENT_TIPS_TIMEOUT:
       _combo_tips_timeout (wp, event->tips_timeout);
       break;
+    case WIDGET_EVENT_WIN_POS:
+      if (wp->xwin) {
+        xitk_rect_t wr = {0, 0, XITK_INT_KEEP, XITK_INT_KEEP};
+
+        xitk_get_widget_pos (wp->iw[_W_label], &wr.x, &wr.y);
+        wr.y += xitk_get_widget_height (wp->iw[_W_label]);
+        wr.x += event->x;
+        wr.y += event->y;
+        xitk_window_move_resize (wp->xwin, &wr);
+        xitk_window_flags (wp->xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_VISIBLE);
+        xitk_window_raise_window (wp->xwin);
+        xitk_window_set_input_focus (wp->xwin);
+        /* No widget focused, give focus to the first one */
+        if (wp->widget_list->widget_focused == NULL)
+          xitk_set_focus_to_next_widget (wp->widget_list, 0, 0);
+        return 1;
+      }
+      break;
     default: ;
   }
   return 0;
@@ -384,6 +424,7 @@ void xitk_combo_set_select(xitk_widget_t *w, int select) {
 /*
  *
  */
+#if 0
 void xitk_combo_update_pos(xitk_widget_t *w) {
   _combo_private_t *wp;
 
@@ -392,22 +433,17 @@ void xitk_combo_update_pos(xitk_widget_t *w) {
     return;
 
   if ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_COMBO) {
-    int                    xx = 0, yy = 0;
-    window_info_t          wi;
-
     if (wp->xwin) {
-      if ((xitk_get_window_info (wp->w.wl->xitk, *(wp->parent_wkey), &wi))) {
-	wp->win_x = wi.x;
-	wp->win_y = wi.y;
-      }
+      xitk_rect_t wr = {0, 0, XITK_INT_KEEP, XITK_INT_KEEP};
+      window_info_t wi;
 
-      xitk_get_widget_pos(wp->iw[_W_label], &xx, &yy);
+      xitk_get_widget_pos (wp->iw[_W_label], &wr.x, &wr.y);
+      wr.y += xitk_get_widget_height (wp->iw[_W_label]);
+      if ((xitk_get_window_info (wp->w.wl->xitk, *(wp->parent_wkey), &wi)))
+        wr.x += wi.x, wr.y += wi.y;
+      wp->win_x = wr.x, wp->win_y = wr.y;
 
-      yy += xitk_get_widget_height(wp->iw[_W_label]);
-      wp->win_x += xx;
-      wp->win_y += yy;
-
-      xitk_window_move_window(wp->xwin, wp->win_x, wp->win_y);
+      xitk_window_move_resize (wp->xwin, &wr);
       xitk_window_flags (wp->xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_VISIBLE);
       xitk_window_raise_window (wp->xwin);
 
@@ -419,6 +455,7 @@ void xitk_combo_update_pos(xitk_widget_t *w) {
     }
   }
 }
+#endif
 
 /*
  *

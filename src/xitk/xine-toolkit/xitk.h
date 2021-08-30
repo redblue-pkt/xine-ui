@@ -856,8 +856,8 @@ void xitk_window_set_role (xitk_window_t *xwin, xitk_window_role_t role);
 /**
  *
  */
-void xitk_window_move_window(xitk_window_t *w, int x, int y);
-void xitk_window_resize_window (xitk_window_t *xwin, int x, int y, int w, int h);
+#define XITK_INT_KEEP 0x7fffffff
+void xitk_window_move_resize (xitk_window_t *xwin, const xitk_rect_t *r);
 
 /*
  *
@@ -882,15 +882,10 @@ int xitk_window_set_background_image (xitk_window_t *w, xitk_image_t *bg);
 
 void xitk_window_reparent_window(xitk_window_t *w, xitk_window_t *parent, int x, int y);
 
-/**
- *
- */
-void xitk_window_get_window_size(xitk_window_t *w, int *width, int *height);
-
 /*
  *
  */
-void xitk_window_get_window_position(xitk_window_t *w, int *x, int *y, int *width, int *height);
+void xitk_window_get_window_position (xitk_window_t *w, xitk_rect_t *r);
 
 /*
  *

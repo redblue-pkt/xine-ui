@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -46,6 +46,6 @@ void xitk_combo_set_select (xitk_widget_t *w, int select);
 /** */
 void xitk_combo_update_list (xitk_widget_t *w, const char *const *const list, int len);
 /** */
-void xitk_combo_update_pos (xitk_widget_t *w);
+/* void xitk_combo_update_pos (xitk_widget_t *w); */
 
 #endif

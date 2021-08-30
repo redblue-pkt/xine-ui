@@ -95,10 +95,8 @@ struct xui_vwin_st {
   int                    video_duration_valid; /* is use_duration trustable? */
 #endif
   double                 pixel_aspect;
-  int                    win_width;       /* size of non-fullscreen window         */
-  int                    win_height;
-  int                    old_win_width;
-  int                    old_win_height;
+  xitk_rect_t            win_r;           /* current location, size of non-fullscreen window */
+  xitk_rect_t            old_win_r;
   int                    output_width;    /* output video window width/height      */
   int                    output_height;
 
@@ -123,11 +121,6 @@ struct xui_vwin_st {
   int                    xinerama_fullscreen_width;
   int                    xinerama_fullscreen_height;
 #endif
-
-  int                    xwin;            /* current X location */
-  int                    ywin;            /* current Y location */
-  int                    old_xwin;
-  int                    old_ywin;
 
   int                    desktopWidth;    /* desktop width */
   int                    desktopHeight;   /* desktop height */
@@ -484,8 +477,8 @@ static void _detect_xinerama_pos_size(xui_vwin_t *vwin, XSizeHints *hint) {
      * test point I guess.  Right now it's the upper-left.
      */
     if (vwin->video_window != None) {
-      if (vwin->xwin >= 0 && vwin->ywin >= 0 &&
-          vwin->xwin < vwin->desktopWidth && vwin->ywin < vwin->desktopHeight) {
+      if (vwin->win_r.x >= 0 && vwin->win_r.y >= 0 &&
+          vwin->win_r.x < vwin->desktopWidth && vwin->win_r.y < vwin->desktopHeight) {
         knowLocation = 1;
       }
     }
@@ -506,10 +499,10 @@ static void _detect_xinerama_pos_size(xui_vwin_t *vwin, XSizeHints *hint) {
       for (i = 0; i < vwin->xinerama_cnt; i++) {
         if (
             (knowLocation == 1 &&
-             vwin->xwin >= vwin->xinerama[i].x_org &&
-             vwin->ywin >= vwin->xinerama[i].y_org &&
-             vwin->xwin < vwin->xinerama[i].x_org + vwin->xinerama[i].width &&
-             vwin->ywin < vwin->xinerama[i].y_org + vwin->xinerama[i].height) ||
+             vwin->win_r.x >= vwin->xinerama[i].x_org &&
+             vwin->win_r.y >= vwin->xinerama[i].y_org &&
+             vwin->win_r.x < vwin->xinerama[i].x_org + vwin->xinerama[i].width &&
+             vwin->win_r.y < vwin->xinerama[i].y_org + vwin->xinerama[i].height) ||
             (knowLocation == 0 &&
              x_mouse >= vwin->xinerama[i].x_org &&
              y_mouse >= vwin->xinerama[i].y_org &&
@@ -521,8 +514,8 @@ static void _detect_xinerama_pos_size(xui_vwin_t *vwin, XSizeHints *hint) {
           hint->y = vwin->xinerama[i].y_org;
 
           if (knowLocation == 0) {
-            vwin->old_xwin = hint->x;
-            vwin->old_ywin = hint->y;
+            vwin->old_win_r.x = hint->x;
+            vwin->old_win_r.y = hint->y;
           }
 
           if (!(vwin->fullscreen_req & WINDOWED_MODE)) {
@@ -545,8 +538,8 @@ static void _detect_xinerama_pos_size(xui_vwin_t *vwin, XSizeHints *hint) {
       hint->width  = vwin->fullscreen_width;
       hint->height = vwin->fullscreen_height;
     } else {
-      hint->width  = vwin->win_width;
-      hint->height = vwin->win_height;
+      hint->width  = vwin->win_r.width;
+      hint->height = vwin->win_r.height;
     }
   }
 }
@@ -589,7 +582,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
 
   if (vwin->gui->use_root_window) { /* Using root window, but not really */
 
-    vwin->xwin = vwin->ywin = 0;
+    vwin->win_r.x = vwin->win_r.y = 0;
     vwin->output_width    = vwin->fullscreen_width;
     vwin->output_height   = vwin->fullscreen_height;
     vwin->visible_width   = vwin->fullscreen_width;
@@ -685,7 +678,8 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
            * resizing the video window may be necessary if the modeline or tv mode has
            * just been switched
            */ 
-          xitk_window_resize_window (vwin->wrapped_window, hint.x, hint.y, vwin->visible_width, vwin->visible_height);
+          xitk_rect_t r = {hint.x, hint.y, vwin->visible_width, vwin->visible_height};
+          xitk_window_move_resize (vwin->wrapped_window, &r);
           vwin->output_width  = vwin->visible_width;
           vwin->output_height = vwin->visible_height;
         }
@@ -693,7 +687,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
         return;
       }
 
-      xitk_window_get_window_position (vwin->wrapped_window, &vwin->old_xwin, &vwin->old_ywin, NULL, NULL);
+      xitk_window_get_window_position (vwin->wrapped_window, &vwin->old_win_r);
     }
 
     vwin->fullscreen_mode = vwin->fullscreen_req;
@@ -722,7 +716,8 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
 	    * resizing the video window may be necessary if the modeline or tv mode has
 	    * just been switched
 	    */
-          xitk_window_resize_window (vwin->wrapped_window, -1, -1, vwin->visible_width, vwin->visible_height);
+          xitk_rect_t r = {XITK_INT_KEEP, XITK_INT_KEEP, vwin->visible_width, vwin->visible_height};
+          xitk_window_move_resize (vwin->wrapped_window, &r);
           vwin->output_width    = vwin->visible_width;
           vwin->output_height   = vwin->visible_height;
 	}
@@ -730,7 +725,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
 	return;
       }
 
-      xitk_window_get_window_position (vwin->wrapped_window, &vwin->old_xwin, &vwin->old_ywin, NULL, NULL);
+      xitk_window_get_window_position (vwin->wrapped_window, &vwin->old_win_r);
     }
 
     vwin->fullscreen_mode = vwin->fullscreen_req;
@@ -754,8 +749,8 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
   }
   else {
 #ifndef HAVE_XINERAMA
-    hint.width       = vwin->win_width;
-    hint.height      = vwin->win_height;
+    hint.width       = vwin->win_r.width;
+    hint.height      = vwin->win_r.height;
 #endif
     hint.flags       = PPosition | PSize;
 
@@ -763,12 +758,12 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
      * user sets window geom, move back to original location.
      */
     if (vwin->stream_resize_window == 0) {
-      hint.x = vwin->old_xwin;
-      hint.y = vwin->old_ywin;
+      hint.x = vwin->old_win_r.x;
+      hint.y = vwin->old_win_r.y;
     }
 
-    vwin->old_win_width  = hint.width;
-    vwin->old_win_height = hint.height;
+    vwin->old_win_r.width  = hint.width;
+    vwin->old_win_r.height = hint.height;
 
     vwin->output_width  = hint.width;
     vwin->output_height = hint.height;
@@ -776,7 +771,8 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
     if (vwin->wrapped_window) {
 
       if (vwin->fullscreen_mode & WINDOWED_MODE) {
-        xitk_window_resize_window (vwin->wrapped_window, -1, -1, vwin->win_width, vwin->win_height);
+        xitk_rect_t r = {XITK_INT_KEEP, XITK_INT_KEEP, vwin->win_r.width, vwin->win_r.height};
+        xitk_window_move_resize (vwin->wrapped_window, &r);
         return;
       }
     }
@@ -870,10 +866,10 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
   vwin->x_unlock_display (vwin->video_display);
 
   if ((!(vwin->fullscreen_mode & WINDOWED_MODE))) {
+    xitk_rect_t wr = {hint.x, hint.y, XITK_INT_KEEP, XITK_INT_KEEP};
     /* Waiting for visibility, avoid X error on some cases */
-
     video_window_set_input_focus(vwin);
-    xitk_window_move_window (vwin->wrapped_window, hint.x, hint.y);
+    xitk_window_move_resize (vwin->wrapped_window, &wr);
   }
 
   /* The old window should be destroyed now */
@@ -889,13 +885,13 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
   /* take care about window decoration/pos */
   {
     /*
-    int x = vwin->xwin < 0 ? 0 : vwin->xwin;
-    int y = vwin->ywin < 0 ? 0 : vwin->ywin;
+    int x = vwin->win_r.x < 0 ? 0 : vwin->win_r.x;
+    int y = vwin->win_r.y < 0 ? 0 : vwin->win_r.y;
     */
-    xitk_window_get_window_position (vwin->wrapped_window, &vwin->xwin, &vwin->ywin, NULL, NULL);
+    xitk_window_get_window_position (vwin->wrapped_window, &vwin->win_r);
     /*
-    x = vwin->xwin - x;
-    y = vwin->ywin - y;
+    x = vwin->win_r.x - x;
+    y = vwin->win_r.y - y;
     if ((x < 0) || (x > 32))
       x = 0;
     if ((y < 0) || (y > 80))
@@ -1054,8 +1050,8 @@ static void _video_window_frame_output_cb (void *data,
     *dest_pixel_aspect = vwin->pixel_aspect;
   }
 
-  *win_x = (vwin->xwin < 0) ? 0 : vwin->xwin;
-  *win_y = (vwin->ywin < 0) ? 0 : vwin->ywin;
+  *win_x = (vwin->win_r.x < 0) ? 0 : vwin->win_r.x;
+  *win_y = (vwin->win_r.y < 0) ? 0 : vwin->win_r.y;
 
   pthread_mutex_unlock (&vwin->mutex);
 }
@@ -1235,7 +1231,7 @@ void video_window_set_visibility (xui_vwin_t *vwin, int show_window) {
 
   /* Switching to visible: If new window size requested meanwhile, adapt window */
   if ((vwin->show > 1) && (vwin->fullscreen_mode & WINDOWED_MODE) &&
-     (vwin->win_width != vwin->old_win_width || vwin->win_height != vwin->old_win_height))
+     (vwin->win_r.width != vwin->old_win_r.width || vwin->win_r.height != vwin->old_win_r.height))
     video_window_adapt_size (vwin);
 
   if (vwin->show > 1) {
@@ -1392,8 +1388,8 @@ xui_vwin_t *video_window_init (gGui_t *gui, int window_id,
     vwin->x_unlock_display (vwin->video_display);
   }
 
-  vwin->xwin               = geometry_x;
-  vwin->ywin               = geometry_y;
+  vwin->win_r.x               = geometry_x;
+  vwin->win_r.y               = geometry_y;
 
   if (vwin->video_be_display) {
     vwin->desktopWidth  = vwin->video_be_display->width;
@@ -1447,8 +1443,8 @@ xui_vwin_t *video_window_init (gGui_t *gui, int window_id,
     vwin->video_width  = 768;
     vwin->video_height = 480;
   }
-  vwin->old_win_width  = vwin->win_width  = vwin->video_width;
-  vwin->old_win_height = vwin->win_height = vwin->video_height;
+  vwin->old_win_r.width  = vwin->win_r.width  = vwin->video_width;
+  vwin->old_win_r.height = vwin->win_r.height = vwin->video_height;
 
 #ifdef HAVE_XF86VIDMODE
   if (xine_config_register_bool (vwin->gui->xine, "gui.use_xvidext",
@@ -1474,18 +1470,20 @@ xui_vwin_t *video_window_init (gGui_t *gui, int window_id,
 
   /*
    * for plugins that aren't really bind to the window, it's necessary that the
-   * vwin->xwin and vwin->ywin variables are set to *real* values, otherwise the
+   * vwin->win_r.x and vwin->win_r.y variables are set to *real* values, otherwise the
    * overlay will be displayed somewhere outside the window
    */
   if (vwin->wrapped_window) {
     if (geometry && (geometry_x > -8192) && (geometry_y > -8192)) {
-      vwin->xwin = vwin->old_xwin = geometry_x;
-      vwin->ywin = vwin->old_ywin = geometry_y;
-
-      xitk_window_resize_window(vwin->wrapped_window, vwin->xwin, vwin->ywin, vwin->video_width, vwin->video_height);
+      vwin->win_r.x = vwin->old_win_r.x = geometry_x;
+      vwin->win_r.y = vwin->old_win_r.y = geometry_y;
+      {
+        xitk_rect_t r = {vwin->win_r.x, vwin->win_r.y, vwin->video_width, vwin->video_height};
+        xitk_window_move_resize (vwin->wrapped_window, &r);
+      }
     }
     else {
-      xitk_window_get_window_position (vwin->wrapped_window, &vwin->xwin, &vwin->ywin, NULL, NULL);
+      xitk_window_get_window_position (vwin->wrapped_window, &vwin->win_r);
     }
   }
 
@@ -1579,9 +1577,10 @@ void video_window_exit (xui_vwin_t *vwin) {
 static int video_window_translate_point (xui_vwin_t *vwin,
   int gui_x, int gui_y, int *video_x, int *video_y) {
   x11_rectangle_t rect;
-  int             wwin, hwin;
   float           xf,yf;
   float           scale, width_scale, height_scale,aspect;
+
+  xitk_rect_t     wr = {0, 0, 0, 0};
 
   if (!vwin || !vwin->gui || !vwin->gui->vo_port)
     return 0;
@@ -1602,33 +1601,33 @@ static int video_window_translate_point (xui_vwin_t *vwin,
   /* Driver cannot convert vwin->gui->video space, fall back to old code... */
 
   pthread_mutex_lock (&vwin->mutex);
-  xitk_window_get_window_position (vwin->wrapped_window, NULL, NULL, &wwin, &hwin);
-  if (wwin < 1 || hwin < 1) {
+  xitk_window_get_window_position (vwin->wrapped_window, &wr);
+  if (wr.width < 1 || wr.height < 1) {
     pthread_mutex_unlock (&vwin->mutex);
     return 0;
   }
 
   /* Scale co-ordinate to image dimensions. */
-  height_scale = (float)vwin->video_height / (float)hwin;
-  width_scale  = (float)vwin->video_width / (float)wwin;
+  height_scale = (float)vwin->video_height / (float)wr.height;
+  width_scale  = (float)vwin->video_width / (float)wr.width;
   aspect       = (float)vwin->video_width / (float)vwin->video_height;
-  if (((float)wwin / (float)hwin) < aspect) {
+  if (((float)wr.width / (float)wr.height) < aspect) {
     scale    = width_scale;
     xf       = (float)gui_x * scale;
     yf       = (float)gui_y * scale;
     /* wwin=wwin * scale; */
-    hwin     = hwin * scale;
+    wr.height = wr.height * scale;
     /* FIXME: The 1.25 should really come from the NAV packets. */
     *video_x = xf * 1.25 / aspect;
-    *video_y = yf - ((hwin - vwin->video_height) / 2);
+    *video_y = yf - ((wr.height - vwin->video_height) / 2);
     /* printf("wscale:a=%f, s=%f, x=%d, y=%d\n",aspect, scale,*video_x,*video_y);  */
   } else {
     scale    = height_scale;
     xf       = (float)gui_x * scale;
     yf       = (float)gui_y * scale;
-    wwin     = wwin * scale;
+    wr.width = wr.width * scale;
     /* FIXME: The 1.25 should really come from the NAV packets. */
-    *video_x = (xf - ((wwin - vwin->video_width) /2)) * 1.25 / aspect;
+    *video_x = (xf - ((wr.width - vwin->video_width) /2)) * 1.25 / aspect;
     *video_y = yf;
     /* printf("hscale:a=%f s=%f x=%d, y=%d\n",aspect,scale,*video_x,*video_y);  */
   }
@@ -1659,8 +1658,8 @@ static int video_window_check_mag (xui_vwin_t *vwin) {
 }
 
 static void video_window_calc_mag_win_size (xui_vwin_t *vwin, float xmag, float ymag) {
-  vwin->win_width  = (int) ((float) vwin->video_width * xmag + 0.5f);
-  vwin->win_height = (int) ((float) vwin->video_height * ymag + 0.5f);
+  vwin->win_r.width  = (int) ((float) vwin->video_width * xmag + 0.5f);
+  vwin->win_r.height = (int) ((float) vwin->video_height * ymag + 0.5f);
 }
 
 int video_window_set_mag (xui_vwin_t *vwin, float xmag, float ymag) {
@@ -1788,16 +1787,16 @@ static int _vwin_handle_be_event (void *data, const xitk_be_event_t *e) {
         vwin->output_width  = e->w;
         vwin->output_height = e->h;
         if ((e->x == 0) && (e->y == 0)) {
-          xitk_window_get_window_position (vwin->wrapped_window, &vwin->xwin, &vwin->ywin, NULL, NULL);
+          xitk_window_get_window_position (vwin->wrapped_window, &vwin->win_r);
         } else {
-          vwin->xwin = e->x;
-          vwin->ywin = e->y;
+          vwin->win_r.x = e->x;
+          vwin->win_r.y = e->y;
         }
 
         /* Keep geometry memory of windowed mode in sync. */
         if (vwin->fullscreen_mode & WINDOWED_MODE) {
-          vwin->old_win_width  = vwin->win_width  = vwin->output_width;
-          vwin->old_win_height = vwin->win_height = vwin->output_height;
+          vwin->old_win_r.width  = vwin->win_r.width  = vwin->output_width;
+          vwin->old_win_r.height = vwin->win_r.height = vwin->output_height;
         }
 
         if ((h != vwin->output_height) || (w != vwin->output_width))
@@ -1930,14 +1929,12 @@ void video_window_get_output_size (xui_vwin_t *vwin, int *w, int *h) {
 }
 
 void video_window_get_window_size (xui_vwin_t *vwin, int *window_width, int *window_height) {
-  if (!vwin) {
-    if (window_width)
-      *window_width = 0;
-    if (window_height)
-      *window_height = 0;
-    return;
-  }
-  xitk_window_get_window_position (vwin->wrapped_window, NULL, NULL, window_width, window_height);
+  xitk_rect_t wr = {0, 0, 0, 0};
+  xitk_window_get_window_position (vwin->wrapped_window, &wr);
+  if (window_width)
+    *window_width = wr.width;
+  if (window_height)
+    *window_height = wr.height;
 }
 
 void video_window_set_mrl (xui_vwin_t *vwin, char *mrl) {
@@ -1983,4 +1980,3 @@ void video_window_toggle_border (xui_vwin_t *vwin) {
                              (void*)xitk_window_get_native_id(vwin->wrapped_window));
   }
 }
-

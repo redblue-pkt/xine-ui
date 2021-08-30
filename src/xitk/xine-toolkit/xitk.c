@@ -918,6 +918,7 @@ static __gfx_t *_xitk_gfx_new (__xitk_t *xitk) {
   fx->wl.widget_focused     = NULL;
   fx->wl.widget_under_mouse = NULL;
   fx->wl.widget_pressed     = NULL;
+  fx->wl.widget_win_pos     = NULL;
   fx->wl.mouse.x            = 0;
   fx->wl.mouse.y            = 0;
   fx->wl.qual               = 0;
@@ -1530,15 +1531,18 @@ static void xitk_handle_event (__xitk_t *xitk, xitk_be_event_t *event) {
         fx->width = event->w;
         fx->height = event->h;
 
-        {
-          xitk_widget_t *w = (xitk_widget_t *)fx->wl.list.head.next;
-          while (w->node.next) {
-            if ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_COMBO)
-              xitk_combo_update_pos (w);
-            w = (xitk_widget_t *)w->node.next;
-          }
+        if (fx->wl.widget_win_pos) {
+          /* make open combo window follow alt-click-drag. */
+          widget_event_t we = {
+            .type = WIDGET_EVENT_WIN_POS,
+            .x = event->x,
+            .y = event->y,
+            .width = event->w,
+            .height = event->h
+          };
+          /* _not_ handled = ... */
+          fx->wl.widget_win_pos->event (fx->wl.widget_win_pos, &we, NULL);
         }
-
       }
       break;
 
