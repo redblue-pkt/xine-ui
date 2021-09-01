@@ -433,7 +433,7 @@ skin.SliderPl {
 	  x = 300
 	  y = 38
 	}
-	pixmap = SliderVBg.png
+	pixmap = PlBg.png|300,38,21,125
 	slider {
 	  pixmap = MainBits1.png|170,0,63,9
 	  type = vertical
@@ -461,7 +461,7 @@ skin.SliderHPl {
           x = 31
           y = 164
         }
-        pixmap = PlSlidHBg.png
+        pixmap = PlBg.png|31,164,241,20
         slider {
           pixmap = MainBits1.png|189,16,24,20
           type = horizontal
@@ -534,7 +534,7 @@ skin.SliderCtlHue {
 	  x = 34
 	  y = 36
 	}
-	pixmap = SliderVBg.png
+	pixmap = CtlBg.png|122,36,21,125
 	slider {
 	  pixmap = MainBits1.png|170,0,63,9
 	  type = vertical
@@ -558,7 +558,7 @@ skin.SliderCtlSat {
 	  x = 78
 	  y = 36
 	}
-	pixmap = SliderVBg.png
+	pixmap = CtlBg.png|122,36,21,125
 	slider {
 	  pixmap = MainBits1.png|170,0,63,9
 	type = vertical
@@ -582,7 +582,7 @@ skin.SliderCtlBright {
 	  x = 122
 	  y = 36
 	}
-	pixmap = SliderVBg.png
+	pixmap = CtlBg.png|122,36,21,125
 	slider {
 	  pixmap = MainBits1.png|170,0,63,9
 	  type = vertical
@@ -607,7 +607,7 @@ skin.SliderCtlCont {
 	  x = 166
 	  y = 36
 	}
-	pixmap = SliderVBg.png
+	pixmap = CtlBg.png|122,36,21,125
 	slider {
 	  pixmap = MainBits1.png|170,0,63,9
 	  type = vertical
@@ -631,7 +631,7 @@ skin.SliderCtlGamma {
 	  x = 210
 	  y = 36
 	}
-	pixmap = SliderVBg.png
+	pixmap = CtlBg.png|122,36,21,125
 	slider {
 	  pixmap = MainBits1.png|170,0,63,9
 	  type = vertical
@@ -655,7 +655,7 @@ skin.SliderCtlSharp {
 	  x = 254
 	  y = 36
 	}
-	pixmap = SliderVBg.png
+	pixmap = CtlBg.png|122,36,21,125
 	slider {
 	  pixmap = MainBits1.png|170,0,63,9
 	  type = vertical
@@ -679,7 +679,7 @@ skin.SliderCtlNoise {
 	  x = 298
 	  y = 36
 	}
-	pixmap = SliderVBg.png
+	pixmap = CtlBg.png|122,36,21,125
 	slider {
 	  pixmap = MainBits1.png|170,0,63,9
 	  type = vertical
@@ -723,7 +723,7 @@ skin.SliderCtlSk {
 	  x = 504
 	  y = 38
 	}
-	pixmap = SliderVBg.png
+	pixmap = CtlBg.png|122,36,21,125
 	slider {
 	  pixmap = MainBits1.png|170,0,63,9
 	  type = vertical
@@ -751,7 +751,7 @@ skin.SliderHCtlSk {
           x = 353
           y = 163
         }
-        pixmap = SkSlidHBg.png
+        pixmap = CtlBg.png|353,163,119,20
         slider {
           pixmap = MainBits1.png|170,16,18,20
           type = horizontal
@@ -876,7 +876,7 @@ skin.SliderMrl {
 	  x = 300
 	  y = 38
 	}
-	pixmap = SliderVBg.png
+	pixmap = MrlBg.png|300,38,21,125
 	slider {
 	  pixmap = MainBits1.png|170,0,63,9
 	  type = vertical
@@ -904,7 +904,7 @@ skin.SliderHMrl {
           x = 31
           y = 164
         }
-        pixmap = PlSlidHBg.png
+        pixmap = MrlBg.png|31,164,241,20
         slider {
           pixmap = MainBits1.png|189,16,24,20
           type = horizontal
