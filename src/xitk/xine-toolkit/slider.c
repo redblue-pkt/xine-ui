@@ -638,30 +638,55 @@ static int _xitk_slider_click (_slider_private_t *wp, int button, int bUp, int x
   return 0;
 }
 
+/*
+ * Return current position.
+ */
+static int _xitk_slider_get_pos (_slider_private_t *wp) {
+  return wp->sType == XITK_HVSLIDER
+         ? (wp->hv_max_y > 0 ? (int)wp->upper - wp->hv_info.v.pos : wp->hv_info.h.pos)
+         : wp->value;
+}
+int xitk_slider_get_pos (xitk_widget_t *w) {
+  _slider_private_t *wp;
+
+  xitk_container (wp, w, w);
+  if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER))
+    return _xitk_slider_get_pos (wp);
+  return -1;
+}
+
 static int _xitk_slider_key (_slider_private_t *wp, const char *string, int modifier) {
+  static const struct {int8_t x, y;} tab_ctrl[XITK_KEY_LASTCODE] = {
+    [XITK_KEY_LEFT]        = {-1,  0},
+    [XITK_KEY_RIGHT]       = { 1,  0},
+    [XITK_KEY_HOME]        = {-3, -3},
+    [XITK_KEY_END]         = { 3,  3},
+    [XITK_KEY_PREV]        = {-2, -2},
+    [XITK_KEY_NEXT]        = { 2,  2},
+    [XITK_KEY_UP]          = { 0, -1},
+    [XITK_KEY_DOWN]        = { 0,  1},
+    [XITK_KEY_DELETE]      = {15, 15},
+    [XITK_MOUSE_WHEEL_UP]  = {-1, -1},
+    [XITK_MOUSE_WHEEL_DOWN]= { 1,  1}
+  };
   int v, dx, dy;
 
   if (!(wp->w.state & XITK_WIDGET_STATE_ENABLE) || !string)
     return 0;
 
-  if (string[0] != XITK_CTRL_KEY_PREFIX)
-    return 0;
   if ((modifier & ~MODIFIER_NUML) != MODIFIER_NOMOD)
     return 0;
-
-  dx = dy = 0;
-  switch (string[1]) {
-    case XITK_KEY_LEFT: dx = -1; break;
-    case XITK_KEY_RIGHT: dx = 1; break;
-    case XITK_KEY_HOME: dx = dy = -3; break;
-    case XITK_KEY_END: dx = dy = 3; break;
-    case XITK_KEY_PREV: dx = dy = -2; break;
-    case XITK_KEY_NEXT: dx = dy = 2; break;
-    case XITK_KEY_UP: dy = -1; break;
-    case XITK_KEY_DOWN: dy = 1; break;
-    case XITK_MOUSE_WHEEL_UP: dx = dy = -1; break;
-    case XITK_MOUSE_WHEEL_DOWN: dx = dy = 1; break;
-    default: return 0;
+  if (string[0] == XITK_CTRL_KEY_PREFIX) {
+    uint8_t z = (uint8_t)string[1];
+    if (z >= XITK_KEY_LASTCODE)
+      return 0;
+    dx = tab_ctrl[z].x;
+    dy = tab_ctrl[z].y;
+  } else {
+    uint8_t z = (uint8_t)string[0] ^ '0';
+    if (z >= 10)
+      return 0;
+    dx = dy = 10 + z;
   }
 
   v = 0;
@@ -673,25 +698,24 @@ static int _xitk_slider_key (_slider_private_t *wp, const char *string, int modi
     v = dy ? -dy : dx;
 
   if (v) {
-    int nv;
-    if (v == -3) {
-      nv = xitk_slider_get_min (&wp->w);
+    int nv, ov = _xitk_slider_get_pos (wp);
+    int mn = wp->lower, mx = wp->upper;
+    if (v <= -10)
+      v = -v;
+    if (v >= 10) {
+      nv = mn + ((mx - mn) * (v - 10) + 5) / 10;
+    } else if (v == -3) {
+      nv = mn;
     } else if (v == 3) {
-      nv = xitk_slider_get_max (&wp->w);
-    } else if (v < 0) {
-      int m = xitk_slider_get_min (&wp->w);
-      v = xitk_slider_get_pos (&wp->w);
-      nv = v - wp->step;
-      if (nv < m)
-        nv = m;
+      nv = mx;
     } else {
-      int m = xitk_slider_get_max (&wp->w);
-      v = xitk_slider_get_pos (&wp->w);
-      nv = v + wp->step;
-      if (nv > m)
-        nv = m;
+      nv = ov + v * wp->step;
+      if (nv < mn)
+        nv = mn;
+      else if (nv > mx)
+        nv = mx;
     }
-    if (nv != v) {
+    if (nv != ov) {
       xitk_slider_set_pos (&wp->w, nv);
       if (wp->callback)
         wp->callback (&wp->w, wp->userdata, nv);
@@ -796,9 +820,9 @@ int xitk_slider_make_step(xitk_widget_t *w) {
 
   xitk_container (wp, w, w);
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
-    v = xitk_slider_get_pos (&wp->w);
+    v = _xitk_slider_get_pos (wp);
     if (!(wp->w.state & XITK_WIDGET_STATE_CLICK)) {
-      int m = xitk_slider_get_max (&wp->w);
+      int m = wp->upper;
       if (v < m) {
         v += wp->step;
         if (v > m)
@@ -819,9 +843,9 @@ int xitk_slider_make_backstep(xitk_widget_t *w) {
 
   xitk_container (wp, w, w);
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
-    v = xitk_slider_get_pos (&wp->w);
+    v = _xitk_slider_get_pos (wp);
     if (!(wp->w.state & XITK_WIDGET_STATE_CLICK)) {
-      int m = xitk_slider_get_min (&wp->w);
+      int m = wp->lower;
       if (v > m) {
         v -= wp->step;
         if (v < m)
@@ -906,22 +930,6 @@ void xitk_slider_set_to_max (xitk_widget_t *w) {
       wp->paint (wp, NULL);
     }
   }
-}
-
-/*
- * Return current position.
- */
-int xitk_slider_get_pos (xitk_widget_t *w) {
-  _slider_private_t *wp;
-
-  xitk_container (wp, w, w);
-  if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
-    int value = wp->sType == XITK_HVSLIDER
-              ? (wp->hv_max_y > 0 ? (int)wp->upper - wp->hv_info.v.pos : wp->hv_info.h.pos)
-              : wp->value;
-    return value;
-  }
-  return -1;
 }
 
 /*
