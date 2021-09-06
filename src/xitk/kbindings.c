@@ -159,7 +159,7 @@ struct xui_keyedit_s {
 
 #define WINDOW_WIDTH        530
 #define WINDOW_HEIGHT       456
-#define MAX_DISP_ENTRIES    11
+#define MAX_DISP_ENTRIES    12
 
 /*
   Remap file entries syntax are:
@@ -1136,9 +1136,9 @@ void kbedit_window (gGui_t *gui) {
   x = 15;
   y = 34;
 
-  xitk_image_draw_rectangular_box (bg, x, y, WINDOW_WIDTH - 30, MAX_DISP_ENTRIES * 20 + 16 + 10, DRAW_INNER);
+  xitk_image_draw_rectangular_box (bg, x, y, WINDOW_WIDTH - 30, MAX_DISP_ENTRIES * 20 + 10, DRAW_INNER);
 
-  y += MAX_DISP_ENTRIES * 20 + 16 + 10 + 30;
+  y += MAX_DISP_ENTRIES * 20 + 10 + 30;
   y1 = y; /* remember for later */
   xitk_image_draw_outter_frame (bg,
 		    _("Binding Action"), hboldfontname,
@@ -1176,7 +1176,7 @@ void kbedit_window (gGui_t *gui) {
   br.dbl_click_callback            = NULL;
   br.userdata                      = kbedit;
   kbedit->w[_W_browser] = xitk_noskin_browser_create (kbedit->widget_list, &br,
-    x + 5, y + 5, WINDOW_WIDTH - (30 + 10 + 16), 20, 16, br_fontname);
+    x + 5, y + 5, WINDOW_WIDTH - (30 + 10), 20, -16, br_fontname);
   xitk_add_widget (kbedit->widget_list, kbedit->w[_W_browser], XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
   xitk_browser_set_alignment (kbedit->w[_W_browser], ALIGN_LEFT);
@@ -1394,4 +1394,3 @@ void kbedit_window (gGui_t *gui) {
 
   xitk_window_set_input_focus (kbedit->xwin);
 }
-

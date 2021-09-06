@@ -53,12 +53,12 @@
 #endif
 
 
-#define WINDOW_WIDTH             570
+#define WINDOW_WIDTH             632
 #define WINDOW_HEIGHT            473
 
 #define MAX_SECTIONS             50
 
-#define MAX_DISP_ENTRIES         17
+#define MAX_DISP_ENTRIES         18
 
 typedef struct {
   char                 *name;
@@ -360,7 +360,7 @@ void help_panel (gGui_t *gui) {
     xitk_image_t *bg = xitk_window_get_background_image (help->xwin);
     if (bg) {
       xitk_image_draw_rectangular_box (bg, 15, 24 + help->tabs_height,
-        WINDOW_WIDTH - 30, MAX_DISP_ENTRIES * 20 + 16 + 10, DRAW_OUTTER);
+        WINDOW_WIDTH - 30, MAX_DISP_ENTRIES * 20 + 10, DRAW_OUTTER);
       xitk_window_set_background_image (help->xwin, bg);
     }
   }
@@ -380,7 +380,7 @@ void help_panel (gGui_t *gui) {
     br.dbl_click_callback            = NULL;
     br.userdata                      = NULL;
     help->browser = xitk_noskin_browser_create (help->widget_list, &br,
-      15 + 5, 24 + help->tabs_height + 5, WINDOW_WIDTH - (30 + 10 + 16), 20, 16, br_fontname);
+      15 + 5, 24 + help->tabs_height + 5, WINDOW_WIDTH - (30 + 10), 20, -16, br_fontname);
     xitk_add_widget (help->widget_list, help->browser, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
   }
   xitk_browser_set_alignment (help->browser, ALIGN_LEFT);
@@ -412,4 +412,3 @@ void help_panel (gGui_t *gui) {
   xitk_window_set_input_focus (help->xwin);
   help->gui->help = help;
 }
-

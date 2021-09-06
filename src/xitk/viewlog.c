@@ -41,7 +41,7 @@
 
 #define WINDOW_WIDTH        630
 #define WINDOW_HEIGHT       473
-#define MAX_DISP_ENTRIES    17
+#define MAX_DISP_ENTRIES    18
 
 struct xui_viewlog_s {
   gGui_t               *gui;
@@ -131,7 +131,7 @@ static void viewlog_paint_widgets (xui_viewlog_t *vl) {
 static void viewlog_clear_tab (xui_viewlog_t *vl) {
   xitk_image_t *im;
   int width = WINDOW_WIDTH - 30;
-  int height = MAX_DISP_ENTRIES * 20 + 16 + 10;
+  int height = MAX_DISP_ENTRIES * 20 + 10;
 
   im = xitk_image_new (vl->gui->xitk, NULL, 0, width, height);
 
@@ -295,7 +295,7 @@ static void viewlog_create_tabs (xui_viewlog_t *vl) {
     vl->tabs_height = xitk_get_widget_height (vl->tabs) - 1;
     bg = xitk_window_get_background_image (vl->xwin);
     xitk_image_draw_rectangular_box (bg, 15, 24 + vl->tabs_height,
-      WINDOW_WIDTH - 30, MAX_DISP_ENTRIES * 20 + 16 + 10, DRAW_OUTTER);
+      WINDOW_WIDTH - 30, MAX_DISP_ENTRIES * 20 + 10, DRAW_OUTTER);
     xitk_window_set_background_image (vl->xwin, bg);
   }
 
@@ -373,7 +373,7 @@ void viewlog_panel (gGui_t *gui) {
     br.dbl_click_callback            = NULL;
     br.userdata                      = NULL;
     vl->browser_widget = xitk_noskin_browser_create (vl->widget_list, &br,
-      15 + 5, (24 + vl->tabs_height) + 5, WINDOW_WIDTH - (30 + 10 + 16), 20, 16, br_fontname);
+      15 + 5, (24 + vl->tabs_height) + 5, WINDOW_WIDTH - (30 + 10), 20, -16, br_fontname);
     if (vl->browser_widget) {
       xitk_add_widget (vl->widget_list, vl->browser_widget, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
       xitk_browser_set_alignment (vl->browser_widget, ALIGN_LEFT);
