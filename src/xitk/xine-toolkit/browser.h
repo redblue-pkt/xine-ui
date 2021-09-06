@@ -83,7 +83,7 @@ int xitk_browser_get_current_selected (xitk_widget_t *w);
 /** Select the item 'select' in list */
 void xitk_browser_set_select (xitk_widget_t *w, int select);
 /** Release all enabled buttons */
-void xitk_browser_release_all_buttons (xitk_widget_t *w);
+#define xitk_browser_release_all_buttons(_w) xitk_browser_set_select (_w, -1)
 /** Return the number of displayed entries */
 int xitk_browser_get_num_entries (xitk_widget_t *w);
 /** Return the real number of first displayed in list */
