@@ -68,8 +68,7 @@ typedef struct _browser_private_s {
     int                   start, num, max;
     int                   width, x0, xmax, dx;
     int                   ymax;
-    uint8_t               i2v[MAX_VISIBLE];
-    uint8_t               v2i[MAX_VISIBLE];
+    int                   i2v, v2i, minus_max;
     xitk_short_string_t   fontname;
     xitk_widget_t        *btns[_W_LAST];
     struct _browser_private_s *blist[MAX_VISIBLE];
@@ -227,48 +226,46 @@ static void _browser_set_vslider (_browser_private_t *wp) {
 }
 
 static void _browser_vtab_init (_browser_private_t *wp) {
-  int i;
-  for (i = 0; i < MAX_VISIBLE; i++)
-    wp->visible.i2v[i] = wp->visible.v2i[i] = i;
-}
-
-static void _browser_vtab_move (_browser_private_t *wp, int by) {
-  int i;
-  for (i = 0; i < wp->visible.max; i++) {
-    int v = wp->visible.i2v[i];
-    v += by;
-    if (v < 0)
-      v += wp->visible.max;
-    else if (v >= wp->visible.max)
-      v -= wp->visible.max;
-    wp->visible.i2v[i] = v;
-    wp->visible.v2i[v] = i;
-  }
+  wp->visible.minus_max = -wp->visible.max;
+  wp->visible.i2v = wp->visible.v2i = 0;
 }
 
 #define _XITK_ZERO_TO_MAX_MINUS_1(_v,_max) ((unsigned int)(_v) < (unsigned int)(_max))
 
-static int _browser_item_2_visible (_browser_private_t *wp, int item) {
-  item -= wp->visible.start;
-  if (!_XITK_ZERO_TO_MAX_MINUS_1 (item, wp->visible.num))
-    return -1;
-  return wp->visible.i2v[item];
+static int _browser_i2v (_browser_private_t *wp, int i) {
+  i += wp->visible.i2v;
+  return i + (wp->visible.minus_max & ~((i + wp->visible.minus_max) >> (sizeof (i) * 8 - 1)));
+}
+static int _browser_l_i2v (_browser_private_t *wp, int i) {
+  i -= wp->visible.start;
+  return _XITK_ZERO_TO_MAX_MINUS_1 (i, wp->visible.num) ? _browser_i2v (wp, i) : -1;
+}
+static int _browser_v2i (_browser_private_t *wp, int v) {
+  v += wp->visible.v2i;
+  return v + (wp->visible.minus_max & ~((v + wp->visible.minus_max) >> (sizeof (v) * 8 - 1)));
+}
+static int _browser_l_v2i (_browser_private_t *wp, int v) {
+  return _XITK_ZERO_TO_MAX_MINUS_1 (v, wp->visible.max) ? _browser_v2i (wp, v) + wp->visible.start : -1;
 }
 
-static int _browser_visible_2_item (_browser_private_t *wp, int visible) {
-  if (!_XITK_ZERO_TO_MAX_MINUS_1 (visible, wp->visible.max))
-    return -1;
-  return wp->visible.v2i[visible] + wp->visible.start;
+static void _browser_vtab_move_b (_browser_private_t *wp, int by) {
+  wp->visible.i2v = _browser_i2v (wp, wp->visible.num + by);
+  wp->visible.v2i = _browser_v2i (wp, -by);
+}
+
+static void _browser_vtab_move_f (_browser_private_t *wp, int by) {
+  wp->visible.i2v = _browser_i2v (wp, by);
+  wp->visible.v2i = _browser_v2i (wp, wp->visible.num - by);
 }
 
 static int _browser_select (_browser_private_t *wp, int item) {
   int v;
   if (item == wp->items.selected)
     return 0;
-  v = _browser_item_2_visible (wp, wp->items.selected);
+  v = _browser_l_i2v (wp, wp->items.selected);
   if (v >= 0)
     xitk_labelbutton_set_state (wp->visible.btns[v + _W_items], 0);
-  v = _browser_item_2_visible (wp, item);
+  v = _browser_l_i2v (wp, item);
   if (v >= 0)
     xitk_labelbutton_set_state (wp->visible.btns[v + _W_items], 1);
   wp->items.selected = item;
@@ -289,7 +286,7 @@ static void browser_select(xitk_widget_t *w, void *data, int state, int modifier
 
   wp = *entry;
   num = entry - wp->visible.blist;
-  num = _browser_visible_2_item (wp, num);
+  num = _browser_l_v2i (wp, num);
   if (num < 0)
     return;
   {
@@ -316,7 +313,7 @@ static void _browser_hide_set_pos (_browser_private_t *wp) {
   int h = xitk_get_widget_height (wp->visible.btns[_W_items]) + wp->visible.ygap;
   int i, y = wp->visible.y;
   for (i = 0; i < wp->visible.max; i++) {
-    int v = wp->visible.i2v[i];
+    int v = _browser_i2v (wp, i);
     xitk_widgets_state (wp->visible.btns + _W_items + v, 1, XITK_WIDGET_STATE_VISIBLE, 0);
     xitk_set_widget_pos (wp->visible.btns[v + _W_items], wp->visible.x, y);
     y += h;
@@ -329,20 +326,22 @@ static void _browser_show (_browser_private_t *wp) {
 
   t = wp->w.state & (XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
   for (i = 0; i < wp->visible.num; i++) {
-    int v = wp->visible.i2v[i];
+    int v = _browser_i2v (wp, i);
     if (wp->visible.xmax)
       xitk_labelbutton_set_label_offset (wp->visible.btns[v + _W_items], -wp->visible.dx);
     state[v] = t;
   }
   t &= ~XITK_WIDGET_STATE_ENABLE;
   for (; i < wp->visible.max; i++) {
-    int v = wp->visible.i2v[i];
+    int v = _browser_i2v (wp, i);
     state[v] = t;
   }
-  if ((wp->items.selected >= wp->visible.start) && (wp->items.selected < wp->visible.start + wp->visible.num))
-    state[wp->visible.i2v[wp->items.selected - wp->visible.start]] |= XITK_WIDGET_STATE_ON;
-  if ((wp->items.last_over >= wp->visible.start) && (wp->items.last_over < wp->visible.start + wp->visible.num))
-    state[wp->visible.i2v[wp->items.last_over - wp->visible.start]] |= wp->w.state & XITK_WIDGET_STATE_FOCUS;
+  i = wp->items.selected - wp->visible.start;
+  if (_XITK_ZERO_TO_MAX_MINUS_1 (i, wp->visible.num))
+    state[_browser_i2v (wp, i)] |= XITK_WIDGET_STATE_ON;
+  i = wp->items.last_over - wp->visible.start;
+  if (_XITK_ZERO_TO_MAX_MINUS_1 (i, wp->visible.num))
+    state[_browser_i2v (wp, i)] |= wp->w.state & XITK_WIDGET_STATE_FOCUS;
 
   for (i = 0; i < wp->visible.max; i++)
     xitk_widgets_state (wp->visible.btns + _W_items + i, 1,
@@ -351,14 +350,17 @@ static void _browser_show (_browser_private_t *wp) {
 }
 
 static void _browser_set_label (_browser_private_t *wp, int start, int num) {
-  int i;
+  const char *slab[MAX_VISIBLE];
+  int i, n;
+  n = xitk_min (num, wp->items.snum - start);
+  for (i = 0; i < n; i++)
+    slab[i] = wp->items.shortcuts[start + i];
+  for (; i < num; i++)
+    slab[i] = "";
   for (i = 0; i < num; i++) {
-    int v = wp->visible.i2v[start - wp->visible.start];
-    xitk_labelbutton_change_label (wp->visible.btns[v + _W_items], wp->items.names[start]);
-    if (start < wp->items.snum)
-      xitk_labelbutton_change_shortcut_label (wp->visible.btns[v + _W_items],
-        wp->items.shortcuts[start], 0, NULL);
-    start += 1;
+    xitk_widget_t *w = wp->visible.btns[_W_items + _browser_i2v (wp, start + i - wp->visible.start)];
+    xitk_labelbutton_change_label (w, wp->items.names[start + i]);
+    xitk_labelbutton_change_shortcut_label (w, slab[i], 0, NULL);
   }
 }
 
@@ -379,13 +381,13 @@ static void _browser_move (_browser_private_t *wp, int by) {
   if (by < 0) {
     if (by > -wp->visible.max) {
       nnum = -by;
-      _browser_vtab_move (wp, by);
+      _browser_vtab_move_b (wp, by);
     }
   } else if (by > 0) {
     if (by < wp->visible.max) {
       nset += wp->visible.max - by;
       nnum = by;
-      _browser_vtab_move (wp, by);
+      _browser_vtab_move_f (wp, by);
     }
   }
 
@@ -416,10 +418,10 @@ static void _browser_paint (_browser_private_t *wp, const widget_event_t *event)
       if (!_XITK_ZERO_TO_MAX_MINUS_1 (i - wp->visible.start, wp->visible.num))
         i = wp->visible.start + (wp->visible.num >> 1);
       wp->items.last_over = i;
-      v = _browser_item_2_visible (wp, i);
+      v = _browser_l_i2v (wp, i);
     } else {
       v = _browser_get_focus (wp);
-      wp->items.last_over = _browser_visible_2_item (wp, v);
+      wp->items.last_over = _browser_l_v2i (wp, v);
     }
     if (v >= 0)
       xitk_widgets_state (wp->visible.btns + _W_items + v, 1, XITK_WIDGET_STATE_FOCUS, wp->w.state & XITK_WIDGET_STATE_FOCUS);
@@ -701,7 +703,7 @@ static int _browser_key (_browser_private_t *wp, const char *string, int modifie
         break;
     }
     v = _browser_get_focus (wp);
-    v = (v < 0) ? wp->visible.start + (wp->visible.num >> 1) : _browser_visible_2_item (wp, v);
+    v = (v < 0) ? wp->visible.start + (wp->visible.num >> 1) : _browser_l_v2i (wp, v);
   } while (0);
 
   if (string[0] != XITK_CTRL_KEY_PREFIX)
