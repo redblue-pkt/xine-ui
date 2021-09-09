@@ -114,11 +114,13 @@ typedef enum {
   _W_done,
   _W_comment,
   _W_key,
+  /* keep order */
   _W_ctrl,
   _W_meta,
   _W_mod3,
   _W_mod4,
   _W_mod5,
+  /* /keep order */
   _W_LAST
 } _W_t;
 
@@ -157,7 +159,7 @@ struct xui_keyedit_s {
   }                     kbr;
 };
 
-#define WINDOW_WIDTH        530
+#define WINDOW_WIDTH        576
 #define WINDOW_HEIGHT       456
 #define MAX_DISP_ENTRIES    12
 
@@ -1099,11 +1101,8 @@ void kbedit_window (gGui_t *gui) {
   xitk_labelbutton_widget_t  lb;
   xitk_label_widget_t        l;
   xitk_browser_widget_t      br;
-  xitk_button_widget_t       b;
-  int                        btnw = 80;
   int                        fontheight;
   xitk_font_t               *fs;
-  xitk_widget_t             *w;
   xui_keyedit_t             *kbedit;
 
   if (!gui)
@@ -1133,29 +1132,24 @@ void kbedit_window (gGui_t *gui) {
 
   bg = xitk_window_get_background_image (kbedit->xwin);
 
-  x = 15;
-  y = 34;
+#define _XBRD 15 /* window border */
+#define _XGAP 10
+#define _FRAMEWIDTH 2
+#define _CSIZE 10 /* checkbox */
+#define _XMODTEXT 40
+#define _XMODALL (2 * _FRAMEWIDTH + 5 * (_CSIZE + _XGAP + _XMODTEXT) + 6 * _XGAP)
+#define _XBTN ((WINDOW_WIDTH - 2 * _XBRD - 5 * _XGAP / 2) / 6)
 
-  xitk_image_draw_rectangular_box (bg, x, y, WINDOW_WIDTH - 30, MAX_DISP_ENTRIES * 20 + 10, DRAW_INNER);
+  y = 34;
+  xitk_image_draw_rectangular_box (bg, _XBRD, y, WINDOW_WIDTH - 2 * _XBRD, MAX_DISP_ENTRIES * 20 + 10, DRAW_INNER);
 
   y += MAX_DISP_ENTRIES * 20 + 10 + 30;
   y1 = y; /* remember for later */
-  xitk_image_draw_outter_frame (bg,
-		    _("Binding Action"), hboldfontname,
-		    x, y,
-		    (WINDOW_WIDTH - 30), 45);
+  xitk_image_draw_outter_frame (bg, _("Binding Action"), hboldfontname, _XBRD, y, WINDOW_WIDTH - 2 * _XBRD, 45);
 
   y += 45 + 3;
-  xitk_image_draw_outter_frame (bg,
-		    _("Key"), hboldfontname,
-		    x, y,
-		    120, 45);
-
-  xitk_image_draw_outter_frame (bg,
-		    _("Modifiers"), hboldfontname,
-		    x + 130, y,
-		    (WINDOW_WIDTH - (x + 130) - 15), 45);
-
+  xitk_image_draw_outter_frame (bg, _("Key"), hboldfontname, _XBRD, y, WINDOW_WIDTH - 2 * _XBRD - _XGAP / 2 - _XMODALL, 45);
+  xitk_image_draw_outter_frame (bg, _("Modifiers"), hboldfontname, WINDOW_WIDTH - _XBRD - _XMODALL, y, _XMODALL, 45);
 
   xitk_window_set_background_image (kbedit->xwin, bg);
 
@@ -1176,7 +1170,7 @@ void kbedit_window (gGui_t *gui) {
   br.dbl_click_callback            = NULL;
   br.userdata                      = kbedit;
   kbedit->w[_W_browser] = xitk_noskin_browser_create (kbedit->widget_list, &br,
-    x + 5, y + 5, WINDOW_WIDTH - (30 + 10), 20, -16, br_fontname);
+    _XBRD + 5, y + 5, WINDOW_WIDTH - 2 * (_XBRD + 5), 20, -16, br_fontname);
   xitk_add_widget (kbedit->widget_list, kbedit->w[_W_browser], XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
   xitk_browser_set_alignment (kbedit->w[_W_browser], ALIGN_LEFT);
@@ -1187,86 +1181,64 @@ void kbedit_window (gGui_t *gui) {
   y = y1 - 30 + 4;
 
   XITK_WIDGET_INIT(&lb);
+  lb.userdata          = kbedit;
+  lb.skin_element_name = NULL;
+  lb.align             = ALIGN_CENTER;
+
+  x = (WINDOW_WIDTH - 5 * _XGAP / 2 - 6 * _XBTN) / 2;
 
   lb.button_type       = RADIO_BUTTON;
   lb.label             = _("Alias");
-  lb.align             = ALIGN_CENTER;
   lb.callback          = NULL;
   lb.state_callback    = kbedit_alias;
-  lb.userdata          = kbedit;
-  lb.skin_element_name = NULL;
-  kbedit->w[_W_alias] = xitk_noskin_labelbutton_create (kbedit->widget_list, &lb, x, y, btnw, 23,
+  kbedit->w[_W_alias] = xitk_noskin_labelbutton_create (kbedit->widget_list, &lb, x, y, _XBTN, 23,
     XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_INV, hboldfontname);
   xitk_add_widget (kbedit->widget_list, kbedit->w[_W_alias], XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
-  x += btnw + 4;
-
+  x += _XBTN + _XGAP / 2;
   lb.button_type       = RADIO_BUTTON;
   lb.label             = _("Edit");
-  lb.align             = ALIGN_CENTER;
   lb.callback          = NULL;
   lb.state_callback    = kbedit_edit;
-  lb.userdata          = kbedit;
-  lb.skin_element_name = NULL;
-  kbedit->w[_W_edit] = xitk_noskin_labelbutton_create (kbedit->widget_list, &lb, x, y, btnw, 23,
+  kbedit->w[_W_edit] = xitk_noskin_labelbutton_create (kbedit->widget_list, &lb, x, y, _XBTN, 23,
     XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_INV, hboldfontname);
   xitk_add_widget (kbedit->widget_list, kbedit->w[_W_edit], XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
-  x += btnw + 4;
-
+  x += _XBTN + _XGAP / 2;
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Delete");
-  lb.align             = ALIGN_CENTER;
   lb.callback          = kbedit_delete;
   lb.state_callback    = NULL;
-  lb.userdata          = kbedit;
-  lb.skin_element_name = NULL;
-  kbedit->w[_W_delete] = xitk_noskin_labelbutton_create (kbedit->widget_list, &lb, x, y, btnw, 23,
+  kbedit->w[_W_delete] = xitk_noskin_labelbutton_create (kbedit->widget_list, &lb, x, y, _XBTN, 23,
     XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_INV, hboldfontname);
   xitk_add_widget (kbedit->widget_list, kbedit->w[_W_delete], XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
-  x += btnw + 4;
-
+  x += _XBTN + _XGAP / 2;
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Save");
-  lb.align             = ALIGN_CENTER;
   lb.callback          = kbedit_save;
   lb.state_callback    = NULL;
-  lb.userdata          = kbedit;
-  lb.skin_element_name = NULL;
-  kbedit->w[_W_save] = xitk_noskin_labelbutton_create (kbedit->widget_list, &lb, x, y, btnw, 23,
+  kbedit->w[_W_save] = xitk_noskin_labelbutton_create (kbedit->widget_list, &lb, x, y, _XBTN, 23,
     XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_INV, hboldfontname);
   xitk_add_widget (kbedit->widget_list, kbedit->w[_W_save], XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
-  x += btnw + 4;
-
+  x += _XBTN + _XGAP / 2;
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Reset");
-  lb.align             = ALIGN_CENTER;
   lb.callback          = kbedit_reset;
   lb.state_callback    = NULL;
-  lb.userdata          = kbedit;
-  lb.skin_element_name = NULL;
-  kbedit->w[_W_reset] =  xitk_noskin_labelbutton_create (kbedit->widget_list, &lb, x, y, btnw, 23,
+  kbedit->w[_W_reset] =  xitk_noskin_labelbutton_create (kbedit->widget_list, &lb, x, y, _XBTN, 23,
     XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_INV, hboldfontname);
   xitk_add_widget (kbedit->widget_list, kbedit->w[_W_reset], XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
-  x += btnw + 4;
-
+  x += _XBTN + _XGAP / 2;
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Done");
-  lb.align             = ALIGN_CENTER;
   lb.callback          = kbedit_exit;
   lb.state_callback    = NULL;
-  lb.userdata          = kbedit;
-  lb.skin_element_name = NULL;
-  kbedit->w[_W_done] = xitk_noskin_labelbutton_create (kbedit->widget_list, &lb, x, y, btnw, 23,
+  kbedit->w[_W_done] = xitk_noskin_labelbutton_create (kbedit->widget_list, &lb, x, y, _XBTN, 23,
     XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_INV, hboldfontname);
   xitk_add_widget (kbedit->widget_list, kbedit->w[_W_done], XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
-
-  x = 15;
-
-  XITK_WIDGET_INIT(&l);
 
   fs = xitk_font_load_font(gui->xitk, hboldfontname);
   fontheight = xitk_font_get_string_height(fs, " ");
@@ -1275,105 +1247,55 @@ void kbedit_window (gGui_t *gui) {
   y = y1 + (45 / 2);                /* Checkbox                     */
   y1 = y - ((fontheight - 10) / 2); /* Text, v-centered to ckeckbox */
 
+  XITK_WIDGET_INIT (&l);
   l.skin_element_name = NULL;
-  l.label             = "Binding Action";
   l.callback          = NULL;
-  kbedit->w[_W_comment] = xitk_noskin_label_create (kbedit->widget_list, &l, x + 10, y1,
-    WINDOW_WIDTH - 50 - 2, fontheight, hboldfontname);
+
+  l.label             = "Binding Action";
+  kbedit->w[_W_comment] = xitk_noskin_label_create (kbedit->widget_list, &l, _XBRD + _FRAMEWIDTH + _XGAP, y1,
+    WINDOW_WIDTH - 2 * (_XBRD + _FRAMEWIDTH + _XGAP), fontheight, hboldfontname);
   xitk_add_widget (kbedit->widget_list, kbedit->w[_W_comment], XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
   y += 45 + 3;
   y1 += 45 + 3;
 
-  l.skin_element_name = NULL;
   l.label             = "THE Key";
-  l.callback          = NULL;
-  kbedit->w[_W_key] = xitk_noskin_label_create (kbedit->widget_list, &l, x + 10, y1,
-    100, fontheight, hboldfontname);
+  kbedit->w[_W_key] = xitk_noskin_label_create (kbedit->widget_list, &l, _XBRD + _FRAMEWIDTH + _XGAP, y1,
+    WINDOW_WIDTH - 2 * (_XBRD + _FRAMEWIDTH + _XGAP) - _XMODALL - _XGAP / 2, fontheight, hboldfontname);
   xitk_add_widget (kbedit->widget_list, kbedit->w[_W_key], XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
-  x += 130 + 10;
+  {
+    static const char s[5][8] = { N_("ctrl"), N_("meta"), N_("mod3"), N_("mod4"), N_("mod5") };
+    xitk_button_widget_t b;
+    uint32_t i;
 
-  XITK_WIDGET_INIT (&b);
-  b.callback          = NULL;
-  b.state_callback    = kbedit_dummy;
-  b.userdata          = NULL;
-  b.skin_element_name = "XITK_NOSKIN_CHECK";
+    XITK_WIDGET_INIT (&b);
+    b.callback          = NULL;
+    b.state_callback    = kbedit_dummy;
+    b.userdata          = NULL;
+    b.skin_element_name = "XITK_NOSKIN_CHECK";
 
-  kbedit->w[_W_ctrl] = xitk_noskin_button_create (kbedit->widget_list, &b, x, y, 10, 10);
-  xitk_add_widget (kbedit->widget_list, kbedit->w[_W_ctrl], XITK_WIDGET_STATE_VISIBLE);
+    x = WINDOW_WIDTH - _XBRD - _XMODALL + _FRAMEWIDTH + _XGAP;
+    for (i = 0; i < sizeof (s) / sizeof (s[0]); i++) {
+      xitk_widget_t *w;
 
-  x += 15;
+      kbedit->w[_W_ctrl + i] = w = xitk_noskin_button_create (kbedit->widget_list, &b, x, y, _CSIZE, _CSIZE);
+      xitk_add_widget (kbedit->widget_list, w, XITK_WIDGET_STATE_VISIBLE);
+      x += _CSIZE + _XGAP;
+      l.label = gettext (s[i]);
+      w =  xitk_noskin_label_create (kbedit->widget_list, &l, x, y1, _XMODTEXT, fontheight, hboldfontname);
+      xitk_add_widget (kbedit->widget_list, w, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
+      x += _XMODTEXT + _XGAP;
+    }
+  }
 
-  l.skin_element_name = NULL;
-  l.label             = _("ctrl");
-  l.callback          = NULL;
-  w =  xitk_noskin_label_create (kbedit->widget_list, &l, x, y1, 40, fontheight, hboldfontname);
-  xitk_add_widget (kbedit->widget_list, w, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
-
-  x += 55;
-
-  kbedit->w[_W_meta] = xitk_noskin_button_create (kbedit->widget_list, &b, x, y, 10, 10);
-  xitk_add_widget (kbedit->widget_list, kbedit->w[_W_meta], XITK_WIDGET_STATE_VISIBLE);
-
-  x += 15;
-
-  l.skin_element_name = NULL;
-  l.label             = _("meta");
-  l.callback          = NULL;
-  w =  xitk_noskin_label_create (kbedit->widget_list, &l, x, y1, 40, fontheight, hboldfontname);
-  xitk_add_widget (kbedit->widget_list, w, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
-
-  x += 55;
-
-  kbedit->w[_W_mod3] = xitk_noskin_button_create (kbedit->widget_list, &b, x, y, 10, 10);
-  xitk_add_widget (kbedit->widget_list, kbedit->w[_W_mod3], XITK_WIDGET_STATE_VISIBLE);
-
-  x += 15;
-
-  l.skin_element_name = NULL;
-  l.label             = _("mod3");
-  l.callback          = NULL;
-  w =  xitk_noskin_label_create (kbedit->widget_list, &l, x, y1, 40, fontheight, hboldfontname);
-  xitk_add_widget (kbedit->widget_list, w, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
-
-  x += 55;
-
-  kbedit->w[_W_mod4] = xitk_noskin_button_create (kbedit->widget_list, &b, x, y, 10, 10);
-  xitk_add_widget (kbedit->widget_list, kbedit->w[_W_mod4], XITK_WIDGET_STATE_VISIBLE);
-
-  x += 15;
-
-  l.skin_element_name = NULL;
-  l.label             = _("mod4");
-  l.callback          = NULL;
-  w =  xitk_noskin_label_create (kbedit->widget_list, &l, x, y1, 40, fontheight, hboldfontname);
-  xitk_add_widget (kbedit->widget_list, w, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
-
-  x += 55;
-
-  kbedit->w[_W_mod5] = xitk_noskin_button_create (kbedit->widget_list, &b, x, y, 10, 10);
-  xitk_add_widget (kbedit->widget_list, kbedit->w[_W_mod5], XITK_WIDGET_STATE_VISIBLE);
-
-  x += 15;
-
-  l.skin_element_name = NULL;
-  l.label             = _("mod5");
-  l.callback          = NULL;
-  w =  xitk_noskin_label_create (kbedit->widget_list, &l, x, y1, 40, fontheight, hboldfontname);
-  xitk_add_widget (kbedit->widget_list, w, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
-
-  x = 15;
   y = WINDOW_HEIGHT - (23 + 15);
 
   lb.button_type       = RADIO_BUTTON;
   lb.label             = _("Grab");
-  lb.align             = ALIGN_CENTER;
   lb.callback          = NULL;
   lb.state_callback    = kbedit_grab;
-  lb.userdata          = kbedit;
-  lb.skin_element_name = NULL;
-  kbedit->w[_W_grab] = xitk_noskin_labelbutton_create (kbedit->widget_list, &lb, x, y, WINDOW_WIDTH - 30, 23,
+  kbedit->w[_W_grab] = xitk_noskin_labelbutton_create (kbedit->widget_list, &lb, _XBRD, y, WINDOW_WIDTH - 2 * _XBRD, 23,
     XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_INV, hboldfontname);
   xitk_add_widget (kbedit->widget_list, kbedit->w[_W_grab], XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
