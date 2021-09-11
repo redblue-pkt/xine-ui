@@ -62,7 +62,7 @@
 
 typedef struct {
   char                 *name;
-  const char          **content;
+  char                **content;
   int                   line_num;
   int                   order_num;
 } help_section_t;
@@ -89,72 +89,182 @@ struct xui_help_s {
 
 };
 
+static void _help_unload_string_list (char **list) {
+  if (list) {
+    free (list[0]);
+    free (list);
+  }
+}
+
+static char **_help_load_text_as_string_list (const char *filename, uint32_t *num_lines, xitk_recode_t *xr) {
+  char **list, *p, **rlist, *q;
+  uint32_t *bv, *pv, *ev;
+  uint32_t have, used, fsize, l;
+  FILE *f;
+
+  if (!filename)
+    return NULL;
+  if (!filename[0])
+    return NULL;
+
+  f = fopen (filename, "rb");
+  if (!f)
+    return NULL;
+  if (fseek (f, 0, SEEK_END)) {
+    fclose (f);
+    return NULL;
+  }
+  fsize = ftell (f);
+  if (fseek (f, 0, SEEK_SET)) {
+    fclose (f);
+    return NULL;
+  }
+
+  have = 256;
+  used = 1;
+  list = malloc (have * sizeof (*list));
+  if (!list) {
+    fclose (f);
+    return NULL;
+  }
+  if (fsize > 2 << 20)
+    fsize = 2 << 20;
+  bv = (uint32_t *)malloc ((fsize + 7) & ~3);
+  if (!bv) {
+    free (list);
+    fclose (f);
+    return NULL;
+  }
+  list[0] = p = (char *)bv;
+  fsize = fread (p, 1, fsize, f);
+  fclose (f);
+  memset (p + fsize, 0x0a, (~fsize & 3) + 4);
+
+  ev = bv + ((fsize + 3) >> 2);
+  for (pv = bv; pv < ev; pv++) {
+    union {uint32_t v; char b[4];} u;
+    uint32_t v;
+    while (1) {
+      v = *pv ^ ~0x0a0a0a0a;
+      v = (v & 0x80808080) & ((v & 0x7f7f7f7f) + 0x01010101);
+      if (v)
+        break;
+      pv++;
+    }
+    if (used + 5 > have) {
+      char **new = realloc (list, (have + 256) * sizeof (*list));
+      if (!new)
+        break;
+      list = new;
+      have += 256;
+    }
+    p = (char *)pv;
+    u.v = v;
+    if (u.b[0]) {
+      p[0] = 0;
+      list[used++] = p + 1;
+      if ((p > (char *)bv) && (p[-1] == '\r'))
+        p[-1] = 0;
+    }
+    if (u.b[1]) {
+      p[1] = 0;
+      list[used++] = p + 2;
+      if (p[0] == '\r')
+        p[0] = 0;
+    }
+    if (u.b[2]) {
+      p[2] = 0;
+      list[used++] = p + 3;
+      if (p[1] == '\r')
+        p[1] = 0;
+    }
+    if (u.b[3]) {
+      p[3] = 0;
+      list[used++] = p + 4;
+      if (p[2] == '\r')
+        p[2] = 0;
+    }
+  }
+  while (used && (list[used - 1] >= list[0] + fsize))
+    used--;
+  *num_lines = used;
+
+  if (!xr || !used) {
+    list[used] = NULL;
+    return list;
+  }
+
+  rlist = malloc ((used + 1) * sizeof (*rlist));
+  if (!rlist) {
+    list[used] = NULL;
+    return list;
+  }
+  q = malloc (2 * ((fsize + 7) & ~3));
+  if (!q) {
+    free (rlist);
+    list[used] = NULL;
+    return list;
+  }
+  p = q + 2 * fsize;
+  for (l = 0; l < used; l++) {
+    xitk_recode_string_t rr = {
+      .src = list[l],
+      .ssize = list[l + 1] - list[l] - 1,
+      .buf = rlist[l] = q,
+      .bsize = p - q,
+      .res = NULL,
+      .rsize = 0
+    };
+    xitk_recode2_do (xr, &rr);
+    if (rr.res != q) {
+      /* no recoding done/needed. */
+      free (rlist[0]);
+      free (rlist);
+      list[used] = NULL;
+      return list;
+    }
+    q += rr.rsize;
+    *q++ = 0;
+  }
+  rlist[used] = NULL;
+  _help_unload_string_list (list);
+  return rlist;
+}
+
 static void help_change_section (xitk_widget_t *w, void *data, int section) {
   xui_help_t *help = data;
 
   (void)w;
   if (section < help->num_sections)
-    xitk_browser_update_list (help->browser, help->sections[section]->content, NULL,
+    xitk_browser_update_list (help->browser, (const char * const *)help->sections[section]->content, NULL,
       help->sections[section]->line_num, 0);
 }
 
 static void help_add_section (xui_help_t *help, const char *filename, const char *doc_encoding,
   int order_num, char *section_name) {
-  struct stat  st;
-  xitk_recode_t *xr;
 
   /* ensure that the file is not empty */
-  if(help->num_sections < MAX_SECTIONS) {
-    if((stat(filename, &st) == 0) && (st.st_size)) {
-      int   fd;
+  if (help->num_sections < MAX_SECTIONS) {
+    xitk_recode_t *xr = xitk_recode_init (doc_encoding, NULL, 0);
+    uint32_t num_lines = 0;
+    char **rlist = _help_load_text_as_string_list (filename, &num_lines, xr);
 
-      assert(doc_encoding != NULL);
-      xr = xitk_recode_init (doc_encoding, NULL, 0);
+    xitk_recode_done (xr);
+    if (rlist && num_lines) {
+      help_section_t *section = (help_section_t *)calloc (1, sizeof (help_section_t));
 
-      if((fd = xine_open_cloexec(filename, O_RDONLY)) >= 0) {
-	char  *buf = NULL, *pbuf;
-	int    bytes_read;
+      if (section) {
+        section->name = strdup ((section_name && section_name[0]) ? section_name : _("Undefined"));
+        section->content = rlist;
+        section->line_num = num_lines;
+        section->order_num = order_num;
+        rlist = NULL;
 
-	if((buf = (char *) malloc(st.st_size + 1))) {
-	  if((bytes_read = read(fd, buf, st.st_size)) == st.st_size) {
-	    char  *p, **hbuf = NULL;
-	    int    lines = 0;
-
-	    buf[st.st_size] = '\0';
-
-	    pbuf = buf;
-	    while((p = xine_strsep(&pbuf, "\n")) != NULL) {
-	      hbuf  = (char **) realloc(hbuf, sizeof(char *) * (lines + 2));
-
-	      while((*(p + strlen(p) - 1) == '\n') || (*(p + strlen(p) - 1) == '\r'))
-		*(p + strlen(p) - 1) = '\0';
-
-              hbuf[lines] = xitk_recode(xr, p);
-	      hbuf[++lines]   = NULL;
-	    }
-
-	    if(lines) {
-	      help_section_t  *section;
-
-	      section = (help_section_t *) calloc(1, sizeof(help_section_t));
-
-	      section->name      = strdup((section_name && strlen(section_name)) ?
-					  section_name : _("Undefined"));
-	      section->content   = (const char **)hbuf;
-	      section->line_num  = lines;
-	      section->order_num = order_num;
-
-	      help->sections[help->num_sections++] = section;
-	      help->sections[help->num_sections]   = NULL;
-	    }
-	  }
-
-	  free(buf);
-	}
-	close(fd);
+        help->sections[help->num_sections++] = section;
+        help->sections[help->num_sections]   = NULL;
       }
-      xitk_recode_done(xr);
     }
+    _help_unload_string_list (rlist);
   }
 }
 
@@ -250,18 +360,9 @@ static void help_exit (xitk_widget_t *w, void *data, int state) {
       int i;
 
       for(i = 0; i < help->num_sections; i++) {
-	int j = 0;
-
 	free(help->tab_sections[i]);
-
 	free(help->sections[i]->name);
-
-	while(help->sections[i]->content[j]) {
-	  free((char *) help->sections[i]->content[j]);
-	  j++;
-	}
-
-	free(help->sections[i]->content);
+        _help_unload_string_list (help->sections[i]->content);
 	free(help->sections[i]);
       }
     }
