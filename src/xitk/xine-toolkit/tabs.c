@@ -30,110 +30,24 @@
 #include "labelbutton.h"
 #include "button.h"
 
-typedef struct _tabs_private_s {
+typedef struct {
   xitk_widget_t           w;
 
-  xitk_widget_t          *left;
-  xitk_widget_t          *right;
+  int                     all_width, lgap, rgap;
 
-  int                     x, y, width, all_width;
-  int                     lgap, rgap;
+  int                     num_entries, selected, start, stop;
 
-  int                     num_entries;
-  char                  **entries;
-
+  xitk_widget_t          *left, *right;
   xitk_widget_t          *tabs[MAX_TABS];
-  struct _tabs_private_s *ref[MAX_TABS];
 
-  int                     selected;
-  int                     start, stop;
-
-  int                     bheight;
+  uint8_t                 ref[MAX_TABS];
 
   xitk_state_callback_t  callback;
   void                   *userdata;
-
 } _tabs_private_t;
 
 static void _notify_destroy (_tabs_private_t *wp) {
   (void)wp;
-}
-
-static void _tabs_arrange (_tabs_private_t *wp, int start, int paint) {
-  int width;
-
-  if ((start < 0) || (start >= wp->num_entries) || (start == wp->start))
-    return;
-
-  if (wp->start < 0)
-    wp->start = 0;
-
-  xitk_widgets_state (wp->tabs + wp->start, wp->stop - wp->start, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE, 0);
-
-  wp->start = start;
-  wp->stop = wp->num_entries;
-  wp->lgap = 0;
-  wp->rgap = 0;
-  width = wp->all_width;
-
-  if (width > wp->w.width) {
-    int i, width = wp->w.width - 40;
-    for (i = wp->start; i < wp->stop; i++) {
-      int w = xitk_get_widget_width (wp->tabs[i]);
-      width -= w;
-      if (width < 0) {
-        width += w;
-        break;
-      }
-    }
-    wp->stop = i;
-    if (wp->start > 0) {
-      if (wp->stop < wp->num_entries) { /* middle */
-        wp->lgap = width >> 1;
-        wp->rgap = width - wp->lgap;
-      } else { /* right */
-        wp->lgap = width;
-      }
-    } else { /* left */
-      wp->rgap = width;
-    }
-    xitk_widgets_state (&wp->left, 1, XITK_WIDGET_STATE_ENABLE, wp->start <= 0 ? 0 : ~0u);
-    xitk_widgets_state (&wp->right, 1, XITK_WIDGET_STATE_ENABLE, wp->stop < wp->num_entries ? ~0u : 0);
-  }
-
-  {
-    int i, x = wp->w.x + wp->lgap;
-    if (wp->start > 0) {
-      int w = xitk_get_widget_width (wp->tabs[wp->start - 1]);
-      xitk_set_widget_pos (wp->tabs[wp->start - 1], x - w, wp->y);
-    }
-    for (i = wp->start; i < wp->stop; i++) {
-      int w = xitk_get_widget_width (wp->tabs[i]);
-      xitk_set_widget_pos (wp->tabs[i], x, wp->y);
-      x += w;
-    }
-    xitk_widgets_state (wp->tabs + wp->start, wp->stop - wp->start,
-        XITK_WIDGET_STATE_ENABLE | (paint ? XITK_WIDGET_STATE_VISIBLE : 0), ~0u);
-    if (wp->stop < wp->num_entries)
-      xitk_set_widget_pos (wp->tabs[wp->stop], x, wp->y);
-  }
-}
-
-static void _tabs_arrange_item (_tabs_private_t *wp, int item, int paint) {
-  if ((item < 0) || (item >= wp->num_entries))
-    return;
-
-  if (item < wp->start) {
-    _tabs_arrange (wp, item, paint);
-  } else if (item >= wp->stop) {
-    int width = wp->width - 40, i = wp->num_entries;
-
-    while ((i > 0) && (width >= 0))
-      width -= xitk_get_widget_width (wp->tabs[--i]);
-    if (width < 0)
-      i += 1;
-    _tabs_arrange (wp, i, paint);
-  }
 }
 
 static void _tabs_paint (_tabs_private_t *wp, widget_event_t *event) {
@@ -141,15 +55,12 @@ static void _tabs_paint (_tabs_private_t *wp, widget_event_t *event) {
   int x1, x2, y1, y2;
   uint32_t d = wp->w.state ^ wp->w.shown_state;
 
-  if (d & XITK_WIDGET_STATE_FOCUS) {
-    if ((wp->w.state & (XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE))
-      == (XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE)) {
-      xitk_widget_t *sel = wp->selected >= 0 ? wp->tabs[wp->selected] : NULL;
+  if (!(wp->w.state & XITK_WIDGET_STATE_VISIBLE))
+    return;
 
-      if (sel)
-        xitk_widgets_state (wp->tabs + wp->selected, 1, XITK_WIDGET_STATE_FOCUS,
-          (wp->w.state & XITK_WIDGET_STATE_FOCUS) ? ~0u : 0);
-    }
+  if (d & XITK_WIDGET_STATE_FOCUS) {
+    if (wp->w.state & XITK_WIDGET_STATE_ENABLE)
+      xitk_widgets_state (wp->tabs + wp->selected, 1, XITK_WIDGET_STATE_FOCUS, wp->w.state);
   }
 
   /* We have up to 2 partly visible tabs here. They are marked invisible
@@ -158,6 +69,8 @@ static void _tabs_paint (_tabs_private_t *wp, widget_event_t *event) {
    * manually here. */
 
   if (wp->lgap > 0) do {
+    if (!wp->tabs[wp->start - 1])
+      break;
     x1 = xitk_max (event->x, wp->w.x);
     x2 = xitk_min (event->x + event->width, wp->w.x + wp->lgap);
     if (x1 >= x2)
@@ -177,6 +90,8 @@ static void _tabs_paint (_tabs_private_t *wp, widget_event_t *event) {
   } while (0);
 
   if (wp->rgap > 0) do {
+    if (!wp->tabs[wp->stop])
+      break;
     x1 = xitk_max (event->x, wp->w.x + wp->w.width - 40 - wp->rgap);
     x2 = xitk_min (event->x + event->width, wp->w.x + wp->w.width - 40);
     if (x1 >= x2)
@@ -196,30 +111,123 @@ static void _tabs_paint (_tabs_private_t *wp, widget_event_t *event) {
   } while (0);
 }
 
+static int _tabs_arrange (_tabs_private_t *wp, int item) {
+  int width = wp->w.width;
+
+  if (width >= wp->all_width) {
+    if (wp->start == 0)
+      return 0;
+    xitk_widgets_state (wp->tabs + wp->start, wp->stop - wp->start, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE, 0);
+    wp->start = 0;
+    wp->stop = wp->num_entries;
+  } else if (item >= wp->stop) {
+    int i;
+    if (item >= wp->num_entries)
+      return 0;
+    xitk_widgets_state (wp->tabs + wp->start, wp->stop - wp->start, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE, 0);
+    wp->stop = item + 1;
+    width -= 40;
+    for (i = wp->stop - 1; i >= 0; i--) {
+      int w = xitk_get_widget_width (wp->tabs[i]);
+      width -= w;
+      if (width < 0) {
+        width += w;
+        break;
+      }
+    }
+    wp->start = i + 1;
+  } else if (item < wp->start) {
+    int i;
+    if (item < 0)
+      return 0;
+    xitk_widgets_state (wp->tabs + wp->start, wp->stop - wp->start, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE, 0);
+    wp->start = item;
+    width -= 40;
+    for (i = wp->start; i < wp->num_entries; i++) {
+      int w = xitk_get_widget_width (wp->tabs[i]);
+      width -= w;
+      if (width < 0) {
+        width += w;
+        break;
+      }
+    }
+    wp->stop = i;
+  } else {
+    return 0;
+  }
+
+  if (wp->start > 0) {
+    if (wp->stop < wp->num_entries) { /* middle */
+      wp->lgap = width >> 1;
+      wp->rgap = width - wp->lgap;
+    } else { /* right */
+      wp->lgap = width;
+      wp->rgap = 0;
+    }
+  } else { /* left */
+    wp->rgap = (wp->stop < wp->num_entries) ? width : 0;
+    wp->lgap = 0;
+  }
+  xitk_widgets_state (&wp->left, 1, XITK_WIDGET_STATE_ENABLE, wp->start <= 0 ? 0 : ~0u);
+  xitk_widgets_state (&wp->right, 1, XITK_WIDGET_STATE_ENABLE, wp->stop < wp->num_entries ? ~0u : 0);
+
+  {
+    int i, x = wp->w.x + wp->lgap;
+    if (wp->start > 0) {
+      int w = xitk_get_widget_width (wp->tabs[wp->start - 1]);
+      xitk_set_widget_pos (wp->tabs[wp->start - 1], x - w, wp->w.y);
+    }
+    for (i = wp->start; i < wp->stop; i++) {
+      int w = xitk_get_widget_width (wp->tabs[i]);
+      xitk_set_widget_pos (wp->tabs[i], x, wp->w.y);
+      x += w;
+    }
+    xitk_widgets_state (wp->tabs + wp->start, wp->stop - wp->start,
+      XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE, wp->w.state);
+    if (wp->stop < wp->num_entries)
+      xitk_set_widget_pos (wp->tabs[wp->stop], x, wp->w.y);
+  }
+
+  if (wp->w.state & XITK_WIDGET_STATE_VISIBLE) {
+    if ((wp->lgap > 0) && wp->tabs[wp->start - 1]) {
+      widget_event_t ne;
+      ne.type = WIDGET_EVENT_PAINT;
+      ne.x = wp->w.x;
+      ne.y = wp->w.y;
+      ne.width = wp->lgap;
+      ne.height = wp->w.height;
+      wp->tabs[wp->start - 1]->state |= XITK_WIDGET_STATE_VISIBLE;
+      wp->tabs[wp->start - 1]->event (wp->tabs[wp->start - 1], &ne, NULL);
+      wp->tabs[wp->start - 1]->state &= ~XITK_WIDGET_STATE_VISIBLE;
+    }
+    if ((wp->rgap > 0) && wp->tabs[wp->stop]) {
+      widget_event_t ne;
+      ne.type = WIDGET_EVENT_PAINT;
+      ne.x = wp->w.x + wp->w.width - 40 - wp->rgap;
+      ne.y = wp->w.y;
+      ne.width = wp->rgap;
+      ne.height = wp->w.height;
+      wp->tabs[wp->stop]->state |= XITK_WIDGET_STATE_VISIBLE;
+      wp->tabs[wp->stop]->event (wp->tabs[wp->stop], &ne, NULL);
+      wp->tabs[wp->stop]->state &= ~XITK_WIDGET_STATE_VISIBLE;
+    }
+  }
+
+  return 1;
+}
+
 /*
  *
  */
 static void _tabs_enability (_tabs_private_t *wp) {
-  if (wp->w.state & XITK_WIDGET_STATE_ENABLE) {
-    widget_event_t ne;
-    xitk_widgets_state (&wp->left, 1,
-      XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE,
-      (wp->start <= 0 ? 0 : XITK_WIDGET_STATE_ENABLE) | XITK_WIDGET_STATE_VISIBLE);
-    xitk_widgets_state (&wp->right, 1,
-      XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE,
-      (wp->stop < wp->num_entries ? XITK_WIDGET_STATE_ENABLE : 0) | XITK_WIDGET_STATE_VISIBLE);
-    xitk_widgets_state (wp->tabs + wp->start, wp->stop - wp->start,
-      XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE, ~0u);
-    ne.x = wp->w.x;
-    ne.y = wp->w.y;
-    ne.width = wp->w.width;
-    ne.height = wp->w.height;
-    _tabs_paint (wp, &ne);
-  } else {
-    xitk_widgets_state (&wp->left, 1, XITK_WIDGET_STATE_ENABLE, 0);
-    xitk_widgets_state (&wp->right, 1, XITK_WIDGET_STATE_ENABLE, 0);
-    xitk_widgets_state (wp->tabs + wp->start, wp->stop - wp->start, XITK_WIDGET_STATE_ENABLE, 0);
-  }
+  uint32_t state_left = wp->w.state, state_right = wp->w.state;
+  if (wp->start <= 0)
+    state_left &= ~XITK_WIDGET_STATE_ENABLE;
+  if (wp->stop >= wp->num_entries)
+    state_right &= ~XITK_WIDGET_STATE_ENABLE;
+  xitk_widgets_state (&wp->left, 1, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE, state_left);
+  xitk_widgets_state (&wp->right, 1, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE, state_right);
+  xitk_widgets_state (wp->tabs + wp->start, wp->stop - wp->start, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE, wp->w.state);
 }
 
 /*
@@ -227,17 +235,9 @@ static void _tabs_enability (_tabs_private_t *wp) {
  */
 static void _tabs_shift_left (xitk_widget_t *w, void *data) {
   _tabs_private_t *wp = (_tabs_private_t *)data;
-  widget_event_t ne;
 
   (void)w;
-  if (wp->start <= 0)
-    return;
-  _tabs_arrange (wp, wp->start - 1, (wp->w.state & XITK_WIDGET_STATE_VISIBLE));
-  ne.x = wp->w.x;
-  ne.y = wp->w.y;
-  ne.width = wp->w.width;
-  ne.height = wp->w.height;
-  _tabs_paint (wp, &ne);
+  _tabs_arrange (wp, wp->start - 1);
 }
 
 /*
@@ -245,17 +245,9 @@ static void _tabs_shift_left (xitk_widget_t *w, void *data) {
  */
 static void _tabs_shift_right (xitk_widget_t *w, void *data) {
   _tabs_private_t *wp = (_tabs_private_t *)data;
-  widget_event_t ne;
 
   (void)w;
-  if (wp->stop >= wp->num_entries)
-    return;
-  _tabs_arrange (wp, wp->start + 1, (wp->w.state & XITK_WIDGET_STATE_VISIBLE));
-  ne.x = wp->w.x;
-  ne.y = wp->w.y;
-  ne.width = wp->w.width;
-  ne.height = wp->w.height;
-  _tabs_paint (wp, &ne);
+  _tabs_arrange (wp, wp->stop);
 }
 
 static int _tabs_key (_tabs_private_t *wp, const char *string, int modifier) {
@@ -271,18 +263,15 @@ static int _tabs_key (_tabs_private_t *wp, const char *string, int modifier) {
         return 1;
       xitk_widgets_state (wp->tabs + wp->selected, 1, XITK_WIDGET_STATE_ON | XITK_WIDGET_STATE_FOCUS, 0);
       wp->selected -= 1;
-      if (wp->selected < wp->start)
-        _tabs_shift_left (NULL, wp);
     } else if (string[1] == XITK_KEY_RIGHT) {
       if (wp->selected + 1 >= wp->num_entries)
         return 1;
       xitk_widgets_state (wp->tabs + wp->selected, 1, XITK_WIDGET_STATE_ON | XITK_WIDGET_STATE_FOCUS, 0);
       wp->selected += 1;
-      if (wp->selected >= wp->stop)
-        _tabs_shift_right (NULL, wp);
     } else {
       return 0;
     }
+    _tabs_arrange (wp, wp->selected);
     xitk_widgets_state (wp->tabs + wp->selected, 1, XITK_WIDGET_STATE_ON | XITK_WIDGET_STATE_FOCUS, ~0u);
     if (wp->callback)
       wp->callback (&wp->w, wp->userdata, wp->selected);
@@ -323,13 +312,17 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
  *
  */
 static void tabs_select(xitk_widget_t *w, void *data, int select, int modifier) {
-  _tabs_private_t **ref = (_tabs_private_t **)data, *wp = *ref;
+  uint8_t *ref = (uint8_t *)data;
+  _tabs_private_t *wp;
+  uint32_t i;
 
   (void)w;
   (void)modifier;
+  i = *ref;
+  xitk_container (wp, ref, ref[i]);
   if (select) {
     xitk_widgets_state (wp->tabs + wp->selected, 1, XITK_WIDGET_STATE_FOCUS | XITK_WIDGET_STATE_ON, 0);
-    wp->selected = ref - wp->ref;
+    wp->selected = i;
     if (wp->callback)
       wp->callback (&wp->w, wp->userdata, wp->selected);
   } else {
@@ -346,10 +339,13 @@ void xitk_tabs_set_current_selected(xitk_widget_t *w, int select) {
   xitk_container (wp, w, w);
   if (wp && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_TABS)) {
     if ((select >= 0) && (select < wp->num_entries)) {
-      xitk_labelbutton_set_state (wp->tabs[wp->selected], 0);
+      uint32_t state = wp->tabs[wp->selected] ? wp->tabs[wp->selected]->state : 0;
+      xitk_widgets_state (wp->tabs + wp->selected, 1,
+        XITK_WIDGET_STATE_FOCUS | XITK_WIDGET_STATE_ON, 0);
       wp->selected = select;
-      _tabs_arrange_item (wp, wp->selected, (wp->w.state & XITK_WIDGET_STATE_VISIBLE));
-      xitk_labelbutton_set_state (wp->tabs[wp->selected], 1);
+      _tabs_arrange (wp, select);
+      xitk_widgets_state (wp->tabs + wp->selected, 1,
+        XITK_WIDGET_STATE_FOCUS | XITK_WIDGET_STATE_ON, state | XITK_WIDGET_STATE_ON);
     }
   }
 }
@@ -369,132 +365,124 @@ int xitk_tabs_get_current_selected(xitk_widget_t *w) {
 /*
  *
  */
-const char *xitk_tabs_get_current_tab_selected(xitk_widget_t *w) {
-  _tabs_private_t *wp;
-
-  xitk_container (wp, w, w);
-  if (wp && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_TABS))
-    return xitk_labelbutton_get_label (wp->tabs[wp->selected]);
-  return NULL;
-}
-
-/*
- *
- */
 xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
 				       xitk_tabs_widget_t *t,
                                        int x, int y, int width,
                                        const char *fontname) {
   _tabs_private_t *wp;
+  const char * const *entries;
+  int xa[MAX_TABS + 1];
+  static const char *none = "---";
 
   ABORT_IF_NULL(wl);
 
   XITK_CHECK_CONSTITENCY(t);
 
-  if((t->entries == NULL) || (t->num_entries == 0))
-    XITK_DIE("%s(): entries should be non NULL.\n", __FUNCTION__);
-
   wp = (_tabs_private_t *)xitk_widget_new (wl, sizeof (*wp));
   if (!wp)
     return NULL;
 
-  wp->entries     = t->entries;
-  wp->num_entries = t->num_entries;
-  wp->x           = x;
-  wp->y           = y;
-  wp->width       = width;
+  if (t->entries && (t->num_entries > 0)) {
+    wp->num_entries = t->num_entries <= MAX_TABS ? t->num_entries : MAX_TABS;
+    entries = t->entries;
+  } else {
+    wp->num_entries = 1;
+    entries = &none;
+  }
   wp->callback    = t->callback;
   wp->userdata    = t->userdata;
 
   wp->w.state    &= ~XITK_WIDGET_STATE_VISIBLE;
   wp->w.x         = x;
   wp->w.y         = y;
-  wp->w.width     = wp->width;
+  wp->w.width     = width;
   wp->w.type      = WIDGET_GROUP | WIDGET_TYPE_TABS | WIDGET_PARTIAL_PAINTABLE | WIDGET_KEYABLE | WIDGET_TABABLE;
   wp->w.event     = notify_event;
 
   {
-    xitk_font_t               *fs;
-    int                        fwidth, fheight, i;
+    xitk_font_t *fs = xitk_font_load_font (wl->xitk, fontname);
+    int fheight = xitk_font_get_string_height (fs, " ");
+    int xx = x, i;
     xitk_labelbutton_widget_t  lb;
-    int                        xx = x;
 
-    fs = xitk_font_load_font(wl->xitk, fontname);
-    fheight = xitk_font_get_string_height(fs, " ");
-
-    wp->w.height = wp->bheight = fheight + 18;
+    wp->w.height = fheight + 18;
 
     XITK_WIDGET_INIT(&lb);
+    lb.skin_element_name = NULL;
+    lb.button_type       = TAB_BUTTON;
+    lb.align             = ALIGN_CENTER;
+    lb.callback          = NULL;
+    lb.state_callback    = tabs_select;
 
     for (i = 0; i < wp->num_entries; i++) {
+      int fwidth = xitk_font_get_string_length (fs, t->entries[i]) + 20;
 
-      wp->ref[i]          = wp;
-
-      fwidth = xitk_font_get_string_length(fs, t->entries[i]);
-
-      lb.skin_element_name = NULL;
-      lb.button_type       = TAB_BUTTON;
-      lb.align             = ALIGN_CENTER;
-      lb.label             = t->entries[i];
-      lb.callback          = NULL;
-      lb.state_callback    = tabs_select;
-      lb.userdata          = (void *)&wp->ref[i];
+      xa[i] = xx;
+      wp->ref[i]  = i;
+      lb.label    = entries[i];
+      lb.userdata = wp->ref + i;
       if ((wp->tabs[i] = xitk_noskin_labelbutton_create (wl, &lb,
-        xx, y, fwidth + 20, wp->bheight, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, fontname))) {
+        xx, y, fwidth, wp->w.height, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, fontname))) {
         wp->tabs[i]->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_TABS;
         wp->tabs[i]->type &= ~WIDGET_TABABLE;
         xitk_dlist_add_tail (&wl->list, &wp->tabs[i]->node);
         xitk_widget_set_parent (wp->tabs[i], &wp->w);
-        xitk_widgets_state (wp->tabs + i, 1, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE, 0);
       }
-      xx += fwidth + 20;
+      xx += fwidth;
     }
+    xa[i] = xx;
     wp->all_width = xx - x;
-
-    /*
-       Add left/rigth arrows
-    */
-    if (wp->all_width > wp->w.width) {
-      xitk_button_widget_t b;
-
-      XITK_WIDGET_INIT (&b);
-      b.state_callback    = NULL;
-      b.userdata          = wp;
-
-      b.skin_element_name = "XITK_NOSKIN_LEFT";
-      b.callback          = _tabs_shift_left;
-      if ((wp->left = xitk_noskin_button_create (wl, &b,
-        wp->x + width - 40, y - 1 + wp->bheight - 20, 20, 20))) {
-        wp->left->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_TABS;
-        wp->left->type &= ~WIDGET_TABABLE;
-        xitk_dlist_add_tail (&wl->list, &wp->left->node);
-        xitk_widget_set_parent (wp->left, &wp->w);
-      }
-
-      xx += 20;
-      b.skin_element_name = "XITK_NOSKIN_RIGHT";
-      b.callback          = _tabs_shift_right;
-      if ((wp->right = xitk_noskin_button_create (wl, &b,
-        wp->x + width - 20, y - 1 + wp->bheight - 20, 20, 20))) {
-        wp->right->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_TABS;
-        wp->right->type &= ~WIDGET_TABABLE;
-        xitk_dlist_add_tail (&wl->list, &wp->right->node);
-        xitk_widget_set_parent (wp->right, &wp->w);
-      }
-    } else {
-      wp->left = NULL;
-      wp->right = NULL;
-    }
-
-    wp->selected = 0;
-    wp->start = -2;
-    wp->stop = wp->num_entries;
-    _tabs_arrange (wp, 0, 0);
-
-    xitk_font_unload_font(fs);
+    xitk_font_unload_font (fs);
+    xitk_widgets_state (wp->tabs, i, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE, 0);
   }
 
-  xitk_labelbutton_set_state (wp->tabs[wp->selected], 1);
+  /* Add left/rigth arrows */
+  if (wp->all_width > wp->w.width) {
+    xitk_button_widget_t b;
+    int i, right;
+
+    XITK_WIDGET_INIT (&b);
+    b.state_callback = NULL;
+    b.userdata       = wp;
+
+    b.skin_element_name = "XITK_NOSKIN_LEFT";
+    b.callback          = _tabs_shift_left;
+    if ((wp->left = xitk_noskin_button_create (wl, &b,
+      wp->w.x + width - 40, y - 1 + wp->w.height - 20, 20, 20))) {
+      wp->left->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_TABS;
+      wp->left->type &= ~WIDGET_TABABLE;
+      xitk_dlist_add_tail (&wl->list, &wp->left->node);
+      xitk_widget_set_parent (wp->left, &wp->w);
+      xitk_widgets_state (&wp->left, 1, XITK_WIDGET_STATE_ENABLE, 0);
+    }
+
+    b.skin_element_name = "XITK_NOSKIN_RIGHT";
+    b.callback          = _tabs_shift_right;
+    if ((wp->right = xitk_noskin_button_create (wl, &b,
+      wp->w.x + width - 20, y - 1 + wp->w.height - 20, 20, 20))) {
+      wp->right->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_TABS;
+      wp->right->type &= ~WIDGET_TABABLE;
+      xitk_dlist_add_tail (&wl->list, &wp->right->node);
+      xitk_widget_set_parent (wp->right, &wp->w);
+      xitk_widgets_state (&wp->left, 1, XITK_WIDGET_STATE_ENABLE, ~0u);
+    }
+
+    right = wp->w.x + wp->w.width - 40;
+    for (i = 0; xa[i + 1] <= right; i++) ;
+    wp->stop = i;
+    wp->rgap = right - xa[i];
+  } else {
+    wp->left = NULL;
+    wp->right = NULL;
+    wp->stop = wp->num_entries;
+    wp->rgap = 0;
+  }
+
+  wp->selected = 0;
+  wp->start = 0;
+  wp->lgap = 0;
+
+  xitk_widgets_state (wp->tabs + wp->selected, 1, XITK_WIDGET_STATE_ON, ~0u);
 
   return &wp->w;
 }

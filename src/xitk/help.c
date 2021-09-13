@@ -437,14 +437,14 @@ void help_panel (gGui_t *gui) {
 
     if (help->num_sections) {
       tab.num_entries = help->num_sections;
-      tab.entries     = help->tab_sections;
+      tab.entries     = (const char * const *)help->tab_sections;
     } else {
       static const char *no_section[2];
 
       no_section[0] = _("No Help Section Available");
       no_section[1] = NULL;
       tab.num_entries = 1;
-      tab.entries     = (char **)no_section;
+      tab.entries     = no_section;
     }
     tab.skin_element_name = NULL;
     tab.callback          = help_change_section;
@@ -513,3 +513,4 @@ void help_panel (gGui_t *gui) {
   xitk_window_set_input_focus (help->xwin);
   help->gui->help = help;
 }
+

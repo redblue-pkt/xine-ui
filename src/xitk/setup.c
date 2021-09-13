@@ -823,7 +823,7 @@ static void setup_sections (xui_setup_t *setup) {
 
   tab.skin_element_name = NULL;
   tab.num_entries       = setup->num_sections;
-  tab.entries           = setup->section_names;
+  tab.entries           = (const char * const *)setup->section_names;
   tab.callback          = setup_change_section;
   tab.userdata          = setup;
   setup->tabs = xitk_noskin_tabs_create (setup->widget_list, &tab, 15, 24, WINDOW_WIDTH - 30, tabsfontname);
