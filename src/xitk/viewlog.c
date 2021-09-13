@@ -228,7 +228,7 @@ static void viewlog_change_section (xitk_widget_t *wx, void *data, int section) 
       get_layer_above_video (vl->gui), 400, _("log info"), NULL, NULL,
       XITK_LABEL_OK, NULL, NULL, NULL, 0, ALIGN_CENTER,
       _("There is no log entry for logging section '%s'.\n"),
-      xitk_tabs_get_current_tab_selected (vl->tabs));
+      xine_get_log_names (vl->gui->xine)[xitk_tabs_get_current_selected (vl->tabs)]);
 #endif
 
   if (vl->gui->verbosity) {
@@ -271,22 +271,15 @@ static void viewlog_create_tabs (xui_viewlog_t *vl) {
   xitk_tabs_widget_t   tab;
   const char   *const *log_sections = xine_get_log_names(vl->gui->xine);
   unsigned int         log_section_count = xine_get_log_section_count(vl->gui->xine);
-  char                *tab_sections[log_section_count + 1];
-  unsigned int         i;
 
   /*
    * create log sections
    */
-  for(i = 0; i < log_section_count; i++) {
-    tab_sections[i] = (char *)log_sections[i];
-  }
-  tab_sections[i] = NULL;
-
   XITK_WIDGET_INIT (&tab);
 
   tab.skin_element_name = NULL;
   tab.num_entries       = log_section_count;
-  tab.entries           = tab_sections;
+  tab.entries           = log_sections;
   tab.callback          = viewlog_change_section;
   tab.userdata          = vl;
   vl->tabs = xitk_noskin_tabs_create (vl->widget_list, &tab, 15, 24, WINDOW_WIDTH - 30, tabsfontname);
@@ -423,4 +416,3 @@ void viewlog_panel (gGui_t *gui) {
 
   vl->gui->viewlog = vl;
 }
-
