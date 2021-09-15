@@ -257,20 +257,45 @@ static int _tabs_key (_tabs_private_t *wp, const char *string, int modifier) {
     return 0;
 
   if (string[0] == XITK_CTRL_KEY_PREFIX) {
-
-    if (string[1] == XITK_KEY_LEFT) {
-      if (wp->selected <= 0)
-        return 1;
-      xitk_widgets_state (wp->tabs + wp->selected, 1, XITK_WIDGET_STATE_ON | XITK_WIDGET_STATE_FOCUS, 0);
-      wp->selected -= 1;
-    } else if (string[1] == XITK_KEY_RIGHT) {
-      if (wp->selected + 1 >= wp->num_entries)
-        return 1;
-      xitk_widgets_state (wp->tabs + wp->selected, 1, XITK_WIDGET_STATE_ON | XITK_WIDGET_STATE_FOCUS, 0);
-      wp->selected += 1;
-    } else {
-      return 0;
+    int i;
+    switch (string[1]) {
+      case XITK_KEY_LEFT:
+        if ((i = wp->selected - 1) < 0)
+          i = 0;
+        break;
+      case XITK_KEY_RIGHT:
+        if ((i = wp->selected + 1) >= wp->num_entries)
+          i = wp->num_entries - 1;
+        break;
+      case XITK_KEY_PREV:
+        if ((i = wp->selected - 2) < 0)
+          i = 0;
+        break;
+      case XITK_KEY_NEXT:
+        if ((i = wp->selected + 2) >= wp->num_entries)
+          i = wp->num_entries - 1;
+        break;
+      case XITK_KEY_HOME:
+        i = 0;
+        break;
+      case XITK_KEY_END:
+        i = wp->num_entries - 1;
+        break;
+      case XITK_MOUSE_WHEEL_UP:
+        if ((i = wp->selected - 1) < 0)
+          i = wp->num_entries - 1;
+        break;
+      case XITK_MOUSE_WHEEL_DOWN:
+        if ((i = wp->selected + 1) >= wp->num_entries)
+          i = 0;
+        break;
+      default:
+        return 0;
     }
+    if (i == wp->selected)
+      return 1;
+    xitk_widgets_state (wp->tabs + wp->selected, 1, XITK_WIDGET_STATE_ON | XITK_WIDGET_STATE_FOCUS, 0);
+    wp->selected = i;
     _tabs_arrange (wp, wp->selected);
     xitk_widgets_state (wp->tabs + wp->selected, 1, XITK_WIDGET_STATE_ON | XITK_WIDGET_STATE_FOCUS, ~0u);
     if (wp->callback)
