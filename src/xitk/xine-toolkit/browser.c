@@ -314,7 +314,7 @@ static void _browser_hide_set_pos (_browser_private_t *wp) {
   int i, y = wp->visible.y;
   for (i = 0; i < wp->visible.max; i++) {
     int v = _browser_i2v (wp, i);
-    xitk_widgets_state (wp->visible.btns + _W_items + v, 1, XITK_WIDGET_STATE_VISIBLE, 0);
+    xitk_widgets_state (wp->visible.btns + _W_items + v, 1, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE, 0);
     xitk_set_widget_pos (wp->visible.btns[v + _W_items], wp->visible.x, y);
     y += h;
   }
@@ -324,14 +324,14 @@ static void _browser_show (_browser_private_t *wp) {
   uint32_t state[MAX_VISIBLE], t;
   int i;
 
-  t = wp->w.state & (XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
+  t = (wp->w.state & (XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE)) | XITK_WIDGET_STATE_RECHECK_MOUSE;
   for (i = 0; i < wp->visible.num; i++) {
     int v = _browser_i2v (wp, i);
     if (wp->visible.xmax)
       xitk_labelbutton_set_label_offset (wp->visible.btns[v + _W_items], -wp->visible.dx);
     state[v] = t;
   }
-  t &= ~XITK_WIDGET_STATE_ENABLE;
+  t &= ~(XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_RECHECK_MOUSE);
   for (; i < wp->visible.max; i++) {
     int v = _browser_i2v (wp, i);
     state[v] = t;
@@ -345,7 +345,8 @@ static void _browser_show (_browser_private_t *wp) {
 
   for (i = 0; i < wp->visible.max; i++)
     xitk_widgets_state (wp->visible.btns + _W_items + i, 1,
-      XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE | XITK_WIDGET_STATE_ON | XITK_WIDGET_STATE_MOUSE | XITK_WIDGET_STATE_FOCUS,
+      XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE | XITK_WIDGET_STATE_ON |
+      XITK_WIDGET_STATE_MOUSE | XITK_WIDGET_STATE_FOCUS | XITK_WIDGET_STATE_RECHECK_MOUSE,
       state[i]);
 }
 

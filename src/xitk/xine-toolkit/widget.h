@@ -91,13 +91,14 @@ struct xitk_widget_s {
   uint32_t               type;
 
   /* XITK_WIDGET_STATE_* */
-#define XITK_WIDGET_STATE_MOUSE 0x10000
-#define XITK_WIDGET_STATE_FOCUS 0x20000
+#define XITK_WIDGET_STATE_MOUSE 0x10000 /** << being under mouse pointer */
+#define XITK_WIDGET_STATE_FOCUS 0x20000 /** << reeiving keyboard input */
+#define XITK_WIDGET_STATE_RECHECK_MOUSE 0x40000000 /** << when enabling widgets */
   uint32_t               state;
   /* xitk_show_widgets () restores the state before xitk_hide_widgets (). */
   uint32_t               saved_state;
   /* detect state changes, and avoid double paint. */
-#define XITK_WIDGET_STATE_UNSET 0x80000000
+#define XITK_WIDGET_STATE_UNSET 0x80000000 /** << force repaint */
   uint32_t               shown_state;
 
   widget_event_notify_t  event;

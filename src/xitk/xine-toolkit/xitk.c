@@ -1490,11 +1490,15 @@ static void xitk_handle_event (__xitk_t *xitk, xitk_be_event_t *event) {
             fx->move.enabled = 0;
 
           if ((event->code == 4) || (event->code == 5)) {
-            if (fx->wl.widget_focused) {
-              xitk_widget_t *w = fx->wl.widget_focused;
-              const char sup[3] = {XITK_CTRL_KEY_PREFIX, XITK_MOUSE_WHEEL_UP, 0};
-              const char sdown[3] = {XITK_CTRL_KEY_PREFIX, XITK_MOUSE_WHEEL_DOWN, 0};
-              handled = xitk_widget_key_event (w, event->code == 4 ? sup : sdown, event->qual, 0);
+            xitk_widget_t *w = fx->wl.widget_under_mouse;
+            if (!w)
+              w = fx->wl.widget_focused;
+            if (w) {
+              static const char s[8] = {
+                XITK_CTRL_KEY_PREFIX, XITK_MOUSE_WHEEL_UP, 0, 0,
+                XITK_CTRL_KEY_PREFIX, XITK_MOUSE_WHEEL_DOWN, 0, 0
+              };
+              handled = xitk_widget_key_event (w, s + (event->code - 4) * 4, event->qual, 0);
             }
           }
 

@@ -527,6 +527,7 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int but
   }
 
   if (!bUp) {
+    uint32_t state = (button <= 2) ? (XITK_WIDGET_STATE_MOUSE | XITK_WIDGET_STATE_FOCUS) : XITK_WIDGET_STATE_MOUSE;
 
     if (w != wl->widget_focused) {
 
@@ -539,11 +540,12 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int but
         _xitk_widget_paint (wl->widget_focused, &event);
       }
 
-      wl->widget_focused = w;
+      if (button <= 2)
+        wl->widget_focused = w;
 
       if (w) {
         if ((w->type & WIDGET_FOCUSABLE) && (w->state & XITK_WIDGET_STATE_ENABLE)) {
-          w->state |= XITK_WIDGET_STATE_MOUSE | XITK_WIDGET_STATE_FOCUS;
+          w->state |= state;
         } else {
           wl->widget_focused = NULL;
         }
@@ -882,18 +884,26 @@ static void xitk_widget_paint (xitk_widget_t *w) {
 
 static void _xitk_widget_able (xitk_widget_t *w) {
   if ((w->state ^ w->shown_state) & (XITK_WIDGET_STATE_UNSET | XITK_WIDGET_STATE_ENABLE)) {
+    widget_event_t  event;
+
     if (w->wl) {
       if (w->state & XITK_WIDGET_STATE_ENABLE) {
-#if 0
-        int dx = w->wl->mouse.x - w->x, dy = w->wl->mouse.y - w->y;
-        if ((dx >= 0) && (dx < w->width) && (dy >= 0) && (dy < w->height)) {
-          /* enabling the widget under mouse. this may happen when opening menu or
-           * switching tabs by keyboard. better dont grab focus here now, and
-           * wait for user moving the mouse again. */
-          xitk_motion_notify_widget_list (w->wl, w->wl->mouse.x, w->wl->mouse.y, w->wl->qual);
+        if (w->state & XITK_WIDGET_STATE_RECHECK_MOUSE) {
+          /* enabling the widget under mouse. this may happen when opening menu.
+           * better dont grab focus there now, and wait for user moving the mouse again.
+           * when caller wants it (moving tabs bar or browser), grab focus. */
+          w->state &= ~XITK_WIDGET_STATE_RECHECK_MOUSE;
+          if (!w->wl->widget_under_mouse) {
+            int dx = w->wl->mouse.x - w->x, dy = w->wl->mouse.y - w->y;
+            if (_ZERO_TO_MAX_MINUS_1 (dx, w->width) && _ZERO_TO_MAX_MINUS_1 (dy, w->height)) {
+              event.type = WIDGET_EVENT_INSIDE;
+              event.x = w->wl->mouse.x;
+              event.y = w->wl->mouse.y;
+              if (w->event (w, &event, NULL) != 2)
+                w->state |= XITK_WIDGET_STATE_MOUSE;
+            }
+          }
         }
-#endif
-        ;
       } else {
         if (w == w->wl->widget_under_mouse)
           xitk_tips_hide_tips (w->wl->xitk->tips);
@@ -904,8 +914,6 @@ static void _xitk_widget_able (xitk_widget_t *w) {
       }
     }
     if (w->type & WIDGET_GROUP) {
-      widget_event_t  event;
-
       event.type = WIDGET_EVENT_ENABLE;
       w->event (w, &event, NULL);
     }
@@ -1035,7 +1043,7 @@ unsigned int xitk_widgets_state (xitk_widget_t * const *w, unsigned int n, unsig
   uint32_t _and, _or, _new = 0;
 
   mask &= XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE | XITK_WIDGET_STATE_ON | XITK_WIDGET_STATE_IMMEDIATE |
-    XITK_WIDGET_STATE_MOUSE | XITK_WIDGET_STATE_FOCUS;
+    XITK_WIDGET_STATE_MOUSE | XITK_WIDGET_STATE_FOCUS | XITK_WIDGET_STATE_RECHECK_MOUSE;
   /* disable implies lose focus. */
   if (mask & ~state & XITK_WIDGET_STATE_ENABLE) {
     mask |= XITK_WIDGET_STATE_MOUSE | XITK_WIDGET_STATE_FOCUS;
