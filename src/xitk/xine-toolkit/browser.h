@@ -71,7 +71,6 @@ xitk_widget_t *xitk_browser_create (xitk_widget_list_t *wl,
 /** Create the list browser with generic skin.
  *  If slider width is < 0, sliders and move buttons appear if needed only
  *  within (itemw) x (itemh * br->browser.max_displayed_entries).
- *  NOTE: this does not yet re-evaluate with xitk_browser_update_list ().
  *  If slider width is 0, movement will be keyboard and mouse wheel only. */
 xitk_widget_t *xitk_noskin_browser_create (xitk_widget_list_t *wl,
   const xitk_browser_widget_t *br,
