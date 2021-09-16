@@ -183,7 +183,8 @@ static int _tabs_arrange (_tabs_private_t *wp, int item) {
       x += w;
     }
     xitk_widgets_state (wp->tabs + wp->start, wp->stop - wp->start,
-      XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE, wp->w.state);
+      XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE | XITK_WIDGET_STATE_RECHECK_MOUSE,
+      wp->w.state | XITK_WIDGET_STATE_RECHECK_MOUSE);
     if (wp->stop < wp->num_entries)
       xitk_set_widget_pos (wp->tabs[wp->stop], x, wp->w.y);
   }
@@ -257,6 +258,7 @@ static int _tabs_key (_tabs_private_t *wp, const char *string, int modifier) {
     return 0;
 
   if (string[0] == XITK_CTRL_KEY_PREFIX) {
+    uint32_t mask = XITK_WIDGET_STATE_ON | XITK_WIDGET_STATE_FOCUS;
     int i;
     switch (string[1]) {
       case XITK_KEY_LEFT:
@@ -282,10 +284,12 @@ static int _tabs_key (_tabs_private_t *wp, const char *string, int modifier) {
         i = wp->num_entries - 1;
         break;
       case XITK_MOUSE_WHEEL_UP:
+        mask = XITK_WIDGET_STATE_ON;
         if ((i = wp->selected - 1) < 0)
           i = wp->num_entries - 1;
         break;
       case XITK_MOUSE_WHEEL_DOWN:
+        mask = XITK_WIDGET_STATE_ON;
         if ((i = wp->selected + 1) >= wp->num_entries)
           i = 0;
         break;
@@ -294,10 +298,10 @@ static int _tabs_key (_tabs_private_t *wp, const char *string, int modifier) {
     }
     if (i == wp->selected)
       return 1;
-    xitk_widgets_state (wp->tabs + wp->selected, 1, XITK_WIDGET_STATE_ON | XITK_WIDGET_STATE_FOCUS, 0);
+    xitk_widgets_state (wp->tabs + wp->selected, 1, mask, 0);
     wp->selected = i;
     _tabs_arrange (wp, wp->selected);
-    xitk_widgets_state (wp->tabs + wp->selected, 1, XITK_WIDGET_STATE_ON | XITK_WIDGET_STATE_FOCUS, ~0u);
+    xitk_widgets_state (wp->tabs + wp->selected, 1, mask, ~0u);
     if (wp->callback)
       wp->callback (&wp->w, wp->userdata, wp->selected);
     return 1;
