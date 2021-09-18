@@ -44,12 +44,7 @@ typedef struct _slider_private_s {
   float                   angle;
   float                   percentage;
 
-  float                   upper;
-  float                   value;
-  float                   lower;
-  int                     step;
-
-  int                     radius;
+  int                     upper, lower, step, value, radius;
 
   xitk_part_image_t       paddle_skin;
   xitk_part_image_t       bg_skin;
@@ -113,13 +108,15 @@ static int _xitk_slider_report_xy (_slider_private_t *wp, int x, int y) {
 /*
  *
  */
-static int _xitk_slider_update_value (_slider_private_t *wp, float value) {
+static int _xitk_slider_update_value (_slider_private_t *wp, int value, int clip) {
   float range;
 
-  if (value < wp->lower)
-    value = wp->lower;
-  else if (value > wp->upper)
-    value = wp->upper;
+  if (clip) {
+    if (value < wp->lower)
+      value = wp->lower;
+    else if (value > wp->upper)
+      value = wp->upper;
+  }
   if (value == wp->value)
     return 0;
 
@@ -141,14 +138,14 @@ static void _xitk_slider_update_minmax (_slider_private_t *wp, float min, float 
 
   wp->upper = (min == max) ? max + 1 : max;
   wp->lower = min;
-  _xitk_slider_update_value (wp, wp->value);
+  _xitk_slider_update_value (wp, wp->value, 1);
 }
 
 /*
  *
  */
 static int _xitk_slider_update_xy (_slider_private_t *wp, int x, int y) {
-  float value;
+  int value;
 
   if (wp->sType == XITK_RSLIDER) {
 
@@ -161,7 +158,7 @@ static int _xitk_slider_update_xy (_slider_private_t *wp, int x, int y) {
       angle = -M_PI / 6;
     if (angle > 7. * M_PI / 6.)
       angle = 7. * M_PI / 6.;
-    value = (7. * M_PI / 6 - angle) / (4. * M_PI / 3.);
+    value = (7. * M_PI / 6 - angle) / (4. * M_PI / 3.) * (wp->upper - wp->lower) + 0.5;
 
   } else if (wp->sType == XITK_HSLIDER) {
 
@@ -171,7 +168,7 @@ static int _xitk_slider_update_xy (_slider_private_t *wp, int x, int y) {
       x -= wp->button_width >> 1;
       width -= wp->button_width;
     }
-    value = (float)x / (float)width;
+    value = ((wp->upper - wp->lower) * x + (width >> 1)) / width;
 
   } else { /* wp->sType == XITK_VSLIDER */
 
@@ -181,11 +178,11 @@ static int _xitk_slider_update_xy (_slider_private_t *wp, int x, int y) {
       y -= wp->paddle_skin.height >> 1;
       height -= wp->paddle_skin.height;
     }
-    value = (float)(height - y) / (float)height;
+    value = ((wp->upper - wp->lower) * (height - y) + (height >> 1)) / height;
 
   }
 
-  return _xitk_slider_update_value (wp, wp->lower + (value * (wp->upper - wp->lower)));
+  return _xitk_slider_update_value (wp, wp->lower + value, 1);
 }
 
 /*
@@ -397,7 +394,7 @@ static void _xitk_slider_paint_h (_slider_private_t *wp, const widget_event_t *e
         if (wp->bar_mode && (wp->paddle_drawn_here.fx == paddle_x)) {
           /* nasty little shortcut ;-) */
           int oldpos = wp->paddle_drawn_here.w;
-          int newpos = (int)wp->value / ((wp->upper - wp->lower) / wp->bg_skin.width);
+          int newpos = (wp->value * wp->bg_skin.width + ((wp->upper - wp->lower) >> 1)) / (wp->upper - wp->lower);
 
           if (newpos < oldpos) {
             xitk_part_image_draw (wp->w.wl, &wp->bg_skin, NULL,
@@ -428,7 +425,7 @@ static void _xitk_slider_paint_h (_slider_private_t *wp, const widget_event_t *e
 
     if (wp->w.state & XITK_WIDGET_STATE_ENABLE) {
       if (wp->bar_mode == 1) {
-        wp->paddle_drawn_here.w  = (int)wp->value / ((wp->upper - wp->lower) / wp->bg_skin.width);
+        wp->paddle_drawn_here.w = (wp->value * wp->bg_skin.width + ((wp->upper - wp->lower) >> 1)) / (wp->upper - wp->lower);
         wp->paddle_drawn_here.x = 0;
       } else {
         wp->paddle_drawn_here.x = ((wp->w.width - paddle_width) * .01) * (wp->percentage * 100.0) + 0.5;
@@ -467,7 +464,7 @@ static void _xitk_slider_paint_v (_slider_private_t *wp, const widget_event_t *e
         if (wp->bar_mode && (wp->paddle_drawn_here.fx == paddle_x)) {
           /* nasty little shortcut ;-) */
           int oldpos = wp->paddle_drawn_here.y;
-          int newpos = (int)wp->value / ((wp->upper - wp->lower) / wp->bg_skin.height);
+          int newpos = (wp->value * wp->bg_skin.height + ((wp->upper - wp->lower) >> 1)) / (wp->upper - wp->lower);
 
           newpos = wp->bg_skin.height - newpos;
           if (newpos > oldpos) {
@@ -500,7 +497,7 @@ static void _xitk_slider_paint_v (_slider_private_t *wp, const widget_event_t *e
 
     if (wp->w.state & XITK_WIDGET_STATE_ENABLE) {
       if (wp->bar_mode == 1) {
-        wp->paddle_drawn_here.h  = (int)wp->value / ((wp->upper - wp->lower) / wp->bg_skin.height);
+        wp->paddle_drawn_here.h = (wp->value * wp->bg_skin.height + ((wp->upper - wp->lower) >> 1)) / (wp->upper - wp->lower);
         wp->paddle_drawn_here.y =
         wp->paddle_drawn_here.fy = paddle_height - wp->paddle_drawn_here.h;
       } else {
@@ -608,7 +605,7 @@ static int _xitk_slider_click (_slider_private_t *wp, int button, int bUp, int x
       if (wp->sType == XITK_HVSLIDER) {
         /* if this thing really moves x and y, use xitk_slider_hv_sync (). */
         moved = _xitk_slider_report_xy (wp, x, y);
-        value = wp->hv_max_y > 0 ? (int)wp->upper - wp->hv_info.v.pos : wp->hv_info.h.pos;
+        value = wp->hv_max_y > 0 ? wp->upper - wp->hv_info.v.pos : wp->hv_info.h.pos;
       } else {
         moved = _xitk_slider_update_xy (wp, (x - wp->w.x), (y - wp->w.y));
         value = wp->value;
@@ -643,7 +640,7 @@ static int _xitk_slider_click (_slider_private_t *wp, int button, int bUp, int x
  */
 static int _xitk_slider_get_pos (_slider_private_t *wp) {
   return wp->sType == XITK_HVSLIDER
-         ? (wp->hv_max_y > 0 ? (int)wp->upper - wp->hv_info.v.pos : wp->hv_info.h.pos)
+         ? (wp->hv_max_y > 0 ? wp->upper - wp->hv_info.v.pos : wp->hv_info.h.pos)
          : wp->value;
 }
 
@@ -654,7 +651,7 @@ static void _xitk_slider_set_pos (_slider_private_t *wp, int pos) {
   if (!(wp->w.state & XITK_WIDGET_STATE_CLICK)) {
     if (wp->sType == XITK_HVSLIDER) {
       if (wp->hv_max_y > 0) {
-        pos = (int)wp->upper - pos;
+        pos = wp->upper - pos;
         if (wp->hv_info.v.pos != pos) {
           wp->hv_info.v.pos = pos;
           wp->paint (wp, NULL);
@@ -665,15 +662,12 @@ static void _xitk_slider_set_pos (_slider_private_t *wp, int pos) {
           wp->paint (wp, NULL);
         }
       }
-      if ((pos >= (int)wp->lower) && (pos <= (int)wp->upper))
+      if ((pos >= wp->lower) && (pos <= wp->upper))
         wp->value = pos;
     } else {
-      float value = (float) pos;
-
-      if ((value >= wp->lower) && (value <= wp->upper)) {
-        _xitk_slider_update_value (wp, value);
-        wp->paint (wp, NULL);
-      }
+      if ((pos >= wp->lower) && (pos <= wp->upper))
+        if (_xitk_slider_update_value (wp, pos, 0))
+          wp->paint (wp, NULL);
     }
   }
 }
@@ -812,8 +806,17 @@ static int xitk_slider_event (xitk_widget_t *w, const widget_event_t *event) {
       wp->paint (wp, event);
       return 0;
     case WIDGET_EVENT_SELECT:
-      if (event->button != XITK_INT_KEEP)
-        _xitk_slider_set_pos (wp, event->button);
+      if (event->button != XITK_INT_KEEP) {
+        int v = event->button;
+        switch (v) {
+          case XITK_SLIDER_MIN: v = wp->lower; break;
+          case XITK_SLIDER_MAX: v = wp->upper; break;
+          case XITK_SLIDER_PLUS: v = xitk_min (_xitk_slider_get_pos (wp) + wp->step, wp->upper); break;
+          case XITK_SLIDER_MINUS: v = xitk_max (_xitk_slider_get_pos (wp) - wp->step, wp->lower); break;
+	  default: ;
+        }
+        _xitk_slider_set_pos (wp, v);
+      }
       return _xitk_slider_get_pos (wp);
     case WIDGET_EVENT_KEY:
       return event->pressed ? _xitk_slider_key (wp, event->string, event->modifier) : 0;
@@ -839,52 +842,6 @@ static int xitk_slider_event (xitk_widget_t *w, const widget_event_t *event) {
 }
 
 /*
- * Increment position
- */
-int xitk_slider_make_step(xitk_widget_t *w) {
-  _slider_private_t *wp;
-  int v = 0;
-
-  xitk_container (wp, w, w);
-  if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
-    v = _xitk_slider_get_pos (wp);
-    if (!(wp->w.state & XITK_WIDGET_STATE_CLICK)) {
-      int m = wp->upper;
-      if (v < m) {
-        v += wp->step;
-        if (v > m)
-          v = m;
-        _xitk_slider_set_pos (wp, v);
-      }
-    }
-  }
-  return v;
-}
-
-/*
- * Decrement position
- */
-int xitk_slider_make_backstep(xitk_widget_t *w) {
-  _slider_private_t *wp;
-  int v = 0;
-
-  xitk_container (wp, w, w);
-  if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
-    v = _xitk_slider_get_pos (wp);
-    if (!(wp->w.state & XITK_WIDGET_STATE_CLICK)) {
-      int m = wp->lower;
-      if (v > m) {
-        v -= wp->step;
-        if (v < m)
-          v = m;
-        _xitk_slider_set_pos (wp, v);
-      }
-    }
-  }
-  return v;
-}
-
-/*
  * Set value MIN.
  */
 void xitk_slider_set_min (xitk_widget_t *w, int min) {
@@ -892,7 +849,7 @@ void xitk_slider_set_min (xitk_widget_t *w, int min) {
 
   xitk_container (wp, w, w);
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER))
-    _xitk_slider_update_minmax (wp, (float)((min == wp->upper) ? min - 1 : min), wp->upper);
+    _xitk_slider_update_minmax (wp, (min == wp->upper) ? min - 1 : min, wp->upper);
 }
 
 /*
@@ -915,7 +872,7 @@ int xitk_slider_get_max (xitk_widget_t *w) {
 
   xitk_container (wp, w, w);
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER))
-    return (int)wp->upper;
+    return wp->upper;
   return -1;
 }
 
@@ -928,35 +885,6 @@ void xitk_slider_set_max (xitk_widget_t *w, int max) {
   xitk_container (wp, w, w);
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER))
     _xitk_slider_update_minmax (wp, wp->lower, (float)((max == wp->lower) ? max + 1 : max));
-}
-
-/*
- * Set pos to 0 and redraw the widget.
- */
-void xitk_slider_reset (xitk_widget_t *w) {
-  _slider_private_t *wp;
-
-  xitk_container (wp, w, w);
-  if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
-    _xitk_slider_update_value (wp, 0.0);
-    wp->w.state &= ~XITK_WIDGET_STATE_CLICK;
-    wp->paint (wp, NULL);
-  }
-}
-
-/*
- * Set pos to max and redraw the widget.
- */
-void xitk_slider_set_to_max (xitk_widget_t *w) {
-  _slider_private_t *wp;
-
-  xitk_container (wp, w, w);
-  if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
-    if (!(wp->w.state & XITK_WIDGET_STATE_CLICK)) {
-      _xitk_slider_update_value (wp, wp->upper);
-      wp->paint (wp, NULL);
-    }
-  }
 }
 
 void xitk_slider_hv_sync (xitk_widget_t *w, xitk_slider_hv_t *info, xitk_slider_sync_t mode) {
@@ -1029,8 +957,8 @@ void xitk_slider_hv_sync (xitk_widget_t *w, xitk_slider_hv_t *info, xitk_slider_
 static xitk_widget_t *_xitk_slider_create (_slider_private_t *wp, xitk_slider_widget_t *s) {
   wp->angle              = 0.0;
 
-  wp->upper              = (float)((s->min == s->max) ? s->max + 1 : s->max);
-  wp->lower              = (float)s->min;
+  wp->upper              = (s->min == s->max) ? s->max + 1 : s->max;
+  wp->lower              = s->min;
 
   wp->value              = 0.0;
   wp->percentage         = 0.0;
