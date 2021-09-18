@@ -110,7 +110,7 @@ static void _db_tips_timeout (_doublebox_private_t *wp, unsigned long timeout) {
     xitk_set_widget_tips_and_timeout (wp->iw[_W_input], wp->w.tips_string, timeout);
 }
 
-static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
+static int notify_event (xitk_widget_t *w, const widget_event_t *event) {
   _doublebox_private_t *wp;
 
   xitk_container (wp, w, w);
@@ -118,7 +118,6 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
     return 0;
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_DOUBLEBOX)
     return 0;
-  (void)result;
 
   switch (event->type) {
     case WIDGET_EVENT_PAINT:
@@ -314,3 +313,4 @@ xitk_widget_t *xitk_noskin_doublebox_create (xitk_widget_list_t *wl,
 
   return &wp->w;
 }
+

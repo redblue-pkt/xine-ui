@@ -922,6 +922,7 @@ static __gfx_t *_xitk_gfx_new (__xitk_t *xitk) {
   fx->wl.mouse.x            = 0;
   fx->wl.mouse.y            = 0;
   fx->wl.qual               = 0;
+  fx->wl.flags              = 0;
 
   fx->xitk                  = xitk;
   fx->refs                  = 1;
@@ -1280,7 +1281,7 @@ static void xitk_handle_event (__xitk_t *xitk, xitk_be_event_t *event) {
         widget_event_t we;
 
         we.type = WIDGET_EVENT_CLIP_READY;
-        (void)xitk->clipboard.widget_in->event (xitk->clipboard.widget_in, &we, NULL);
+        xitk->clipboard.widget_in->event (xitk->clipboard.widget_in, &we);
         xitk->clipboard.widget_in = NULL;
       }
       break;
@@ -1545,7 +1546,7 @@ static void xitk_handle_event (__xitk_t *xitk, xitk_be_event_t *event) {
             .height = event->h
           };
           /* _not_ handled = ... */
-          fx->wl.widget_win_pos->event (fx->wl.widget_win_pos, &we, NULL);
+          fx->wl.widget_win_pos->event (fx->wl.widget_win_pos, &we);
         }
       }
       break;

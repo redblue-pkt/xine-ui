@@ -576,6 +576,9 @@ int xitk_get_widget_pos(xitk_widget_t *w, int *x, int *y);
  */
 uint32_t xitk_get_widget_type(xitk_widget_t *w);
 
+/** use XITK_INT_KEEP to just query. */
+int xitk_widget_select (xitk_widget_t *w, int index);
+
 /**
  * Set widgets of widget list visible.
  */

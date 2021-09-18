@@ -256,7 +256,7 @@ const char *xitk_label_get_label (xitk_widget_t *w) {
 /*
  *
  */
-static void _label_paint (_label_private_t *wp, widget_event_t *event) {
+static void _label_paint (_label_private_t *wp, const widget_event_t *event) {
 #ifdef XITK_PAINT_DEBUG
     printf ("xitk.label.paint (%d, %d, %d, %d).\n", event->x, event->y, event->width, event->height);
 #endif
@@ -493,7 +493,7 @@ static int _label_click (_label_private_t *wp, int button, int bUp, int x, int y
   return ret;
 }
 
-static int notify_event (xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
+static int notify_event (xitk_widget_t *w, const widget_event_t *event) {
   _label_private_t *wp;
 
   xitk_container (wp, w, w);
@@ -520,8 +520,8 @@ static int notify_event (xitk_widget_t *w, widget_event_t *event, widget_event_r
       _label_destroy (wp);
       break;
     case WIDGET_EVENT_GET_SKIN:
-      if (result) {
-        result->image = _label_get_skin (wp, event->skin_layer);
+      if (event->image) {
+        *event->image = _label_get_skin (wp, event->skin_layer);
         return 1;
       }
       break;
@@ -665,4 +665,3 @@ xitk_widget_t *xitk_noskin_label_create (xitk_widget_list_t *wl,
 
   return _label_create (wp, l);
 }
-

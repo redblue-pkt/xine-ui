@@ -357,7 +357,7 @@ static int _notify_inside (_inputtext_private_t *wp, int x, int y) {
 /*
  * Paint the input text box.
  */
-static void _paint_partial_inputtext (_inputtext_private_t *wp, widget_event_t *event) {
+static void _paint_partial_inputtext (_inputtext_private_t *wp, const widget_event_t *event) {
   xitk_font_t         *fs = NULL;
   int                  xsize, ysize, lbear, rbear, width, asc, des;
   int                  cursor_x, yoff = 0;
@@ -989,7 +989,7 @@ static int _inputtext_key (_inputtext_private_t *wp, const char *s, int modifier
   return 1;
 }
 
-static int notify_event (xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
+static int notify_event (xitk_widget_t *w, const widget_event_t *event) {
   _inputtext_private_t *wp;
 
   xitk_container (wp, w, w);
@@ -1015,8 +1015,8 @@ static int notify_event (xitk_widget_t *w, widget_event_t *event, widget_event_r
       _notify_destroy (wp);
       return 0;
     case WIDGET_EVENT_GET_SKIN:
-      if (result) {
-        result->image = _get_skin (wp, event->skin_layer);
+      if (event->image) {
+        *event->image = _get_skin (wp, event->skin_layer);
         return 1;
       }
       return 0;

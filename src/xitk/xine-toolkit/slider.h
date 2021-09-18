@@ -61,9 +61,9 @@ xitk_widget_t *xitk_slider_create (xitk_widget_list_t *wl, xitk_skin_config_t *s
 xitk_widget_t *xitk_noskin_slider_create (xitk_widget_list_t *wl, xitk_slider_widget_t *s,
   int x, int y, int width, int height, int type);
 /** * Get current position of paddle. */
-int xitk_slider_get_pos (xitk_widget_t *);
+#define xitk_slider_get_pos(_w) xitk_widget_select (_w, XITK_INT_KEEP)
 /** Set position of paddle. */
-void xitk_slider_set_pos (xitk_widget_t *, int);
+#define xitk_slider_set_pos(_w, _pos) xitk_widget_select (_w, _pos)
 /** * Set min value of slider. */
 void xitk_slider_set_min (xitk_widget_t *, int);
 /** Set max value of slider. */

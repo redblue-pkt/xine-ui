@@ -462,7 +462,7 @@ static void _browser_paint (_browser_private_t *wp, const widget_event_t *event)
         .height = y2
       };
       w->state |= XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE;
-      w->event (w, &e2, NULL);
+      w->event (w, &e2);
       w->state &= ~(XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
     }
   }
@@ -780,7 +780,19 @@ static int _browser_key (_browser_private_t *wp, const char *string, int modifie
   return 0;
 }
 
-static int browser_notify_event (xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
+static int _browser_event_select (_browser_private_t *wp, int item) {
+  if (item != XITK_INT_KEEP) {
+    gettimeofday (&wp->click_time, NULL);
+    _browser_select (wp, item);
+    if (wp->items.selected >= 0) {
+      _browser_move (wp, wp->items.selected - (wp->visible.max >> 1) - wp->visible.start);
+      _browser_set_vslider (wp);
+    }
+  }
+  return wp->items.selected;
+}
+
+static int browser_notify_event (xitk_widget_t *w, const widget_event_t *event) {
   _browser_private_t *wp;
 
   xitk_container (wp, w, w);
@@ -788,7 +800,6 @@ static int browser_notify_event (xitk_widget_t *w, widget_event_t *event, widget
     return 0;
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_BROWSER)
     return 0;
-  (void)result;
   switch (event->type) {
     case WIDGET_EVENT_PAINT:
       _browser_paint (wp, event);
@@ -804,6 +815,8 @@ static int browser_notify_event (xitk_widget_t *w, widget_event_t *event, widget
     case WIDGET_EVENT_ENABLE:
       _browser_enability (wp);
       break;
+    case WIDGET_EVENT_SELECT:
+      return _browser_event_select (wp, event->button);
     default: ;
   }
   return 0;
@@ -854,43 +867,6 @@ void xitk_browser_set_alignment(xitk_widget_t *w, int align) {
     xitk_labelbutton_set_alignment (wp->visible.btns[i + _W_items], align);
   _browser_set_hslider (wp, 1);
   _browser_move (wp, 0);
-}
-
-/**
- * Return the current selected button (if not, return -1)
- */
-static int _xitk_browser_get_current_selected (_browser_private_t *wp) {
-  return wp->items.selected;
-}
-int xitk_browser_get_current_selected(xitk_widget_t *w) {
-  _browser_private_t *wp;
-
-  xitk_container (wp, w, w);
-  if (!wp)
-    return -1;
-  if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_BROWSER)
-    return -1;
-  return _xitk_browser_get_current_selected (wp);
-}
-
-/**
- * Select the item 'select' in list
- */
-void xitk_browser_set_select (xitk_widget_t *w, int item) {
-  _browser_private_t *wp;
-
-  xitk_container (wp, w, w);
-  if (!wp)
-    return;
-  if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_BROWSER)
-    return;
-
-  gettimeofday (&wp->click_time, NULL);
-  _browser_select (wp, item);
-  if (wp->items.selected >= 0) {
-    _browser_move (wp, wp->items.selected - (wp->visible.max >> 1) - wp->visible.start);
-    _browser_set_vslider (wp);
-  }
 }
 
 /**

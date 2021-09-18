@@ -78,9 +78,9 @@ xitk_widget_t *xitk_noskin_browser_create (xitk_widget_list_t *wl,
 /** Update the list, and rebuild button list */
 void xitk_browser_update_list (xitk_widget_t *w, const char *const *list, const char *const *shortcut, int len, int start);
 /** Return the current selected button (if not, return -1) */
-int xitk_browser_get_current_selected (xitk_widget_t *w);
+#define xitk_browser_get_current_selected(_w) xitk_widget_select (_w, XITK_INT_KEEP)
 /** Select the item 'select' in list */
-void xitk_browser_set_select (xitk_widget_t *w, int select);
+#define xitk_browser_set_select(_w,index) xitk_widget_select (_w, index)
 /** Release all enabled buttons */
 #define xitk_browser_release_all_buttons(_w) xitk_browser_set_select (_w, -1)
 /** Return the number of displayed entries */

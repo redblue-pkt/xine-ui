@@ -135,9 +135,14 @@ static int combo_event (void *data, const xitk_be_event_t *e) {
       _combo_close (wp, 1);
       return 1;
     case XITK_EV_KEY_DOWN:
-      if ((e->utf8[0] == XITK_CTRL_KEY_PREFIX) && (e->utf8[1] == XITK_KEY_ESCAPE)) {
-        _combo_close (wp, 1);
-        return 1;
+      if (e->utf8[0] == XITK_CTRL_KEY_PREFIX) {
+        switch (e->utf8[1]) {
+          case XITK_KEY_ESCAPE:
+            _combo_close (wp, 1);
+            return 1;
+          default:
+            return 0;
+        }
       }
       break;
 #if 0
@@ -352,7 +357,17 @@ static void _combo_tips_timeout (_combo_private_t *wp, unsigned long timeout) {
     xitk_set_widget_tips_and_timeout (wp->iw[_W_button], wp->w.tips_string, timeout);
 }
 
-static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
+static int _combo_event_select (_combo_private_t *wp, int index) {
+  if ((index >= 0) && (index < wp->num_entries) && (index != wp->selected)) {
+    if (wp->entries && wp->entries[index]) {
+      wp->selected = index;
+      xitk_label_change_label (wp->iw[_W_label], wp->entries[index]);
+    }
+  }
+  return wp->selected;
+}
+
+static int notify_event(xitk_widget_t *w, const widget_event_t *event) {
   _combo_private_t *wp;
 
   xitk_container (wp, w, w);
@@ -361,7 +376,6 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_COMBO)
     return 0;
 
-  (void)result;
   switch (event->type) {
     case WIDGET_EVENT_PAINT:
       _combo_paint (wp);
@@ -377,6 +391,52 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
       break;
     case WIDGET_EVENT_TIPS_TIMEOUT:
       _combo_tips_timeout (wp, event->tips_timeout);
+      break;
+    case WIDGET_EVENT_SELECT:
+      return _combo_event_select (wp, event->button);
+    case WIDGET_EVENT_KEY:
+      if (event->pressed && event->string && event->string[0] == XITK_CTRL_KEY_PREFIX
+        && !(event->modifier & (MODIFIER_CTRL | MODIFIER_SHIFT))) {
+        int i;
+        switch (event->string[1]) {
+          case XITK_KEY_HOME:
+            i = 0;
+            break;
+          case XITK_KEY_END:
+            i = wp->num_entries - 1;
+            break;
+          case XITK_KEY_PREV:
+            i = wp->selected - 1;
+            if (i < 0)
+              i = 0;
+            break;
+          case XITK_KEY_NEXT:
+            i = wp->selected + 1;
+            if (i >= wp->num_entries)
+              i = wp->num_entries - 1;
+            break;
+          case XITK_MOUSE_WHEEL_UP:
+            i = wp->selected - 1;
+            if (i < 0)
+              i = wp->num_entries - 1;
+            break;
+          case XITK_MOUSE_WHEEL_DOWN:
+            i = wp->selected + 1;
+            if (i >= wp->num_entries)
+              i = 0;
+            break;
+          default:
+            return 0;
+        }
+        if (i != wp->selected) {
+          _combo_close (wp, 1);
+          wp->selected = i;
+          xitk_label_change_label (wp->iw[_W_label], wp->entries[i]);
+          if (wp->callback)
+            wp->callback (wp->iw[_W_combo], wp->userdata, i);
+        }
+        return 1;
+      }
       break;
     case WIDGET_EVENT_WIN_POS:
       if (wp->xwin) {
@@ -402,24 +462,6 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
 }
 
 /* ************************* END OF PRIVATES ******************************* */
-
-/*
- *
- */
-void xitk_combo_set_select(xitk_widget_t *w, int select) {
-  _combo_private_t *wp;
-
-  xitk_container (wp, w, w);
-  if (!wp)
-    return;
-
-  if ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_COMBO) {
-    if (wp->entries && wp->entries[select]) {
-      wp->selected = select;
-      xitk_label_change_label (wp->iw[_W_label], wp->entries[select]);
-    }
-  }
-}
 
 /*
  *
@@ -456,22 +498,6 @@ void xitk_combo_update_pos(xitk_widget_t *w) {
   }
 }
 #endif
-
-/*
- *
- */
-int xitk_combo_get_current_selected(xitk_widget_t *w) {
-  _combo_private_t *wp;
-
-  xitk_container (wp, w, w);
-  if (!wp)
-    return -1;
-
-  if ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_COMBO) {
-    return wp->selected;
-  }
-  return -1;
-}
 
 /*
  *
@@ -549,7 +575,7 @@ static xitk_widget_t *_combo_create (xitk_widget_list_t *wl, xitk_combo_widget_t
   wp->w.state |= enable ? XITK_WIDGET_STATE_ENABLE : 0;
 
   //  wp->w.x = wp->w.y = wp->w.width = wp->w.height = 0;
-  wp->w.type         = WIDGET_GROUP | WIDGET_TYPE_COMBO;
+  wp->w.type         = WIDGET_GROUP | WIDGET_TYPE_COMBO | WIDGET_KEYABLE;
   wp->w.event        = notify_event;
 
   xitk_widget_set_focus_redirect (wp->iw[_W_label], wp->iw[_W_button]);
@@ -677,3 +703,4 @@ xitk_widget_t *xitk_noskin_combo_create (xitk_widget_list_t *wl,
 
   return _combo_create (wl, c, NULL, wp, 0, 0);
 }
+

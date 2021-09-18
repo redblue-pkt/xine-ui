@@ -643,7 +643,7 @@ static void _menu_open (_menu_node_t *node, int x, int y) {
 #endif
 #endif
 
-static int menu_notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
+static int menu_notify_event (xitk_widget_t *w, const widget_event_t *event) {
   _menu_private_t *wp;
 
   xitk_container (wp, w, w);
@@ -651,7 +651,6 @@ static int menu_notify_event(xitk_widget_t *w, widget_event_t *event, widget_eve
     return 0;
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_MENU)
     return 0;
-  (void)result;
 
   switch (event->type) {
     case WIDGET_EVENT_CLICK:

@@ -229,7 +229,7 @@ static void _mrlbrowser_destroy (_mrlbrowser_private_t *wp) {
   XITK_FREE (wp->current_origin);
 }
 
-static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
+static int notify_event(xitk_widget_t *w, const widget_event_t *event) {
   _mrlbrowser_private_t *wp;
 
   xitk_container (wp, w, w);
@@ -238,7 +238,6 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_MRLBROWSER)
     return 0;
 
-  (void)result;
   switch (event->type) {
     case WIDGET_EVENT_DESTROY:
       _mrlbrowser_destroy (wp);
