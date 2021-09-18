@@ -161,20 +161,20 @@ static void xitk_button_list_new_skin (xitk_button_list_t *bl, xitk_skin_config_
     event.skonfig = skin_config;
     for (i = 0; i < bl->first; i++) {
       xitk_dnode_insert_after (&bl->add_here->node, &bl->widgets[i]->node);
-      bl->widgets[i]->event (bl->widgets[i], &event, NULL);
+      bl->widgets[i]->event (bl->widgets[i], &event);
       xitk_widgets_state (bl->widgets + i, 1, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE, 0);
       xitk_dnode_remove (&bl->widgets[i]->node);
     }
     for (i = bl->first + bl->visible; i < bl->last; i++) {
       xitk_dnode_insert_after (&bl->add_here->node, &bl->widgets[i]->node);
-      bl->widgets[i]->event (bl->widgets[i], &event, NULL);
+      bl->widgets[i]->event (bl->widgets[i], &event);
       xitk_widgets_state (bl->widgets + i, 1, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE, 0);
       xitk_dnode_remove (&bl->widgets[i]->node);
     }
     if (bl->swap) {
       if (!bl->swap->node.next) {
         xitk_dnode_insert_after (&bl->add_here->node, &bl->swap->node);
-        bl->swap->event (bl->swap, &event, NULL);
+        bl->swap->event (bl->swap, &event);
       }
       xitk_widgets_state (&bl->swap, 1, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE, 0);
       xitk_dnode_remove (&bl->swap->node);
@@ -270,10 +270,9 @@ static void xitk_button_list_able (xitk_button_list_t *bl) {
     xitk_widgets_state (&bl->swap, 1, XITK_WIDGET_STATE_ENABLE, m);
 }
 
-static int xitk_button_list_event (xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
+static int xitk_button_list_event (xitk_widget_t *w, const widget_event_t *event) {
   xitk_button_list_t *bl = (xitk_button_list_t *)w;
 
-  (void)result;
   if (event && bl && ((bl->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON_LIST)) {
     switch (event->type) {
       case WIDGET_EVENT_CHANGE_SKIN:

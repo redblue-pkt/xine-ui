@@ -1907,7 +1907,7 @@ static void _xitk_image_change_skin (_image_private_t *wp, xitk_skin_config_t *s
   }
 }
 
-static int _xitk_image_event (xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
+static int _xitk_image_event (xitk_widget_t *w, const widget_event_t *event) {
   _image_private_t *wp;
 
   xitk_container (wp, w, w);
@@ -1935,8 +1935,8 @@ static int _xitk_image_event (xitk_widget_t *w, widget_event_t *event, widget_ev
       XITK_FREE (wp->skin_element_name);
       return 0;
     case WIDGET_EVENT_GET_SKIN:
-      if (result) {
-        result->image = (event->skin_layer == BACKGROUND_SKIN) ? wp->skin.image : NULL;
+      if (event->image) {
+        *event->image = (event->skin_layer == BACKGROUND_SKIN) ? wp->skin.image : NULL;
         return 1;
       }
       return 0;

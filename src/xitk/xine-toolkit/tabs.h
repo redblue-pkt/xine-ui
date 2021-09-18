@@ -36,9 +36,9 @@ typedef struct {
 xitk_widget_t *xitk_noskin_tabs_create (xitk_widget_list_t *wl,
   xitk_tabs_widget_t *t, int x, int y, int width, const char *font_name);
 /** */
-int xitk_tabs_get_current_selected (xitk_widget_t *w);
+#define xitk_tabs_get_current_selected(_w) xitk_widget_select (_w, XITK_INT_KEEP)
 /** */
-void xitk_tabs_set_current_selected (xitk_widget_t *w, int select);
+#define xitk_tabs_set_current_selected(_w,index) xitk_widget_select (_w, index)
 
 #endif
 

@@ -35,18 +35,19 @@ typedef struct {
     WIDGET_EVENT_INSIDE,       /** << return 0 (unsupported??), 1 (yes), 2 (no) */
     WIDGET_EVENT_CHANGE_SKIN,
     WIDGET_EVENT_ENABLE,
-    WIDGET_EVENT_GET_SKIN,     /** << return 0 (failed), 1 (result.image filled in) */
+    WIDGET_EVENT_GET_SKIN,     /** << return 0 (failed), 1 (*event.image filled in) */
     WIDGET_EVENT_DESTROY,
     WIDGET_EVENT_TIPS_TIMEOUT,
     WIDGET_EVENT_CLIP_READY,
-    WIDGET_EVENT_WIN_POS       /** << new pos/size of containing window */
+    WIDGET_EVENT_WIN_POS,      /** << new pos/size of containing window */
+    WIDGET_EVENT_SELECT        /** << set new index if valid, return real index */
   }                     type;
 
   int                   x, y;            /** << PAINT, CLICK, INSIDE, WIN_POS */
   int                   width, height;   /** << PAINT, WIN_POS */
 
   int                   pressed;         /** << CLICK, KEY */
-  int                   button;          /** << CLICK */
+  int                   button;          /** << CLICK, SELECT */
 
   int                   modifier;        /** << CLICK, KEY */
 
@@ -60,12 +61,8 @@ typedef struct {
     FOREGROUND_SKIN = 1,
     BACKGROUND_SKIN
   }                     skin_layer;      /** << GET_SKIN */
+  xitk_image_t        **image;           /** << GET_SKIN return */
 } widget_event_t;
-
-typedef struct {
-  int                   value;
-  xitk_image_t         *image;
-} widget_event_result_t;
 
 typedef struct xitk_widget_rel_s {
   xitk_dnode_t node;
@@ -73,9 +70,6 @@ typedef struct xitk_widget_rel_s {
   struct xitk_widget_rel_s *group;
   xitk_widget_t *w;
 } xitk_widget_rel_t;
-
-/* return 1 if event_result is filled, otherwise 0 */
-typedef int (*widget_event_notify_t)(xitk_widget_t *, widget_event_t *, widget_event_result_t *);
 
 struct xitk_widget_s {
   xitk_dnode_t           node;
@@ -101,7 +95,7 @@ struct xitk_widget_s {
 #define XITK_WIDGET_STATE_UNSET 0x80000000 /** << force repaint */
   uint32_t               shown_state;
 
-  widget_event_notify_t  event;
+  int                  (*event) (xitk_widget_t *w, const widget_event_t *e);
 
   unsigned long          tips_timeout;
   char                  *tips_string;
@@ -119,6 +113,8 @@ struct xitk_widget_list_s {
     int           x, y;
   }               mouse;
   unsigned int    qual;
+#define XITK_WL_NO_MOUSE_FOCUS 1
+  unsigned int    flags;
   xine_sarray_t  *shared_images;
   xitk_window_t  *xwin;
 };

@@ -206,7 +206,7 @@ static void _create_labelofbutton (_lbutton_private_t *wp,
 /*
  * Paint the button with correct background pixmap
  */
-static void _labelbutton_partial_paint (_lbutton_private_t *wp, widget_event_t *event) {
+static void _labelbutton_partial_paint (_lbutton_private_t *wp, const widget_event_t *event) {
 #ifdef XITK_PAINT_DEBUG
   printf ("xitk.labelbutton.paint (%d, %d, %d, %d).\n", event->x, event->y, event->width, event->height);
 #endif
@@ -422,7 +422,7 @@ static void _labelbutton_new_skin (_lbutton_private_t *wp, xitk_skin_config_t *s
 }
 
 
-static int labelbutton_event (xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
+static int labelbutton_event (xitk_widget_t *w, const widget_event_t *event) {
   _lbutton_private_t *wp;
 
   xitk_container (wp, w, w);
@@ -447,8 +447,8 @@ static int labelbutton_event (xitk_widget_t *w, widget_event_t *event, widget_ev
       _labelbutton_destroy (wp);
       break;
     case WIDGET_EVENT_GET_SKIN:
-      if (result) {
-        result->image = _labelbutton_get_skin (wp, event->skin_layer);
+      if (event->image) {
+        *event->image = _labelbutton_get_skin (wp, event->skin_layer);
         return 1;
       }
       break;

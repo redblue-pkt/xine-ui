@@ -73,7 +73,7 @@ static int _button_inside (_button_private_t *wp, int x, int y) {
 /**
  *
  */
-static void _button_paint (_button_private_t *wp, widget_event_t *event) {
+static void _button_paint (_button_private_t *wp, const widget_event_t *event) {
   int f = 0;
 #ifdef XITK_PAINT_DEBUG
   printf ("xitk.button.paint (%d, %d, %d, %d).\n", event->x, event->y, event->width, event->height);
@@ -184,7 +184,7 @@ static int _button_input (_button_private_t *wp, const widget_event_t *event) {
   return 1;
 }
 
-static int button_event (xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
+static int button_event (xitk_widget_t *w, const widget_event_t *event) {
   _button_private_t *wp;
 
   xitk_container (wp, w, w);
@@ -210,8 +210,8 @@ static int button_event (xitk_widget_t *w, widget_event_t *event, widget_event_r
       _button_destroy (wp);
       break;
     case WIDGET_EVENT_GET_SKIN:
-      if (result) {
-        result->image = _button_get_skin (wp, event->skin_layer);
+      if (event->image) {
+        *event->image = _button_get_skin (wp, event->skin_layer);
         return 1;
       }
       break;
@@ -342,4 +342,3 @@ xitk_widget_t *xitk_noskin_button_create (xitk_widget_list_t *wl,
 
   return _xitk_button_create (wp, &_b);
 }
-
