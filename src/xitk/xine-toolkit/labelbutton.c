@@ -349,6 +349,7 @@ int xitk_labelbutton_change_shortcut_label (xitk_widget_t *w, const char *newlab
 /*
  * Return the current button label
  */
+#if 0
 const char *xitk_labelbutton_get_shortcut_label (xitk_widget_t *w) {
   _lbutton_private_t *wp;
 
@@ -359,6 +360,7 @@ const char *xitk_labelbutton_get_shortcut_label (xitk_widget_t *w) {
     return wp->shortcut_label.s;
   return NULL;
 }
+#endif
 
 /*
  *
@@ -483,6 +485,7 @@ int xitk_labelbutton_get_alignment (xitk_widget_t *w) {
 /*
  * Return used font name
  */
+#if 0
 char *xitk_labelbutton_get_fontname (xitk_widget_t *w) {
   _lbutton_private_t *wp;
 
@@ -491,6 +494,7 @@ char *xitk_labelbutton_get_fontname (xitk_widget_t *w) {
     return strdup (wp->font.s);
   return NULL;
 }
+#endif
 
 /*
  *
@@ -709,3 +713,4 @@ xitk_widget_t *xitk_noskin_labelbutton_create (xitk_widget_list_t *wl,
 
   return &wp->w;
 }
+
