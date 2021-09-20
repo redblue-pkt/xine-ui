@@ -58,26 +58,20 @@ typedef enum {
 void xitk_slider_hv_sync (xitk_widget_t *w, xitk_slider_hv_t *info, xitk_slider_sync_t mode);
 
 /** Create a slider */
-xitk_widget_t *xitk_slider_create (xitk_widget_list_t *wl, xitk_skin_config_t *skonfig, xitk_slider_widget_t *sl);
-xitk_widget_t *xitk_noskin_slider_create (xitk_widget_list_t *wl, xitk_slider_widget_t *s,
+xitk_widget_t *xitk_slider_create (xitk_widget_list_t *wl, xitk_skin_config_t *skonfig, const xitk_slider_widget_t *sl);
+xitk_widget_t *xitk_noskin_slider_create (xitk_widget_list_t *wl, const xitk_slider_widget_t *s,
   int x, int y, int width, int height, int type);
 
 #define XITK_SLIDER_MIN 0x7ffffff0
 #define XITK_SLIDER_MAX 0x7ffffff1
 #define XITK_SLIDER_PLUS 0x7ffffff2
 #define XITK_SLIDER_MINUS 0x7ffffff3
-/** * Get current position of paddle. */
+/** Get current position of paddle. */
 #define xitk_slider_get_pos(_w) xitk_widget_select (_w, XITK_INT_KEEP)
 /** Set position of paddle. */
 #define xitk_slider_set_pos(_w, _pos) xitk_widget_select (_w, _pos)
-/** * Set min value of slider. */
-void xitk_slider_set_min (xitk_widget_t *, int);
-/** Set max value of slider. */
-void xitk_slider_set_max (xitk_widget_t *, int);
-/** * Get min value of slider. */
-int xitk_slider_get_min (xitk_widget_t *);
-/** Get max value of slider. */
-int xitk_slider_get_max (xitk_widget_t *);
+/** Set min, max, step value of slider. */
+void xitk_slider_set_range (xitk_widget_t *w, int min, int max, int step);
 /** Set position to 0 and redraw the widget. */
 #define xitk_slider_reset(_w) xitk_widget_select (_w, 0)
 /** Set position to max and redraw the widget. */

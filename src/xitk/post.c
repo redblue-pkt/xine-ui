@@ -115,7 +115,7 @@ struct post_win_s {
   char                      **plugin_names;
 
   post_object_t              *post_objects[MAX_USED_FILTERS];
-  int                         first_displayed, object_num;
+  int                         first_displayed, slidmax, object_num;
 
   xitk_widget_t              *w[_V_LAST];
 
@@ -811,7 +811,8 @@ static void _pplugin_paint_widgets(post_info_t *info) {
         xitk_widgets_state (info->win->w + _V_slider, 1, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE, 0);
     }
 
-    xitk_slider_set_max(info->win->w[_V_slider], slidmax);
+    info->win->slidmax = slidmax;
+    xitk_slider_set_range (info->win->w[_V_slider], 0, slidmax, 1);
     xitk_slider_set_pos(info->win->w[_V_slider], slidpos);
   }
 }
@@ -1563,7 +1564,7 @@ static void _pplugin_list_step (post_info_t *info, int step) {
 
 static void _pplugin_nextprev (xitk_widget_t *w, void *data, int pos) {
   post_info_t *info = data;
-  int rpos = (xitk_slider_get_max(info->win->w[_V_slider])) - pos;
+  int rpos = info->win->slidmax - pos;
 
   (void)w;
   if(rpos != info->win->first_displayed) {
