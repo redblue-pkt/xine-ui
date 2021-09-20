@@ -864,7 +864,7 @@ void panel_update_mixer_display (xui_panel_t *panel) {
       break;
     }
 
-    xitk_slider_set_max (panel->w[_W_slider_mixer], max);
+    xitk_slider_set_range (panel->w[_W_slider_mixer], 0, max, max / 50);
     xitk_slider_set_pos (panel->w[_W_slider_mixer], vol);
     xitk_button_set_state (panel->w[_W_mute], gui->mixer.mute);
   }

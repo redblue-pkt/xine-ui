@@ -684,14 +684,7 @@ static void setup_section_widgets (xui_setup_t *setup, int s) {
     si.v.step = 1;
     si.v.max = setup->num_wg;
     xitk_slider_hv_sync (setup->slider_wg, &si, XITK_SLIDER_SYNC_SET);
-    /*slidmax = setup->num_wg - MAX_DISPLAY_WIDGETS;*/
   }
-  /*else
-    slidmax = 1;*/
-#if 0
-  xitk_slider_set_max (setup->slider_wg, slidmax);
-  xitk_slider_set_pos (setup->slider_wg, slidmax);
-#endif
 }
 
 /*
@@ -851,10 +844,13 @@ void setup_end (xui_setup_t *setup) {
  */
 static void setup_nextprev_wg(xitk_widget_t *w, void *data, int pos) {
   xui_setup_t *setup = data;
-  int rpos = (xitk_slider_get_max (setup->slider_wg)) - pos;
+  int max;
 
   (void)w;
-  setup_paint_widgets (setup, rpos);
+  max = setup->num_wg - MAX_DISPLAY_WIDGETS;
+  if (max < 0)
+    max = 0;
+  setup_paint_widgets (setup, max - pos);
 }
 
 

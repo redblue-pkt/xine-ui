@@ -168,8 +168,7 @@ static void _browser_set_hslider (_browser_private_t *wp, int reset) {
 
     pos = reset ? wp->visible.x0 : xitk_slider_get_pos (wp->visible.btns[_W_hor]);
     if (wp->skin_element_name[0]) {
-      xitk_slider_set_min (wp->visible.btns[_W_hor], 0);
-      xitk_slider_set_max (wp->visible.btns[_W_hor], dw);
+      xitk_slider_set_range (wp->visible.btns[_W_hor], 0, dw, 1);
       if (pos > dw)
         pos = dw;
       else if (pos < 0)
@@ -191,8 +190,7 @@ static void _browser_set_hslider (_browser_private_t *wp, int reset) {
   } else {
     wp->visible.xmax = 0;
     wp->visible.x0 = 0;
-    xitk_slider_set_max (wp->visible.btns[_W_hor], 1);
-    xitk_slider_set_min (wp->visible.btns[_W_hor], 0);
+    xitk_slider_set_range (wp->visible.btns[_W_hor], 0, 1, 1);
     xitk_slider_reset (wp->visible.btns[_W_hor]);
   }
 }
@@ -208,8 +206,7 @@ static void _browser_set_vslider (_browser_private_t *wp) {
     return;
 
   if (wp->skin_element_name[0]) {
-    xitk_slider_set_min (wp->visible.btns[_W_vert], 0);
-    xitk_slider_set_max (wp->visible.btns[_W_vert], wp->visible.ymax);
+    xitk_slider_set_range (wp->visible.btns[_W_vert], 0, wp->visible.ymax, 1);
     xitk_slider_set_pos (wp->visible.btns[_W_vert], wp->visible.ymax - wp->visible.start);
   } else {
     xitk_slider_hv_t si;
@@ -1346,3 +1343,4 @@ xitk_widget_t *xitk_noskin_browser_create (xitk_widget_list_t *wl, const xitk_br
   wp->skonfig = NULL;
   return _xitk_browser_create (wp, br);
 }
+
