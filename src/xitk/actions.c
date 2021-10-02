@@ -50,6 +50,7 @@
 #include "event_sender.h"
 #include "help.h"
 #include "viewlog.h"
+#include "acontrol.h"
 #include "control.h"
 #include "videowin.h"
 #include "file_browser.h"
@@ -1696,6 +1697,17 @@ void gui_set_current_mmk_by_index (gGui_t *gui, int idx) {
   pthread_mutex_unlock(&gui->mmk_mutex);
 
   mmk_set_update(gui);
+}
+
+void gui_acontrol_show(xitk_widget_t *w, void *data) {
+  gGui_t *gui = data;
+
+  if (!gui)
+    return;
+  if (!gui->actrl)
+    acontrol_init (gui);
+  else
+    acontrol_toggle_window (w, gui->actrl);
 }
 
 void gui_control_show(xitk_widget_t *w, void *data) {

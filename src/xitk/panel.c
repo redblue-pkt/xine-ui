@@ -1284,6 +1284,12 @@ xui_panel_t *panel_init (gGui_t *gui) {
     xitk_add_widget (panel->widget_list, w, XITK_WIDGET_STATE_KEEP);
     xitk_set_widget_tips (w, _("Control"));
 
+    b.skin_element_name = "AudioCtlBtn";
+    b.callback          = gui_acontrol_show;
+    w = xitk_button_create (panel->widget_list, panel->gui->skin_config, &b);
+    xitk_add_widget (panel->widget_list, w, XITK_WIDGET_STATE_KEEP);
+    xitk_set_widget_tips (w, _("Audio control"));
+
     b.skin_element_name = "MrlBtn";
     b.callback          = gui_mrlbrowser_show;
     w =  xitk_button_create (panel->widget_list, panel->gui->skin_config, &b);

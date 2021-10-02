@@ -49,6 +49,7 @@
 #include "videowin.h"
 #include "playlist.h"
 #include "skins.h"
+#include "acontrol.h"
 #include "control.h"
 #include "event_sender.h"
 #include "splash.h"
@@ -544,6 +545,10 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
 
   case ACTID_CONTROLSHOW:
     gui_control_show (NULL, gui);
+    break;
+
+  case ACTID_ACONTROLSHOW:
+    gui_acontrol_show (NULL, gui);
     break;
 
   case ACTID_TOGGLE_WINOUT_VISIBLITY:
@@ -1784,6 +1789,7 @@ void gui_run(gGui_t *gui, char **session_opts) {
   panel_update_runtime_display (gui->panel);
 
   /* Register config entries related to video control settings */
+  acontrol_init (gui);
   control_init (gui);
 
   /* autoscan playlist  */

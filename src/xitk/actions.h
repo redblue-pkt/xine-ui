@@ -40,6 +40,7 @@ int is_layer_above (gGui_t *gui);
 void gui_playlist_show (xitk_widget_t *w, void *gui);
 void gui_mrlbrowser_show (xitk_widget_t *w, void *gui);
 void gui_control_show (xitk_widget_t *w, void *gui);
+void gui_acontrol_show (xitk_widget_t *w, void *gui);
 void gui_setup_show (xitk_widget_t *w, void *gui);
 void gui_event_sender_show (xitk_widget_t *w, void *gui);
 void gui_viewlog_show (xitk_widget_t *w, void *gui);

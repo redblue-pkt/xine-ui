@@ -38,6 +38,7 @@ typedef struct gGui_st gGui_t;
 
 typedef struct xui_keyedit_s xui_keyedit_t;
 typedef struct xui_vwin_st xui_vwin_t;
+typedef struct xui_actrl_st xui_actrl_t;
 typedef struct xui_vctrl_st xui_vctrl_t;
 typedef struct xui_event_sender_st xui_event_sender_t;
 typedef struct xui_help_s xui_help_t;
@@ -340,6 +341,7 @@ struct gGui_st {
   xui_vwin_t                *vwin;
   xui_setup_t               *setup;
   xui_mrlb_t                *mrlb;
+  xui_actrl_t               *actrl;
   xui_vctrl_t               *vctrl;
   xui_event_sender_t        *eventer;
   xui_skdloader_t           *skdloader;
@@ -411,3 +413,4 @@ void gui_save_window_pos (gGui_t *gui, const char *name, xitk_register_key_t key
 #endif
 
 #endif
+

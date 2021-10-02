@@ -6,7 +6,7 @@
 skin.name    = Xinetic
 skin.version = 5
 skin.date    = 25.05.2002
-skin.author  = Jérôme Villette <garogoril@wanadoo.fr>
+skin.author  = JÃ©rÃ´me Villette <garogoril@wanadoo.fr>
 skin.url     = none
 #skin.logo = file://$(SKIN_PARENT_PATH)/xine-ui_logo.mpg
 
@@ -276,6 +276,14 @@ skin.CtlBtn {
 	pixmap = MainBits2.png|0,129,102,16
 }
 
+skin.AudioCtlBtn {
+	coords {
+	  x = 497
+	  y = 37
+	}
+	pixmap = MainBits2.png|0,213,60,16
+}
+
 skin.MrlBtn {
 	coords {
 	  x = 427
@@ -536,7 +544,7 @@ skin.SliderCtlHue {
 	}
 	pixmap = CtlBg.png|122,36,21,125
 	slider {
-	  pixmap = MainBits1.png|170,0,63,9
+	  pixmap = MainBits1.png|170,8,63,9
 	  type = vertical
 	}
 }
@@ -560,7 +568,7 @@ skin.SliderCtlSat {
 	}
 	pixmap = CtlBg.png|122,36,21,125
 	slider {
-	  pixmap = MainBits1.png|170,0,63,9
+	  pixmap = MainBits1.png|170,8,63,9
 	type = vertical
 	}
 }
@@ -584,7 +592,7 @@ skin.SliderCtlBright {
 	}
 	pixmap = CtlBg.png|122,36,21,125
 	slider {
-	  pixmap = MainBits1.png|170,0,63,9
+	  pixmap = MainBits1.png|170,8,63,9
 	  type = vertical
 	}
 }
@@ -609,7 +617,7 @@ skin.SliderCtlCont {
 	}
 	pixmap = CtlBg.png|122,36,21,125
 	slider {
-	  pixmap = MainBits1.png|170,0,63,9
+	  pixmap = MainBits1.png|170,8,63,9
 	  type = vertical
 	}
 }
@@ -633,7 +641,7 @@ skin.SliderCtlGamma {
 	}
 	pixmap = CtlBg.png|122,36,21,125
 	slider {
-	  pixmap = MainBits1.png|170,0,63,9
+	  pixmap = MainBits1.png|170,8,63,9
 	  type = vertical
 	}
 }
@@ -657,7 +665,7 @@ skin.SliderCtlSharp {
 	}
 	pixmap = CtlBg.png|122,36,21,125
 	slider {
-	  pixmap = MainBits1.png|170,0,63,9
+	  pixmap = MainBits1.png|170,8,63,9
 	  type = vertical
 	}
 }
@@ -681,7 +689,7 @@ skin.SliderCtlNoise {
 	}
 	pixmap = CtlBg.png|122,36,21,125
 	slider {
-	  pixmap = MainBits1.png|170,0,63,9
+	  pixmap = MainBits1.png|170,8,63,9
 	  type = vertical
 	}
 }
@@ -786,6 +794,177 @@ skin.CtlSkItemBtn {
 skin.CtlDismiss {
 	coords {
 	  x = 465
+	  y = 195
+	}
+	pixmap = PlBits2.png|0,150,159,29
+	label {
+	  color = #9fa4ad
+	  color_focus = #081e2f
+	  color_click = #081e2f
+	  font = *-helvetica-bold-o-*-*-12-*-*-*-*-*-*-*
+	  y = 8
+	}
+}
+
+#Audio Control Panel
+skin.ACtlBG {
+	coords {
+	  x = 0
+	  y = 0
+	}
+	pixmap = ACtlBg.png
+}
+
+skin.SliderACtl30 {
+	coords {
+	  x = 34
+	  y = 36
+	}
+	pixmap = ACtlBg.png|34,36,21,125
+	slider {
+	  pixmap = MainBits1.png|170,8,63,9
+	  type = vertical
+	}
+}
+
+skin.SliderACtl60 {
+	coords {
+	  x = 70
+	  y = 36
+	}
+	pixmap = ACtlBg.png|34,36,21,125
+	slider {
+	  pixmap = MainBits1.png|170,8,63,9
+	  type = vertical
+	}
+}
+
+skin.SliderACtl125 {
+	coords {
+	  x = 106
+	  y = 36
+	}
+	pixmap = ACtlBg.png|34,36,21,125
+	slider {
+	  pixmap = MainBits1.png|170,8,63,9
+	  type = vertical
+	}
+}
+
+skin.SliderACtl250 {
+	coords {
+	  x = 142
+	  y = 36
+	}
+	pixmap = ACtlBg.png|34,36,21,125
+	slider {
+	  pixmap = MainBits1.png|170,8,63,9
+	  type = vertical
+	}
+}
+
+skin.SliderACtl500 {
+	coords {
+	  x = 178
+	  y = 36
+	}
+	pixmap = ACtlBg.png|34,36,21,125
+	slider {
+	  pixmap = MainBits1.png|170,8,63,9
+	  type = vertical
+	}
+}
+
+skin.SliderACtl1k {
+	coords {
+	  x = 214
+	  y = 36
+	}
+	pixmap = ACtlBg.png|34,36,21,125
+	slider {
+	  pixmap = MainBits1.png|170,8,63,9
+	  type = vertical
+	}
+}
+
+skin.SliderACtl2k {
+	coords {
+	  x = 250
+	  y = 36
+	}
+	pixmap = ACtlBg.png|34,36,21,125
+	slider {
+	  pixmap = MainBits1.png|170,8,63,9
+	  type = vertical
+	}
+}
+
+skin.SliderACtl4k {
+	coords {
+	  x = 286
+	  y = 36
+	}
+	pixmap = ACtlBg.png|34,36,21,125
+	slider {
+	  pixmap = MainBits1.png|170,8,63,9
+	  type = vertical
+	}
+}
+
+skin.SliderACtl8k {
+	coords {
+	  x = 322
+	  y = 36
+	}
+	pixmap = ACtlBg.png|34,36,21,125
+	slider {
+	  pixmap = MainBits1.png|170,8,63,9
+	  type = vertical
+	}
+}
+
+skin.SliderACtl16k {
+	coords {
+	  x = 358
+	  y = 36
+	}
+	pixmap = ACtlBg.png|34,36,21,125
+	slider {
+	  pixmap = MainBits1.png|170,8,63,9
+	  type = vertical
+	}
+}
+
+skin.SliderACtlAmp {
+	coords {
+	  x = 413
+	  y = 36
+	}
+	pixmap = ACtlBg.png|34,36,21,125
+	slider {
+	  pixmap = MainBits1.png|170,8,63,9
+	  type = vertical
+	}
+}
+
+skin.ACtlFlat {
+	coords {
+	  x = 15
+	  y = 195
+	}
+	pixmap = PlBits2.png|0,150,159,29
+	label {
+	  color = #9fa4ad
+	  color_focus = #081e2f
+	  color_click = #081e2f
+	  font = *-helvetica-bold-o-*-*-12-*-*-*-*-*-*-*
+	  y = 8
+	}
+}
+
+skin.ACtlDismiss {
+	coords {
+	  x = 390
 	  y = 195
 	}
 	pixmap = PlBits2.png|0,150,159,29

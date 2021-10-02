@@ -474,6 +474,8 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y) {
       _("Settings/Keymap Editor..."), "KeyBindingEditor"},
     { XITK_MENU_ENTRY_PLAIN, _MENU_GUI_ACTION_BASE + ACTID_CONTROLSHOW,
       _("Settings/Video..."), "ControlShow"},
+    { XITK_MENU_ENTRY_PLAIN, _MENU_GUI_ACTION_BASE + ACTID_ACONTROLSHOW,
+      _("Settings/Audio..."), "AControlShow"},
     { XITK_MENU_ENTRY_PLAIN, _MENU_GUI_ACTION_BASE + ACTID_TVANALOG,
       _("Settings/TV Analog..."), "TVAnalogShow"},
     { XITK_MENU_ENTRY_SEPARATOR, 0,
