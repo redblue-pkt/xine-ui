@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.99.5\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2021-07-18 02:38+0200\n"
+"POT-Creation-Date: 2021-10-01 20:21+0200\n"
 "PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Torsten Jager <t.jager@gmx.de>\n"
 "Language-Team: German <de@li.org>\n"
@@ -76,6 +76,21 @@ msgstr "%s: Option `-W %s' ist mehrdeutig\n"
 #, c-format
 msgid "%s: option `-W %s' doesn't allow an argument\n"
 msgstr "%s: Option `-W %s' erlaubt kein Argument\n"
+
+msgid "xine audio control Window"
+msgstr "xine Toneinstellungensfenster"
+
+msgid "Audio amplification"
+msgstr "Tonverstärkung"
+
+msgid "Neutral sound"
+msgstr "Neutraler Klang"
+
+msgid "Dismiss"
+msgstr "Schließen"
+
+msgid "Close control window"
+msgstr "Einstellungen-Fenster schließen"
 
 #. TRANSLATORS: only ASCII characters (skin)
 msgctxt "skin"
@@ -299,12 +314,6 @@ msgstr "control: Konnte Hintergrundbild nicht finden\n"
 msgctxt "skin"
 msgid "Choose a Skin"
 msgstr "Skin-Auswahl"
-
-msgid "Dismiss"
-msgstr "Schließen"
-
-msgid "Close control window"
-msgstr "Einstellungen-Fenster schließen"
 
 #, c-format
 msgid "%s(): couldn't find image for background\n"
@@ -1129,6 +1138,9 @@ msgstr "Bedienteil zeigen/verbergen"
 
 msgid "visibility toggle of control window"
 msgstr "Bildeinstellungen zeigen/verbergen"
+
+msgid "visibility toggle of audio control window"
+msgstr "Toneinstellungen zeigen/verbergen"
 
 msgid "visibility toggle of mrl browser window"
 msgstr "Medienauswahl zeigen/verbergen"
@@ -2407,7 +2419,10 @@ msgid "Settings/Keymap Editor..."
 msgstr "Einstellungen/Tastenbelegung..."
 
 msgid "Settings/Video..."
-msgstr "Einstellungen/Video..."
+msgstr "Einstellungen/Bild..."
+
+msgid "Settings/Audio..."
+msgstr "Einstellungen/Ton..."
 
 msgid "Settings/TV Analog..."
 msgstr "Einstellungen/Analog TV..."
@@ -2596,6 +2611,9 @@ msgstr "Vollbild/Fenster-Modus"
 
 msgid "Control"
 msgstr "Steuerung"
+
+msgid "Audio control"
+msgstr "Toneinstellungen"
 
 msgid "Open Location"
 msgstr "Objekt öffnen"
@@ -3046,34 +3064,6 @@ msgstr ""
 "videowin: Ausgabetreiber überschreibt ausgewähltes Visual mit Visual id 0x%"
 "lx\n"
 
-#, c-format
-msgid "XF86VidMode Extension (%d.%d) detected, trying to use it.\n"
-msgstr "XF86VidMode Erweiterung (%d.%d) erkannt, versuche sie zu nutzen.\n"
-
-#, c-format
-msgid "XF86VidMode Extension: %d modelines found.\n"
-msgstr "XF86VidMode Erweiterung: %d Auflösungen gefunden.\n"
-
-#, c-format
-msgid "XF86VidModeModeLine %dx%d isn't valid: discarded.\n"
-msgstr "XF86VidModeModeLine %dx%d ist ungültig: Verworfen.\n"
-
-#, c-format
-msgid ""
-"XF86VidMode Extension: could not get list of available modelines. Failed.\n"
-msgstr ""
-"XF86VidMode Erweiterung: Konnte Liste der verfügbaren Auflösungen nicht "
-"bestimmen.\n"
-
-#, c-format
-msgid "XF86VidMode Extension: initialization failed, not using it.\n"
-msgstr ""
-"XF86VidMode Erweiterung: Initialisierung fehlgeschlagen, wird nicht "
-"benutzt.\n"
-
-msgid "XF86VidMode Extension: modeline switching failed.\n"
-msgstr "XF86VidMode Erweiterung: Umschaltung der Modeline fehlgeschlagen.\n"
-
 msgid ""
 "Screens to use in order to do a very fullscreen in xinerama mode. (example 0 "
 "2 3)"
@@ -3156,6 +3146,30 @@ msgstr "xine Log-Betrachter"
 
 msgid "Refresh"
 msgstr "Aktualisieren"
+
+#~ msgid "XF86VidMode Extension (%d.%d) detected, trying to use it.\n"
+#~ msgstr "XF86VidMode Erweiterung (%d.%d) erkannt, versuche sie zu nutzen.\n"
+
+#~ msgid "XF86VidMode Extension: %d modelines found.\n"
+#~ msgstr "XF86VidMode Erweiterung: %d Auflösungen gefunden.\n"
+
+#~ msgid "XF86VidModeModeLine %dx%d isn't valid: discarded.\n"
+#~ msgstr "XF86VidModeModeLine %dx%d ist ungültig: Verworfen.\n"
+
+#~ msgid ""
+#~ "XF86VidMode Extension: could not get list of available modelines. "
+#~ "Failed.\n"
+#~ msgstr ""
+#~ "XF86VidMode Erweiterung: Konnte Liste der verfügbaren Auflösungen nicht "
+#~ "bestimmen.\n"
+
+#~ msgid "XF86VidMode Extension: initialization failed, not using it.\n"
+#~ msgstr ""
+#~ "XF86VidMode Erweiterung: Initialisierung fehlgeschlagen, wird nicht "
+#~ "benutzt.\n"
+
+#~ msgid "XF86VidMode Extension: modeline switching failed.\n"
+#~ msgstr "XF86VidMode Erweiterung: Umschaltung der Modeline fehlgeschlagen.\n"
 
 #~ msgid "Error"
 #~ msgstr "Fehler"

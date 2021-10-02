@@ -3,6 +3,7 @@
 
 src/common/config_wrapper.c
 src/common/getopt.c
+src/xitk/acontrol.c
 src/xitk/actions.c
 src/xitk/control.c
 src/xitk/download.c
