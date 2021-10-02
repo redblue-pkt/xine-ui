@@ -71,6 +71,7 @@ liboxine_a_CFLAGS = @XINE_CFLAGS@ $(X_CFLAGS)
 liboxine_a_CPPFLAGS = $(AM_CPPFLAGS) -I$(top_srcdir)/src/xitk
 
 xine_SOURCES = \
+	acontrol.c \
 	actions.c \
 	control.c \
 	download.c \
@@ -137,6 +138,7 @@ session_ctrl_SOURCES = session_common.c session_internal.h session.h ctrl_test.c
 
 noinst_HEADERS = \
 	actions.h \
+	acontrol.h \
 	common.h \
 	control.h \
 	download.h \
@@ -175,6 +177,7 @@ skins_DATA = skins/missing.png skins/xine_64.png
 skin1dir = $(datadir)/xine/skins/xinetic
 xinetic_dir = skins/xinetic
 skin1_DATA = \
+	$(xinetic_dir)/ACtlBg.png \
 	$(xinetic_dir)/CtlBg.png \
 	$(xinetic_dir)/Letters.png \
 	$(xinetic_dir)/Letters2.png \
@@ -192,3 +195,4 @@ skin1_DATA = \
 	$(xinetic_dir)/SkItemBtn.png \
 	$(xinetic_dir)/skinconfig \
 	$(xinetic_dir)/unused.png
+
