@@ -88,6 +88,36 @@ struct xui_vctrl_st {
   xitk_widget_t         *combo;
 };
 
+static void _control_set (vctrl_item_t *item, int value) {
+  int real_value;
+
+  if (!item->enable)
+    return;
+
+  if (value < CONTROL_MIN)
+    value = CONTROL_MIN;
+  if (value > CONTROL_MAX)
+    value = CONTROL_MAX;
+  if (value == item->value)
+    return;
+
+  xine_set_param (item->vctrl->gui->stream, item->prop, value);
+  real_value = xine_get_param (item->vctrl->gui->stream, item->prop);
+  /* xine video out may support just a few coarse steps, and snap us back.
+   * escape this black hole while we still can. */
+  if (value > item->value) {
+    if (real_value > item->value)
+      value = real_value;
+  } else {
+    if (real_value < item->value)
+      value = real_value;
+  }
+  item->value = value;
+  osd_draw_bar (item->vctrl->gui, item->name, 0, 65535, value, OSD_BAR_STEPPER);
+  if (item->w && xitk_is_widget_enabled (item->w))
+    xitk_slider_set_pos (item->w, value);
+}
+
 static void control_select_new_skin (xitk_widget_t *w, void *data, int selected, int modifier) {
   xui_vctrl_t *vctrl = data;
 
@@ -101,15 +131,11 @@ static void control_select_new_skin (xitk_widget_t *w, void *data, int selected,
 
 static void control_set_value (xitk_widget_t *w, void *data, int value) {
   vctrl_item_t *item = data;
-  int new_value;
 
   (void)w;
-  xine_set_param (item->vctrl->gui->stream, item->prop, value);
-  new_value = xine_get_param (item->vctrl->gui->stream, item->prop);
-  if ((new_value != value) && item->w && xitk_is_widget_enabled (item->w))
-    xitk_slider_set_pos (item->w, new_value);
+  _control_set (item, value);
   if (item->enable)
-    config_update_num (item->cfg, new_value);
+    config_update_num (item->cfg, value);
 }
 
 static void control_changes_cb (void *data, xine_cfg_entry_t *cfg) {
@@ -313,18 +339,15 @@ static void _control_toggle_window (xitk_widget_t *w, void *data, int state) {
  * Create control panel window
  */
 static int vctrl_open_window (xui_vctrl_t *vctrl) {
-  char                      *title = _("xine Control Window");
   xitk_browser_widget_t      br;
   xitk_labelbutton_widget_t  lb;
   xitk_label_widget_t        lbl;
-  xitk_combo_widget_t        cmb;
   xitk_widget_t             *w;
   xitk_image_t              *bg_image;
   int x, y, width, height;
 
   XITK_WIDGET_INIT (&br);
   XITK_WIDGET_INIT (&lb);
-  XITK_WIDGET_INIT (&cmb);
 
   {
     const xitk_skin_element_info_t *info = xitk_skin_get_info (vctrl->gui->skin_config, "CtlBG");
@@ -342,7 +365,7 @@ static int vctrl_open_window (xui_vctrl_t *vctrl) {
   height = xitk_image_height(bg_image);
 
   vctrl->xwin = xitk_window_create_window_ext (vctrl->gui->xitk, x + 100, y + 100, width, height,
-    _(title), NULL, "xine", 0, is_layer_above (vctrl->gui), vctrl->gui->icon, bg_image);
+    _("xine Control Window"), NULL, "xine", 0, is_layer_above (vctrl->gui), vctrl->gui->icon, bg_image);
   set_window_type_start(vctrl->gui, vctrl->xwin);
 
   /*
@@ -475,23 +498,8 @@ void control_dec_image_prop (xui_vctrl_t *vctrl, int prop) {
       if (item->prop == prop)
         break;
     }
-    if (u < NUM_SLIDERS) {
-      int v = item->value - STEP_SIZE;
-      if (v < 0)
-        v = 0;
-      if (item->enable) {
-        xine_set_param (item->vctrl->gui->stream, item->prop, v);
-        /* not doing this here because xine video out may support
-         * just a few coarse steps, and snap us back. in other words:
-         * we are stuck inside a black hole.
-        v = xine_get_param (item->vctrl->gui->stream, item->prop);
-        */
-        item->value = v;
-        osd_draw_bar (vctrl->gui, item->name, 0, 65535, v, OSD_BAR_STEPPER);
-        if (item->w && xitk_is_widget_enabled (item->w))
-          xitk_slider_set_pos (item->w, v);
-      }
-    }
+    if (u < NUM_SLIDERS)
+      _control_set (item, item->value - STEP_SIZE);
   }
 }
 
@@ -505,18 +513,8 @@ void control_inc_image_prop (xui_vctrl_t *vctrl, int prop) {
       if (item->prop == prop)
         break;
     }
-    if (u < NUM_SLIDERS) {
-      int v = item->value + STEP_SIZE;
-      if (v > 65535)
-        v = 65535;
-      if (item->enable) {
-        xine_set_param (item->vctrl->gui->stream, item->prop, v);
-        item->value = v;
-        osd_draw_bar (vctrl->gui, item->name, 0, 65535, v, OSD_BAR_STEPPER);
-        if (item->w && xitk_is_widget_enabled (item->w))
-          xitk_slider_set_pos (item->w, v);
-      }
-    }
+    if (u < NUM_SLIDERS)
+      _control_set (item, item->value + STEP_SIZE);
   }
 }
 
