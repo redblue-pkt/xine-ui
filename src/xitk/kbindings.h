@@ -110,6 +110,7 @@ typedef enum {
   ACTID_SNAPSHOT,
   ACTID_ZOOM_1_1,
   ACTID_GRAB_POINTER,
+  /* keep order */
   ACTID_ZOOM_IN,
   ACTID_ZOOM_OUT,
   ACTID_ZOOM_X_IN,
@@ -117,6 +118,7 @@ typedef enum {
   ACTID_ZOOM_Y_IN,
   ACTID_ZOOM_Y_OUT,
   ACTID_ZOOM_RESET,
+  /* /keep order */
   ACTID_TOGGLE_TVMODE,
   ACTID_TVANALOG,
   ACTID_SETUP,

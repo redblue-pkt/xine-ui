@@ -834,31 +834,24 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
     break;
 
   case ACTID_ZOOM_IN:
-    gui_change_zoom (gui, 1, 1);
-    break;
-
   case ACTID_ZOOM_OUT:
-    gui_change_zoom (gui, -1, -1);
-    break;
-
   case ACTID_ZOOM_X_IN:
-    gui_change_zoom (gui, 1, 0);
-    break;
-
   case ACTID_ZOOM_X_OUT:
-    gui_change_zoom (gui, -1, 0);
-    break;
-
   case ACTID_ZOOM_Y_IN:
-    gui_change_zoom (gui, 0, 1);
-    break;
-
   case ACTID_ZOOM_Y_OUT:
-    gui_change_zoom (gui, 0, -1);
-    break;
-
   case ACTID_ZOOM_RESET:
-    gui_reset_zoom (gui);
+    {
+      static const int8_t z[ACTID_ZOOM_RESET + 1 - ACTID_ZOOM_IN][2] = {
+        [ACTID_ZOOM_IN    - ACTID_ZOOM_IN] = { 1,  1},
+        [ACTID_ZOOM_OUT   - ACTID_ZOOM_IN] = {-1, -1},
+        [ACTID_ZOOM_X_IN  - ACTID_ZOOM_IN] = { 1,  0},
+        [ACTID_ZOOM_X_OUT - ACTID_ZOOM_IN] = {-1,  0},
+        [ACTID_ZOOM_Y_IN  - ACTID_ZOOM_IN] = { 0,  1},
+        [ACTID_ZOOM_Y_OUT - ACTID_ZOOM_IN] = { 0, -1},
+        [ACTID_ZOOM_RESET - ACTID_ZOOM_IN] = { 0,  0}
+      };
+      gui_change_zoom (gui, z[action - ACTID_ZOOM_IN][0], z[action - ACTID_ZOOM_IN][1]);
+    }
     break;
 
   case ACTID_GRAB_POINTER:
@@ -929,22 +922,15 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
        gui->playlist.loop <  PLAYLIST_LOOP_NO_LOOP)
       gui->playlist.loop = PLAYLIST_LOOP_NO_LOOP;
 
-    switch(gui->playlist.loop) {
-    case PLAYLIST_LOOP_NO_LOOP:
-      osd_display_info (gui, _("Playlist: no loop."));
-      break;
-    case PLAYLIST_LOOP_LOOP:
-      osd_display_info (gui, _("Playlist: loop."));
-      break;
-    case PLAYLIST_LOOP_REPEAT:
-      osd_display_info (gui, _("Playlist: entry repeat."));
-      break;
-    case PLAYLIST_LOOP_SHUFFLE:
-      osd_display_info (gui, _("Playlist: shuffle."));
-      break;
-    case PLAYLIST_LOOP_SHUF_PLUS:
-      osd_display_info (gui, _("Playlist: shuffle forever."));
-      break;
+    {
+      static const char * const loop_names[PLAYLIST_LOOP_MODES_NUM] = {
+        [PLAYLIST_LOOP_NO_LOOP]   = N_("Playlist: no loop."),
+        [PLAYLIST_LOOP_LOOP]      = N_("Playlist: loop."),
+        [PLAYLIST_LOOP_REPEAT]    = N_("Playlist: entry repeat."),
+        [PLAYLIST_LOOP_SHUFFLE]   = N_("Playlist: shuffle."),
+        [PLAYLIST_LOOP_SHUF_PLUS] = N_("Playlist: shuffle forever.")
+      };
+      osd_display_info (gui, "%s", gettext (loop_names[gui->playlist.loop]));
     }
     break;
 

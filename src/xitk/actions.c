@@ -1948,23 +1948,15 @@ void gui_app_enable (gGui_t *gui) {
   }
 }
 
-void gui_change_zoom (gGui_t *gui, int zoom_dx, int zoom_dy) {
-  xine_set_param(gui->stream, XINE_PARAM_VO_ZOOM_X,
-		 xine_get_param(gui->stream, XINE_PARAM_VO_ZOOM_X) + zoom_dx);
-  xine_set_param(gui->stream, XINE_PARAM_VO_ZOOM_Y,
-		 xine_get_param(gui->stream, XINE_PARAM_VO_ZOOM_Y) + zoom_dy);
-
-  panel_raise_window(gui->panel);
-}
-
-/*
- * Reset zooming by recall aspect ratio.
- */
-void gui_reset_zoom (gGui_t *gui) {
-  xine_set_param(gui->stream, XINE_PARAM_VO_ZOOM_X, 100);
-  xine_set_param(gui->stream, XINE_PARAM_VO_ZOOM_Y, 100);
-
-  panel_raise_window(gui->panel);
+void gui_change_zoom (gGui_t *gui, int dx, int dy) {
+  if ((dx == 0) && (dy == 0))
+    dx = dy = 100; /* Reset zooming by recall aspect ratio. */
+  else
+    dx += xine_get_param (gui->stream, XINE_PARAM_VO_ZOOM_X),
+    dy += xine_get_param (gui->stream, XINE_PARAM_VO_ZOOM_Y);
+  xine_set_param (gui->stream, XINE_PARAM_VO_ZOOM_X, dx);
+  xine_set_param (gui->stream, XINE_PARAM_VO_ZOOM_Y, dy);
+  panel_raise_window (gui->panel);
 }
 
 /*

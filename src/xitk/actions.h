@@ -89,7 +89,6 @@ void gui_toggle_aspect (gGui_t *gui, int aspect);
 void gui_toggle_interlaced (gGui_t *gui);
 void gui_vpp_enable (gGui_t *gui);
 void gui_change_zoom (gGui_t *gui, int zoom_dx, int zoom_dy);
-void gui_reset_zoom (gGui_t *gui);
 void gui_toggle_tvmode (gGui_t *gui);
 
 /* audio */
