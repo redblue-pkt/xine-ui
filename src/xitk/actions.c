@@ -1893,47 +1893,31 @@ int get_layer_above_video (gGui_t *gui) {
   return 4;
 }
 
-void change_amp_vol (gGui_t *gui, int value) {
+void gui_set_amp_level (gGui_t *gui, int value) {
   if(value < 0)
     value = 0;
   if(value > 200)
     value = 200;
+  if (gui->mixer.amp_level == value)
+    return;
   gui->mixer.amp_level = value;
   xine_set_param(gui->stream, XINE_PARAM_AUDIO_AMP_LEVEL, gui->mixer.amp_level);
   panel_update_mixer_display (gui->panel);
+  acontrol_update_mixer_display (gui->actrl);
   osd_draw_bar (gui, _("Amplification Level"), 0, 200, gui->mixer.amp_level, OSD_BAR_STEPPER);
 }
-void gui_increase_amp_level (gGui_t *gui) {
-  change_amp_vol (gui, (gui->mixer.amp_level + 1));
-}
-void gui_decrease_amp_level (gGui_t *gui) {
-  change_amp_vol (gui, (gui->mixer.amp_level - 1));
-}
-void gui_reset_amp_level (gGui_t *gui) {
-  change_amp_vol (gui, 100);
-}
 
-void change_audio_vol (gGui_t *gui, int value) {
+void gui_set_audio_vol (gGui_t *gui, int value) {
   if(value < 0)
     value = 0;
   if(value > 100)
     value = 100;
+  if (gui->mixer.volume_level == value)
+    return;
   gui->mixer.volume_level = value;
   xine_set_param(gui->stream, XINE_PARAM_AUDIO_VOLUME, gui->mixer.volume_level);
   panel_update_mixer_display (gui->panel);
   osd_draw_bar (gui, _("Audio Volume"), 0, 100, gui->mixer.volume_level, OSD_BAR_STEPPER);
-}
-void gui_increase_audio_volume (gGui_t *gui) {
-  if((gui->mixer.method == SOUND_CARD_MIXER) && (gui->mixer.caps & MIXER_CAP_VOL))
-    change_audio_vol (gui, (gui->mixer.volume_level + 1));
-  else if(gui->mixer.method == SOFTWARE_MIXER)
-    gui_increase_amp_level (gui);
-}
-void gui_decrease_audio_volume (gGui_t *gui) {
-  if((gui->mixer.method == SOUND_CARD_MIXER) && (gui->mixer.caps & MIXER_CAP_VOL))
-    change_audio_vol (gui, (gui->mixer.volume_level - 1));
-  else if(gui->mixer.method == SOFTWARE_MIXER)
-    gui_decrease_amp_level (gui);
 }
 
 void gui_app_show(xitk_widget_t *w, void *data) {
@@ -2326,4 +2310,3 @@ void visual_anim_stop (gGui_t *gui) {
     gui->visual_anim.running = 0;
   }
 }
-

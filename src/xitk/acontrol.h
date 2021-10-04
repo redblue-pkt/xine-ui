@@ -32,6 +32,7 @@ void acontrol_toggle_window (xitk_widget_t *w, void *actrl);
 /* int control_status (xui_vctrl_t *vctrl); */
 
 void acontrol_reset (xui_actrl_t *actrl);
+void acontrol_update_mixer_display (xui_actrl_t *actrl);
 
 void acontrol_toggle_visibility (xui_actrl_t *actrl);
 void acontrol_change_skins (xui_actrl_t *actrl, int);

@@ -949,9 +949,9 @@ static void panel_slider_mixer_cb (xitk_widget_t *w, void *data, int pos) {
 
   (void)w;
   if (panel->gui->mixer.method == SOUND_CARD_MIXER)
-    change_audio_vol (panel->gui, pos);
+    gui_set_audio_vol (panel->gui, pos);
   else if (panel->gui->mixer.method == SOFTWARE_MIXER)
-    change_amp_vol (panel->gui, pos);
+    gui_set_amp_level (panel->gui, pos);
 }
 
 /*

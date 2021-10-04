@@ -30,6 +30,7 @@
 #include "common.h"
 #include "actions.h"
 #include "event.h"
+#include "kbindings.h"
 #include "control.h"
 #include "skins.h"
 #include "menus.h"
@@ -488,33 +489,15 @@ static void vctrl_close_window (xui_vctrl_t *vctrl) {
   video_window_set_input_focus (vctrl->gui->vwin);
 }
 
-void control_dec_image_prop (xui_vctrl_t *vctrl, int prop) {
-  if (vctrl) {
-    vctrl_item_t *item;
-    unsigned int u;
+void control_action (xui_vctrl_t *vctrl, action_id_t action) {
+  if (vctrl && (action >= ACTID_HUECONTROLp)) {
+    unsigned int u = action - ACTID_HUECONTROLp;
 
-    for (u = 0; u < NUM_SLIDERS; u++) {
-      item = &vctrl->items[u];
-      if (item->prop == prop)
-        break;
+    if (u < 2 * NUM_SLIDERS) {
+      vctrl_item_t *item = vctrl->items + (u >> 1);
+
+      _control_set (item, item->value + ((u & 1) ? -STEP_SIZE : STEP_SIZE));
     }
-    if (u < NUM_SLIDERS)
-      _control_set (item, item->value - STEP_SIZE);
-  }
-}
-
-void control_inc_image_prop (xui_vctrl_t *vctrl, int prop) {
-  if (vctrl) {
-    vctrl_item_t *item;
-    unsigned int u;
-
-    for (u = 0; u < NUM_SLIDERS; u++) {
-      item = &vctrl->items[u];
-      if (item->prop == prop)
-        break;
-    }
-    if (u < NUM_SLIDERS)
-      _control_set (item, item->value + STEP_SIZE);
   }
 }
 

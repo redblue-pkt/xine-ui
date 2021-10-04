@@ -95,14 +95,14 @@ void gui_toggle_tvmode (gGui_t *gui);
 /* audio */
 void gui_direct_change_audio_channel (xitk_widget_t *w, void *gui, int value);
 void gui_nextprev_audio_channel (xitk_widget_t *w, void *gui_nextprev);
-void change_audio_vol (gGui_t *gui, int value);
-void gui_increase_audio_volume (gGui_t *gui);
-void gui_decrease_audio_volume (gGui_t *gui);
+void gui_set_audio_vol (gGui_t *gui, int value);
+#define gui_increase_audio_volume(_gui) gui_set_audio_vol (_gui, (_gui)->mixer.volume_level + 1)
+#define gui_decrease_audio_volume(_gui) gui_set_audio_vol (_gui, (_gui)->mixer.volume_level - 1)
 void gui_app_enable (gGui_t *gui);
-void change_amp_vol (gGui_t *gui, int value);
-void gui_increase_amp_level (gGui_t *gui);
-void gui_decrease_amp_level (gGui_t *gui);
-void gui_reset_amp_level (gGui_t *gui);
+void gui_set_amp_level (gGui_t *gui, int value);
+#define gui_increase_amp_level(_gui) gui_set_amp_level (_gui, (_gui)->mixer.amp_level + 1)
+#define gui_decrease_amp_level(_gui) gui_set_amp_level (_gui, (_gui)->mixer.amp_level - 1)
+#define gui_reset_amp_level(_gui) gui_set_amp_level (_gui, 100)
 
 /* subtitle */
 void gui_direct_change_spu_channel (xitk_widget_t *w, void *gui, int value);

@@ -284,7 +284,7 @@ static const struct {
   { N_("visibility toggle of control window"),
     ACTID_CONTROLSHOW,               "ControlShow",            "c",        KEYMOD_META,     0, 1},
   { N_("visibility toggle of audio control window"),
-    ACTID_CONTROLSHOW,               "AControlShow",           "a",        KEYMOD_META,     0, 1},
+    ACTID_ACONTROLSHOW,              "AControlShow",           "a",        KEYMOD_META,     0, 1},
   { N_("visibility toggle of mrl browser window"),
     ACTID_MRLBROWSER,                "MrlBrowser",             "m",        KEYMOD_META,     0, 1},
   { N_("visibility toggle of playlist editor window"),

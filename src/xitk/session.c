@@ -351,9 +351,9 @@ static __attribute__((noreturn)) void *ctrlsocket_func(void *data) {
 
         if ((gui->mixer.method == SOUND_CARD_MIXER) &&
           (gui->mixer.caps & MIXER_CAP_VOL) && ((*vol >= 0) && (*vol <= 100)))
-          change_audio_vol (gui, *vol);
+          gui_set_audio_vol (gui, *vol);
         else if ((gui->mixer.method == SOFTWARE_MIXER) && ((*vol >= 0) && (*vol <= 200)))
-          change_amp_vol (gui, *vol);
+          gui_set_amp_level (gui, *vol);
 
 	send_ack(shdr);
       }
@@ -364,7 +364,7 @@ static __attribute__((noreturn)) void *ctrlsocket_func(void *data) {
 	int *amp = (int *)shdr->data;
 
 	if((*amp >= 0) && (*amp <= 200))
-          change_amp_vol (gui, *amp);
+          gui_set_amp_level (gui, *amp);
 
 	send_ack(shdr);
       }

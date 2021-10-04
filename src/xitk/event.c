@@ -797,14 +797,6 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
     gui_nextprev_speed (NULL, GUI_RESET (gui));
     break;
 
-  case ACTID_pVOLUME:
-    gui_increase_audio_volume (gui);
-    break;
-
-  case ACTID_mVOLUME:
-    gui_decrease_audio_volume (gui);
-    break;
-
   case ACTID_APP:
     gui_app_show (NULL, gui);
     break;
@@ -813,10 +805,22 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
     gui_app_enable (gui);
     break;
 
+  case ACTID_pVOLUME:
+    if ((gui->mixer.method == SOUND_CARD_MIXER) && (gui->mixer.caps & MIXER_CAP_VOL)) {
+      gui_increase_audio_volume (gui);
+      break;
+    }
+    /* fall through */
   case ACTID_pAMP:
     gui_increase_amp_level (gui);
     break;
 
+  case ACTID_mVOLUME:
+    if ((gui->mixer.method == SOUND_CARD_MIXER) && (gui->mixer.caps & MIXER_CAP_VOL)) {
+      gui_decrease_audio_volume (gui);
+      break;
+    }
+    /* fall through */
   case ACTID_mAMP:
     gui_decrease_amp_level (gui);
     break;
@@ -975,64 +979,20 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
     break;
 
   case ACTID_HUECONTROLp:
-    control_inc_image_prop (gui->vctrl, XINE_PARAM_VO_HUE);
-    break;
   case ACTID_HUECONTROLm:
-    control_dec_image_prop (gui->vctrl, XINE_PARAM_VO_HUE);
-    break;
-
   case ACTID_SATURATIONCONTROLp:
-    control_inc_image_prop (gui->vctrl, XINE_PARAM_VO_SATURATION);
-    break;
   case ACTID_SATURATIONCONTROLm:
-    control_dec_image_prop (gui->vctrl, XINE_PARAM_VO_SATURATION);
-    break;
-
   case ACTID_BRIGHTNESSCONTROLp:
-    control_inc_image_prop (gui->vctrl, XINE_PARAM_VO_BRIGHTNESS);
-    break;
   case ACTID_BRIGHTNESSCONTROLm:
-    control_dec_image_prop (gui->vctrl, XINE_PARAM_VO_BRIGHTNESS);
-    break;
-
   case ACTID_CONTRASTCONTROLp:
-    control_inc_image_prop (gui->vctrl, XINE_PARAM_VO_CONTRAST);
-    break;
   case ACTID_CONTRASTCONTROLm:
-    control_dec_image_prop (gui->vctrl, XINE_PARAM_VO_CONTRAST);
-    break;
-
   case ACTID_GAMMACONTROLp:
-#ifdef XINE_PARAM_VO_GAMMA
-    control_inc_image_prop (gui->vctrl, XINE_PARAM_VO_GAMMA);
-#endif
-    break;
   case ACTID_GAMMACONTROLm:
-#ifdef XINE_PARAM_VO_GAMMA
-    control_dec_image_prop (gui->vctrl, XINE_PARAM_VO_GAMMA);
-#endif
-    break;
-
   case ACTID_SHARPNESSCONTROLp:
-#ifdef XINE_PARAM_VO_SHARPNESS
-    control_inc_image_prop (gui->vctrl, XINE_PARAM_VO_SHARPNESS);
-#endif
-    break;
   case ACTID_SHARPNESSCONTROLm:
-#ifdef XINE_PARAM_VO_SHARPNESS
-    control_dec_image_prop (gui->vctrl, XINE_PARAM_VO_SHARPNESS);
-#endif
-    break;
-
   case ACTID_NOISEREDUCTIONCONTROLp:
-#ifdef XINE_PARAM_VO_NOISE_REDUCTION
-    control_inc_image_prop (gui->vctrl, XINE_PARAM_VO_NOISE_REDUCTION);
-#endif
-    break;
   case ACTID_NOISEREDUCTIONCONTROLm:
-#ifdef XINE_PARAM_VO_NOISE_REDUCTION
-    control_dec_image_prop (gui->vctrl, XINE_PARAM_VO_NOISE_REDUCTION);
-#endif
+    control_action (gui->vctrl, action);
     break;
 
   case ACTID_VPP:

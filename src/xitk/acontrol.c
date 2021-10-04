@@ -98,7 +98,15 @@ static void _actrl_set_amp (xitk_widget_t *w, void *data, int value) {
 
   (void)w;
   actrl->v_amp = value;
-  xine_set_param (actrl->gui->stream, XINE_PARAM_AUDIO_AMP_LEVEL, value);
+  gui_set_amp_level (actrl->gui, value);
+}
+
+void acontrol_update_mixer_display (xui_actrl_t *actrl) {
+  if (actrl->v_amp != actrl->gui->mixer.amp_level) {
+    actrl->v_amp = actrl->gui->mixer.amp_level;
+    if (actrl->amp)
+      xitk_slider_set_pos (actrl->amp, actrl->v_amp);
+  }
 }
 
 xui_actrl_t *acontrol_init (gGui_t *gui) {
@@ -309,9 +317,7 @@ void acontrol_reset (xui_actrl_t *actrl) {
       xine_set_param (actrl->gui->stream, XINE_PARAM_EQ_30HZ + u, 0);
       xitk_slider_set_pos (actrl->slid[u], 0);
     }
-    actrl->v_amp = 100;
-    xine_set_param (actrl->gui->stream, XINE_PARAM_AUDIO_AMP_LEVEL, 100);
-    xitk_slider_set_pos (actrl->amp, 100);
+    gui_set_amp_level (actrl->gui, 100);
   }
 }
 
@@ -387,3 +393,4 @@ void acontrol_deinit (xui_actrl_t *actrl) {
     free (actrl);
   }
 }
+
