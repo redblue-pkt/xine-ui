@@ -137,6 +137,7 @@ typedef enum {
   ACTID_SV_SYNC_p,
   ACTID_SV_SYNC_m,
   ACTID_SV_SYNC_RESET,
+  /* keep order */
   ACTID_HUECONTROLp,
   ACTID_HUECONTROLm,
   ACTID_SATURATIONCONTROLp,
@@ -151,6 +152,7 @@ typedef enum {
   ACTID_SHARPNESSCONTROLm,
   ACTID_NOISEREDUCTIONCONTROLp,
   ACTID_NOISEREDUCTIONCONTROLm,
+  /* /keep order */
   ACTID_VPP,
   ACTID_VPP_ENABLE,
   ACTID_HELP_SHOW,
@@ -281,3 +283,4 @@ void kbedit_toggle_visibility (xitk_widget_t *w, void *kbedit);
 void kbedit_raise_window (xui_keyedit_t *kbedit);
 
 #endif
+

@@ -37,7 +37,6 @@ void control_toggle_visibility (xui_vctrl_t *vctrl);
 void control_change_skins (xui_vctrl_t *vctrl, int);
 void control_raise_window (xui_vctrl_t *vctrl);
 /* void control_update_tips_timeout (xui_vctrl_t *vctrl, unsigned long timeout); */
-void control_inc_image_prop (xui_vctrl_t *vctrl, int prop);
-void control_dec_image_prop (xui_vctrl_t *vctrl, int prop);
+void control_action (xui_vctrl_t *vctrl, action_id_t action);
 
 #endif
