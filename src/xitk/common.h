@@ -94,12 +94,14 @@ typedef struct xui_sinfo_s xui_sinfo_t;
 #define SOFTWARE_MIXER          1
 
 /* Playlist loop modes */
-#define PLAYLIST_LOOP_NO_LOOP   0 /* no loop (default) */
-#define PLAYLIST_LOOP_LOOP      1 /* loop the whole playlist */
-#define PLAYLIST_LOOP_REPEAT    2 /* loop the current mrl */
-#define PLAYLIST_LOOP_SHUFFLE   3 /* random selection in playlist */
-#define PLAYLIST_LOOP_SHUF_PLUS 4 /* random selection in playlist, never ending */
-#define PLAYLIST_LOOP_MODES_NUM 5
+typedef enum {
+  PLAYLIST_LOOP_NO_LOOP = 0, /* no loop (default) */
+  PLAYLIST_LOOP_LOOP,        /* loop the whole playlist */
+  PLAYLIST_LOOP_REPEAT,      /* loop the current mrl */
+  PLAYLIST_LOOP_SHUFFLE,     /* random selection in playlist */
+  PLAYLIST_LOOP_SHUF_PLUS,   /* random selection in playlist, never ending */
+  PLAYLIST_LOOP_MODES_NUM
+} playlist_loop_t;
 
 #define PLAYLIST_CONTROL_STOP         0x00000001 /* Don't start next entry in playlist */
 #define PLAYLIST_CONTROL_STOP_PERSIST 0x00000002 /* Don't automatically reset PLAYLIST_CONTROL_STOP */
