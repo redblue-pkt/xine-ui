@@ -39,6 +39,7 @@
 #include "xine-toolkit/backend.h"
 #include "xine-toolkit/slider.h"
 #include "xine-toolkit/labelbutton.h"
+#include "xine-toolkit/label.h"
 #include "xine-toolkit/skin.h"
 #include <xine/audio_out.h>
 
@@ -65,12 +66,12 @@ struct xui_actrl_st {
   xitk_window_t        *xwin;
   xitk_widget_list_t   *widget_list;
 
-  xitk_widget_t        *slid[NUM_EQ], *amp, *flat, *dismiss;
+  xitk_widget_t        *slid[NUM_EQ], *label[NUM_EQ + 1], *amp, *flat, *dismiss;
 
   uint8_t               refs[NUM_EQ];
   int                   val[NUM_EQ], v_amp;
 
-  int                   status;
+  int                   skin, status;
   xitk_register_key_t   widget_key;
 };
 
@@ -172,7 +173,7 @@ static void _actrl_toggle_window (xitk_widget_t *w, void *data, int state) {
  * Create control panel window
  */
 static int _actrl_open_window (xui_actrl_t *actrl) {
-  char                      *title = _("xine audio control Window");
+  const char *title = _("xine audio control Window");
   xitk_labelbutton_widget_t  lb;
   xitk_image_t              *bg_image;
   int x, y, width, height;
@@ -183,17 +184,36 @@ static int _actrl_open_window (xui_actrl_t *actrl) {
     const xitk_skin_element_info_t *info = xitk_skin_get_info (actrl->gui->skin_config, "ACtlBG");
     bg_image = info ? info->pixmap_img.image : NULL;
   }
-  if (!bg_image)
-    return 0; /* TODO: noskin fallback ?? */
 
   x = 200;
   y = 100;
   gui_load_window_pos (actrl->gui, "acontrol", &x, &y);
-  width = xitk_image_width (bg_image);
-  height = xitk_image_height (bg_image);
 
-  actrl->xwin = xitk_window_create_window_ext (actrl->gui->xitk, x, y, width, height,
-    title, NULL, "xine", 0, is_layer_above (actrl->gui), actrl->gui->icon, bg_image);
+  if (bg_image) {
+    actrl->skin = 1;
+    width = xitk_image_width (bg_image);
+    height = xitk_image_height (bg_image);
+    actrl->xwin = xitk_window_create_window_ext (actrl->gui->xitk, x, y, width, height,
+      title, NULL, "xine", 0, is_layer_above (actrl->gui), actrl->gui->icon, bg_image);
+    if (!actrl->xwin)
+      return 0;
+  } else {
+    uint32_t u;
+    /* noskin fallback */
+    actrl->skin = 0;
+    width = 25 + 35 * (NUM_EQ + 1);
+    height = 245;
+    actrl->xwin = xitk_window_create_dialog_window (actrl->gui->xitk, title, x, y, width, height);
+    if (!actrl->xwin)
+      return 0;
+    bg_image = xitk_window_get_background_image (actrl->xwin);
+    for (u = 0; u < 4; u++)
+      xitk_image_draw_rectangular_box (bg_image, 5, 48 + 14 * u, width - 10, 2, DRAW_INNER);
+    xitk_image_draw_rectangular_box (bg_image, 5, 48 + 14 * u, width - 10, 2, DRAW_OUTTER);
+    for (u = 5; u < 9; u++)
+      xitk_image_draw_rectangular_box (bg_image, 5, 48 + 14 * u, width - 10, 2, DRAW_INNER);
+    xitk_window_set_background_image (actrl->xwin, bg_image);
+  }
   set_window_type_start (actrl->gui, actrl->xwin);
 
   /*
@@ -203,6 +223,7 @@ static int _actrl_open_window (xui_actrl_t *actrl) {
 
   {
     xitk_slider_widget_t sl;
+    xitk_label_widget_t la;
     unsigned int u;
     int val;
 
@@ -212,6 +233,11 @@ static int _actrl_open_window (xui_actrl_t *actrl) {
     sl.step   = 1;
     sl.callback = _actrl_set_value;
     sl.motion_callback = _actrl_set_value;
+
+    XITK_WIDGET_INIT (&la);
+    la.skin_element_name = NULL;
+    la.callback = NULL;
+    la.userdata = NULL;
 
     for (u = 0; u < NUM_EQ; u++) {
       val = xine_get_param (actrl->gui->stream, XINE_PARAM_EQ_30HZ + u);
@@ -226,7 +252,17 @@ static int _actrl_open_window (xui_actrl_t *actrl) {
       sl.skin_element_name = _actrl_names[u].skin;
       sl.userdata        =
       sl.motion_userdata = actrl->refs + u;
-      actrl->slid[u] = xitk_slider_create (actrl->widget_list, actrl->gui->skin_config, &sl);
+
+      la.label = _actrl_names[u].hint;
+
+      if (actrl->skin) {
+        actrl->slid[u] = xitk_slider_create (actrl->widget_list, actrl->gui->skin_config, &sl);
+        actrl->label[u] = NULL;
+      } else {
+        actrl->slid[u] = xitk_noskin_slider_create (actrl->widget_list, &sl, 15 + 35 * u,  30, 20, 150, XITK_VSLIDER);
+        actrl->label[u] = xitk_noskin_label_create (actrl->widget_list, &la,  5 + 35 * u, 190, 30,  15, fontname);
+        xitk_add_widget (actrl->widget_list, actrl->label[u], XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
+      }
       if (actrl->slid[u]) {
         xitk_add_widget (actrl->widget_list, actrl->slid[u], XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
         xitk_slider_set_pos (actrl->slid[u], actrl->val[u]);
@@ -247,7 +283,15 @@ static int _actrl_open_window (xui_actrl_t *actrl) {
     sl.userdata        =
     sl.motion_userdata = actrl;
     sl.skin_element_name = "SliderACtlAmp";
-    actrl->amp = xitk_slider_create (actrl->widget_list, actrl->gui->skin_config, &sl);
+    if (actrl->skin) {
+      actrl->amp = xitk_slider_create (actrl->widget_list, actrl->gui->skin_config, &sl);
+      actrl->label[NUM_EQ] = NULL;
+    } else {
+      la.label = "^";
+      actrl->amp = xitk_noskin_slider_create (actrl->widget_list, &sl, 20 + 35 * NUM_EQ, 30, 25, 150, XITK_VSLIDER);
+      actrl->label[NUM_EQ] = xitk_noskin_label_create (actrl->widget_list, &la, 25 + 35 * NUM_EQ, 190, 15, 15, hboldfontname);
+      xitk_add_widget (actrl->widget_list, actrl->label[NUM_EQ], XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
+    }
     if (actrl->amp) {
       xitk_add_widget (actrl->widget_list, actrl->amp, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
       xitk_slider_set_pos (actrl->amp, actrl->v_amp);
@@ -256,21 +300,31 @@ static int _actrl_open_window (xui_actrl_t *actrl) {
   }
 
   lb.button_type       = CLICK_BUTTON;
-  lb.align             = ALIGN_DEFAULT;
+  lb.align             = ALIGN_CENTER;
   lb.state_callback    = NULL;
   lb.userdata          = actrl;
 
   lb.skin_element_name = "ACtlFlat";
   lb.label             = "----";
   lb.callback          = _actrl_flat;
-  actrl->flat = xitk_labelbutton_create (actrl->widget_list, actrl->gui->skin_config, &lb);
+  if (actrl->skin) {
+    actrl->flat = xitk_labelbutton_create (actrl->widget_list, actrl->gui->skin_config, &lb);
+  } else {
+    actrl->flat = xitk_noskin_labelbutton_create (actrl->widget_list, &lb, 10, 210, 70, 25,
+      XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_INV, hboldfontname);
+  }
   xitk_add_widget (actrl->widget_list, actrl->flat, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
   xitk_set_widget_tips (actrl->flat, _("Neutral sound"));
 
   lb.skin_element_name = "ACtlDismiss";
   lb.label             = _("Dismiss");
   lb.callback          = _actrl_toggle_window;
-  actrl->dismiss = xitk_labelbutton_create (actrl->widget_list, actrl->gui->skin_config, &lb);
+  if (actrl->skin) {
+    actrl->dismiss = xitk_labelbutton_create (actrl->widget_list, actrl->gui->skin_config, &lb);
+  } else {
+    actrl->dismiss = xitk_noskin_labelbutton_create (actrl->widget_list, &lb, width - 80, 210, 70, 25,
+      XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_INV, hboldfontname);
+  }
   xitk_add_widget (actrl->widget_list, actrl->dismiss, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
   xitk_set_widget_tips (actrl->dismiss, _("Close control window"));
 
@@ -393,4 +447,3 @@ void acontrol_deinit (xui_actrl_t *actrl) {
     free (actrl);
   }
 }
-
