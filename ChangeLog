@@ -1,11 +1,17 @@
 xine-ui (0.99.13)
+  * Add audio control window.
+  * Add some menu shortcuts.
+  * Add build optimizations.
   * Better keyboard and mouse wheel support.
+  * Improved key binding editor.
   * Massive code cleanup.
   * Massive graphics optimizations.
   * Drop mrl path length limit.
   * Add utf8 and clipboard support for text input fields.
   * Add skin shared pixmap and text position features.
-  * Many small fixes.
+  * Xinetic skin update.
+  * Many small fixes and optinizations.
+  * Update german translation.
   * Build fixes.
   * Faster build.
   * Separate xitk and X11 stuff pt 1.
