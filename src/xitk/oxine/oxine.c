@@ -39,7 +39,6 @@
 #include <xine/xmlparser.h>
 
 #include "common.h"
-#include "globals.h"
 
 #include "oxine.h"
 #include "odk.h"
