@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -22,12 +22,12 @@
 #ifndef TVOUT_H
 #define TVOUT_H
 
-tvout_t *tvout_init(char *backend);
-int tvout_setup(tvout_t *tvout);
-void tvout_get_size_and_aspect(tvout_t *tvout, int *width, int *height, double *pix_aspect);
-int tvout_set_fullscreen_mode(tvout_t *tvout, int fullscreen, int width, int height);
-int tvout_get_fullscreen_mode(tvout_t *tvout);
-void tvout_deinit(tvout_t *tvout);
-const char **tvout_get_backend_names(void);
+xui_tvout_t *tvout_init (gGui_t *gui, const char *backend);
+int tvout_setup(xui_tvout_t *tvout);
+void tvout_get_size_and_aspect(xui_tvout_t *tvout, int *width, int *height, double *pix_aspect);
+int tvout_set_fullscreen_mode(xui_tvout_t *tvout, int fullscreen, int width, int height);
+int tvout_get_fullscreen_mode(xui_tvout_t *tvout);
+void tvout_deinit(xui_tvout_t *tvout);
+const char * const *tvout_get_backend_names (void);
 
 #endif

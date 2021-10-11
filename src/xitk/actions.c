@@ -716,7 +716,7 @@ void gui_exit_2 (gGui_t *gui) {
   kbedit_end (gui->keyedit);
   event_sender_end (gui);
   stream_infos_end (gui->streaminfo);
-  tvset_end();
+  tvset_end (gui->tvset);
   pplugin_end (&gui->post_audio);
   pplugin_end (&gui->post_video);
   help_end (gui->help);
@@ -1762,22 +1762,18 @@ void gui_stream_infos_show(xitk_widget_t *w, void *data) {
     stream_infos_end (gui->streaminfo);
 }
 
-void gui_tvset_show(xitk_widget_t *w, void *data) {
+void gui_tvset_show (xitk_widget_t *w, void *data) {
   gGui_t *gui = data;
 
   (void)w;
   if (!gui)
     return;
-  if (tvset_is_running() && !tvset_is_visible())
-    tvset_toggle_visibility(NULL, NULL);
-  else if(!tvset_is_running())
-    tvset_panel();
-  else {
-    if(gui->use_root_window)
-      tvset_toggle_visibility(NULL, NULL);
-    else
-      tvset_end();
-  }
+  if (!gui->tvset)
+    tvset_panel (gui);
+  else if (gui->use_root_window || !tvset_is_visible (gui->tvset))
+    tvset_toggle_visibility (NULL, gui);
+  else
+    tvset_end (gui->tvset);
 }
 
 void gui_vpp_show(xitk_widget_t *w, void *data) {

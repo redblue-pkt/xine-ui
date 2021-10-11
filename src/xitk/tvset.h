@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -24,11 +24,10 @@
 
 #include "xitk.h"
 
-void tvset_panel(void);
-void tvset_end(void);
-int tvset_is_visible(void);
-int tvset_is_running(void);
-void tvset_toggle_visibility(xitk_widget_t *, void *);
-void tvset_raise_window(void);
+void tvset_panel (gGui_t *gui);
+void tvset_end (xui_tvset_t *tvset);
+int tvset_is_visible (xui_tvset_t *tvset);
+void tvset_toggle_visibility (xitk_widget_t *w, void *gui);
+void tvset_raise_window (xui_tvset_t *tvset);
 
 #endif
