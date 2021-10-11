@@ -1292,15 +1292,13 @@ int main(int argc, char *argv[]) {
   gui->playlist.loop          = PLAYLIST_LOOP_NO_LOOP;
   gui->playlist.control       = 0;
   gui->skin_server_url        = NULL;
-  gui->verbosity              = __xineui_global_verbosity = 0;
+  gui->verbosity              = 0;
   gui->broadcast_port         = 0;
   gui->display_logo           = 1;
   gui->post_video_enable      = 1;
   gui->post_audio_enable      = 1;
   gui->splash                 = 1;
-#ifdef HAVE_LIRC
-  __xineui_global_lirc_enable            = 1;
-#endif
+  gui->lirc_enable            = 1;
   gui->deinterlace_enable     = 0;
   gui->report                 = stdout;
   gui->ssaver_enabled         = 1;
@@ -1324,6 +1322,7 @@ int main(int argc, char *argv[]) {
 
   gui->mmkedit                = NULL;
   gui->plwin                  = NULL;
+  gui->lirc                   = NULL;
   gui->pl_load                = NULL;
   gui->pl_save                = NULL;
 
@@ -1357,11 +1356,9 @@ int main(int argc, char *argv[]) {
 			 long_options, &option_index)) != EOF) {
     switch(c) {
 
-#ifdef HAVE_LIRC
     case 'L': /* Disable LIRC support */
-      __xineui_global_lirc_enable = 0;
+      gui->lirc_enable = 0;
       break;
-#endif
 
     case 'u': /* Select SPU channel */
       if (optarg) sscanf(optarg, "%i", &spu_channel);
@@ -1612,7 +1609,7 @@ int main(int argc, char *argv[]) {
       break;
 
     case OPTION_VERBOSE:
-      gui->verbosity = __xineui_global_verbosity = optarg ? strtol (optarg, &optarg, 10) : 1;
+      gui->verbosity = optarg ? strtol (optarg, &optarg, 10) : 1;
       break;
 
 #ifdef XINE_PARAM_BROADCASTER_PORT
@@ -1652,7 +1649,7 @@ int main(int argc, char *argv[]) {
       {
         if (optarg) {
           char *cfg = xine_chomp(optarg);
-          gui->cfg_file = __xineui_global_config_file = xitk_filter_filename (cfg);
+          gui->cfg_file = xitk_filter_filename (cfg);
         }
       }
       break;
@@ -1736,7 +1733,7 @@ int main(int argc, char *argv[]) {
 	  }
 
 	  gui->report = f;
-          gui->verbosity = __xineui_global_verbosity = 0xff;
+          gui->verbosity = 0xff;
 	}
 
 	if(optarg) {
@@ -1834,7 +1831,7 @@ int main(int argc, char *argv[]) {
    */
   if (!gui->cfg_file) {
     struct stat st;
-    gui->cfg_file = __xineui_global_config_file = _config_file ();
+    gui->cfg_file = _config_file ();
 
     /* Popup setup window if there is no config file */
     if (!gui->cfg_file || stat (gui->cfg_file, &st) < 0) {
@@ -1860,7 +1857,7 @@ int main(int argc, char *argv[]) {
   gui->no_messages.until.tv_usec = 0;
   gui->no_messages.level = 0;
 
-  __xineui_global_xine_instance = gui->xine = xine_new ();
+  gui->xine = xine_new ();
   if (gui->cfg_file)
     xine_config_load (gui->xine, gui->cfg_file);
   xine_engine_set_param (gui->xine, XINE_ENGINE_PARAM_VERBOSITY, gui->verbosity);
@@ -2159,7 +2156,6 @@ int main(int argc, char *argv[]) {
   free_command_line_args(&_argv, _argc);
 
   free (gui->cfg_file);
-  __xineui_global_config_file = NULL;
 
   free(gui->keymap_file);
 
@@ -2190,8 +2186,8 @@ void gui_save_window_pos (gGui_t *gui, const char *name, xitk_register_key_t key
     for (e = buf + 4; *name; name++)
       *e++ = *name;
     memcpy (e, "_x", 3);
-    config_update_num (buf, wi.x);
+    config_update_num (gui->xine, buf, wi.x);
     e[1] = 'y';
-    config_update_num (buf, wi.y);
+    config_update_num (gui->xine, buf, wi.y);
   }
 }

@@ -59,6 +59,7 @@
 #include "stdctl.h"
 #include "download.h"
 #include "errors.h"
+#include "lirc.h"
 #include "oxine/oxine.h"
 #include "xine-toolkit/skin.h"
 
@@ -509,7 +510,7 @@ int gui_xine_open_and_play (gGui_t *gui, char *_mrl, char *_sub, int start_pos,
 	   __func__, _mrl, (_sub) ? _sub : "NONE", start_pos, start_time, av_offset, spu_offset);
 
   if(!strncasecmp(mrl, "cfg:/", 5)) {
-    config_mrl(mrl);
+    config_mrl (gui->xine, mrl);
     gui_playlist_start_next (gui);
     return 1;
   }
@@ -739,8 +740,8 @@ void gui_exit_2 (gGui_t *gui) {
 
   osd_deinit (gui);
 
-  config_update_num("gui.amp_level", gui->mixer.amp_level);
-  xine_config_save (gui->xine, __xineui_global_config_file);
+  config_update_num (gui->xine, "gui.amp_level", gui->mixer.amp_level);
+  xine_config_save (gui->xine, gui->cfg_file);
 
   xine_close(gui->stream);
   xine_close(gui->visual_anim.stream);
@@ -778,10 +779,8 @@ void gui_exit_2 (gGui_t *gui) {
   video_window_exit (gui->vwin);
   gui->vwin = NULL;
 
-#ifdef HAVE_LIRC
-  if(__xineui_global_lirc_enable)
-    lirc_stop();
-#endif
+  if (gui->lirc_enable)
+    lirc_stop (gui);
 
   if (gui->stdctl_enable)
     stdctl_stop (gui);
@@ -1990,7 +1989,7 @@ static void fileselector_cancel_callback (filebrowser_t *fb, void *userdata) {
   if (fb == gui->load_stream) {
     if(cur_dir && strlen(cur_dir)) {
       strlcpy(gui->curdir, cur_dir, sizeof(gui->curdir));
-      config_update_string("media.files.origin_path", gui->curdir);
+      config_update_string (gui->xine, "media.files.origin_path", gui->curdir);
     }
     gui->load_stream = NULL;
   }
@@ -2011,7 +2010,7 @@ static void fileselector_callback (filebrowser_t *fb, void *userdata) {
   /* Upate configuration with the selected directory path */
   if(cur_dir && strlen(cur_dir)) {
     strlcpy(gui->curdir, cur_dir, sizeof(gui->curdir));
-    config_update_string("media.files.origin_path", gui->curdir);
+    config_update_string (gui->xine, "media.files.origin_path", gui->curdir);
   }
   free(cur_dir);
 
@@ -2066,7 +2065,7 @@ static void fileselector_all_callback (filebrowser_t *fb, void *userdata) {
   /* Update the configuration with the current path */
   if(path && strlen(path)) {
     strlcpy(gui->curdir, path, sizeof(gui->curdir));
-    config_update_string("media.files.origin_path", gui->curdir);
+    config_update_string (gui->xine, "media.files.origin_path", gui->curdir);
   }
 
   /* Get all of the file names in the current directory as an array of pointers to strings */

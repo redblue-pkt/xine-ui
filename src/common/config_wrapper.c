@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -31,7 +31,6 @@
 
 #include "config_wrapper.h"
 #include "utils.h"
-#include "globals.h"
 #include "libcommon.h" /* strsep replacement */
 
 #ifndef _
@@ -52,121 +51,67 @@
  */
 #define XINE_CONFIG_SECURITY   30
 
+int config_update_string (xine_t *xine, const char *key, const char *string) {
+  xine_cfg_entry_t entry;
 
-static void config_update(xine_cfg_entry_t *entry, int type, int min, int max, int value, const char *string) {
-
-  switch(type) {
-
-  case XINE_CONFIG_TYPE_UNKNOWN:
-    fprintf(stderr, "Config key '%s' isn't registered yet.\n", entry->key);
-    return;
-    break;
-
-  case XINE_CONFIG_TYPE_RANGE:
-    entry->range_min = min;
-    entry->range_max = max;
-    break;
-
-  case XINE_CONFIG_TYPE_STRING:
-    entry->str_value = string;
-    break;
-
-  case XINE_CONFIG_TYPE_ENUM:
-  case XINE_CONFIG_TYPE_NUM:
-  case XINE_CONFIG_TYPE_BOOL:
-    entry->num_value = value;
-    break;
-
-  default:
-    fprintf(stderr, "Unknown config type %d\n", type);
-    return;
-    break;
+  if ((xine_config_lookup_entry (xine, key, &entry)) && string) {
+    entry.str_value = (char *)string; /** << will not be written to */
+    xine_config_update_entry (xine, &entry);
+    return 1;
   }
-
-  xine_config_update_entry(__xineui_global_xine_instance, entry);
-}
-
-void config_update_range(const char *key, int min, int max) {
-  xine_cfg_entry_t entry;
-
-  if(xine_config_lookup_entry(__xineui_global_xine_instance, key, &entry))
-    config_update(&entry, XINE_CONFIG_TYPE_RANGE, min, max, 0, NULL);
+  if (!string)
+    fprintf (stderr, "string is NULL\n");
   else
-    fprintf(stderr, "WOW, range key %s isn't registered\n", key);
+    fprintf (stderr, "WOW, string key %s isn't registered\n", key);
+  return 0;
 }
 
-void config_update_string(const char *key, const char *string) {
+int config_update_num (xine_t *xine, const char *key, int value) {
   xine_cfg_entry_t entry;
 
-  if((xine_config_lookup_entry(__xineui_global_xine_instance, key, &entry)) && string)
-    config_update(&entry, XINE_CONFIG_TYPE_STRING, 0, 0, 0, string);
-  else {
-    if(string == NULL)
-      fprintf(stderr, "string is NULL\n");
-    else
-      fprintf(stderr, "WOW, string key %s isn't registered\n", key);
+  if (xine_config_lookup_entry (xine, key, &entry)) {
+    entry.num_value = value;
+    xine_config_update_entry (xine, &entry);
+    return 1;
   }
-}
-
-void config_update_enum(const char *key, int value) {
-  xine_cfg_entry_t entry;
-
-  if(xine_config_lookup_entry(__xineui_global_xine_instance, key, &entry))
-    config_update(&entry, XINE_CONFIG_TYPE_ENUM, 0, 0, value, NULL);
-  else
-    fprintf(stderr, "WOW, enum key %s isn't registered\n", key);
-}
-
-void config_update_bool(const char *key, int value) {
-  xine_cfg_entry_t entry;
-
-  if(xine_config_lookup_entry(__xineui_global_xine_instance, key, &entry))
-    config_update(&entry, XINE_CONFIG_TYPE_BOOL, 0, 0, ((value > 0) ? 1 : 0), NULL);
-  else
-    fprintf(stderr, "WOW, bool key %s isn't registered\n", key);
-}
-
-void config_update_num(const char *key, int value) {
-  xine_cfg_entry_t entry;
-
-  if(xine_config_lookup_entry(__xineui_global_xine_instance, key, &entry))
-    config_update(&entry, XINE_CONFIG_TYPE_NUM, 0, 0, value, NULL);
-  else
-    fprintf(stderr, "WOW, num key %s isn't registered\n", key);
+  fprintf (stderr, "WOW, num key %s isn't registered\n", key);
+  return 0;
 }
 
 /*
  * Handle 'cfg:/' mrl style
  */
-void config_mrl(const char *mrl) {
+int config_mrl (xine_t *xine, const char *mrl) {
   xine_cfg_entry_t entry;
-  char *key;
-  char *config;
-  char *_mrl;
+  char *key, *config, *_mrl;
+  int n = 0;
 
-  if (!xine_config_lookup_entry(__xineui_global_xine_instance, "misc.implicit_config", &entry) ||
+  if (!xine_config_lookup_entry (xine, "misc.implicit_config", &entry) ||
       entry.type != XINE_CONFIG_TYPE_BOOL || !entry.num_value) {
     fprintf (stderr, _("You tried to change the configuration with a cfg: MRL.\n"
                        "This is not allowed unless you enable the 'misc.implicit_config' setting "
                        "after reading and understanding its help text."));
-    return;
+    return 0;
   }
 
-  _mrl = strdup(mrl);
-  config = strchr(_mrl, '/');
+  _mrl = strdup (mrl);
+  if (!_mrl)
+    return 0;
+  config = strchr (_mrl, '/');
 
-  if(config && strlen(config))
+  if (config && config[0])
     config++;
 
-  while((key = strsep(&config, ",")) != NULL) {
+  while ((key = strsep(&config, ",")) != NULL) {
     char *str_value = strchr(key, ':');
 
-    if(str_value && strlen(str_value))
+    if (str_value && str_value[0])
       *str_value++ = '\0';
 
-    if(str_value && strlen(str_value)) {
+    if (str_value && str_value[0]) {
 
-      if(xine_config_lookup_entry(__xineui_global_xine_instance, key, &entry)) {
+      if (xine_config_lookup_entry (xine, key, &entry)) {
+        int set = 0;
 
 	if(entry.exp_level >= XINE_CONFIG_SECURITY) {
           fprintf (stderr, _("For security reason, you're not allowed to change "
@@ -174,34 +119,32 @@ void config_mrl(const char *mrl) {
 	  break;
 	}
 
-	switch(entry.type) {
-
-	case XINE_CONFIG_TYPE_STRING:
-	  config_update(&entry, entry.type, 0, 0, 0, str_value);
-	  break;
-
-	case XINE_CONFIG_TYPE_RANGE:
-	case XINE_CONFIG_TYPE_ENUM:
-	case XINE_CONFIG_TYPE_NUM:
-	  config_update(&entry, ((entry.type == XINE_CONFIG_TYPE_RANGE) ?
-				 XINE_CONFIG_TYPE_NUM : entry.type),
-			0, 0, (strtol(str_value, &str_value, 10)), NULL);
-	  break;
-
-	case XINE_CONFIG_TYPE_BOOL:
-	  config_update(&entry, entry.type, 0, 0, (get_bool_value(str_value)), NULL);
-	  break;
-
-	case XINE_CONFIG_TYPE_UNKNOWN:
-	default:
-	  fprintf(stderr, "WOW, key %s isn't registered\n", key);
-	  break;
-	}
+        switch (entry.type) {
+          case XINE_CONFIG_TYPE_STRING:
+            entry.str_value = str_value;
+            set = 1;
+            break;
+          case XINE_CONFIG_TYPE_RANGE:
+          case XINE_CONFIG_TYPE_ENUM:
+          case XINE_CONFIG_TYPE_NUM:
+            entry.num_value = strtol (str_value, &str_value, 10);
+            set = 1;
+            break;
+          case XINE_CONFIG_TYPE_BOOL:
+            entry.num_value = get_bool_value (str_value);
+            set = 1;
+            break;
+          default:
+            fprintf (stderr, "WOW, key %s is of unknown type %d.\n", key, (int)entry.type);
+        }
+        if (set) {
+          xine_config_update_entry (xine, &entry);
+          n++;
+        }
       }
-
     }
   }
 
   free(_mrl);
+  return n;
 }
-

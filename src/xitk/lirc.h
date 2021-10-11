@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -24,7 +24,12 @@
 #ifndef LIRC_H
 #define LIRC_H
 
-void lirc_start(void);
-void lirc_stop(void);
+#ifdef HAVE_LIRC
+void lirc_start (gGui_t *gui);
+void lirc_stop (gGui_t *gui);
+#else
+#define lirc_start(_gui) (void)(_gui)
+#define lirc_stop(_gui) (void)(_gui)
+#endif
 
 #endif

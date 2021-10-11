@@ -121,7 +121,7 @@ static int open_and_play(const char *mrl)
 
         if(!strncasecmp(mrl, "cfg:/", 5))
 	{
-		config_mrl(mrl);
+		config_mrl (__xineui_global_xine_instance, mrl);
 		return 0;
 	}
 

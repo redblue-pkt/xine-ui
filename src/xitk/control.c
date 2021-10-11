@@ -136,7 +136,7 @@ static void control_set_value (xitk_widget_t *w, void *data, int value) {
   (void)w;
   _control_set (item, value);
   if (item->enable)
-    config_update_num (item->cfg, value);
+    config_update_num (item->vctrl->gui->xine, item->cfg, value);
 }
 
 static void control_changes_cb (void *data, xine_cfg_entry_t *cfg) {
@@ -510,7 +510,7 @@ void control_reset (xui_vctrl_t *vctrl) {
 
       if (item->enable) {
         xine_set_param (vctrl->gui->stream, item->prop, item->default_value);
-        config_update_num (item->cfg, -1);
+        config_update_num (vctrl->gui->xine, item->cfg, -1);
         if (item->w && xitk_is_widget_enabled (item->w))
           xitk_slider_set_pos (item->w, item->default_value);
       }

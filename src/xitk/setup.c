@@ -222,13 +222,13 @@ static void setup_apply (xitk_widget_t *w, void *data, int state) {
 
           switch (setup->wg[i].cfg.type) {
 	  case XINE_CONFIG_TYPE_STRING:
-            config_update_string ((char *)setup->wg[i].cfg.key, strval);
+            config_update_string (setup->gui->xine, (char *)setup->wg[i].cfg.key, strval);
 	    break;
 	  case XINE_CONFIG_TYPE_ENUM:
 	  case XINE_CONFIG_TYPE_NUM:
 	  case XINE_CONFIG_TYPE_BOOL:
 	  case XINE_CONFIG_TYPE_RANGE:
-            config_update_num ((char *)setup->wg[i].cfg.key, numval);
+            config_update_num (setup->gui->xine, (char *)setup->wg[i].cfg.key, numval);
 	    break;
 	  case XINE_CONFIG_TYPE_UNKNOWN:
 	    break;

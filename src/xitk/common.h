@@ -52,19 +52,16 @@ typedef struct filebrowser_s filebrowser_t;
 typedef struct tvout_s tvout_t;
 typedef struct xui_skdloader_s xui_skdloader_t;
 typedef struct xui_sinfo_s xui_sinfo_t;
+typedef struct xui_lirc_s xui_lirc_t;
 
 #include "config_wrapper.h"
 #include "i18n.h"
-#ifdef HAVE_LIRC
-#include "lirc.h"
-#endif
 #include "post.h"
 #include "osd.h"
 #include "kbindings.h"
 #include "mediamark.h"
 
 #include "libcommon.h"
-#include "globals.h"
 
 #ifdef HAVE_ORBIT
 #include "../corba/xine-server.h"
@@ -153,6 +150,7 @@ struct gGui_st {
   int                       post_video_enable;
   int                       post_audio_enable;
   int                       deinterlace_enable;
+  int                       lirc_enable;
 
   xine_audio_port_t        *ao_port;
 
@@ -353,6 +351,7 @@ struct gGui_st {
   xui_playlist_t            *plwin;
   xui_mmkedit_t             *mmkedit;
   xui_sinfo_t               *streaminfo;
+  xui_lirc_t                *lirc;
   filebrowser_t             *pl_load;
   filebrowser_t             *pl_save;
 
@@ -415,4 +414,3 @@ void gui_save_window_pos (gGui_t *gui, const char *name, xitk_register_key_t key
 #endif
 
 #endif
-

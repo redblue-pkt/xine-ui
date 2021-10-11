@@ -167,7 +167,7 @@ static void _menu_action (xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
       break;
 
     case (_MENU_AUDIO_VIZ_BASE >> 24):
-      config_update_num ("gui.post_audio_plugin", me->user_id - _MENU_AUDIO_VIZ_BASE);
+      config_update_num (gui->xine, "gui.post_audio_plugin", me->user_id - _MENU_AUDIO_VIZ_BASE);
       break;
 
     case (_MENU_SUBT_CHAN_BASE >> 24):

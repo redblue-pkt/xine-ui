@@ -40,6 +40,7 @@
 #include "kbindings.h"
 #include "panel.h"
 #include "actions.h"
+#include "lirc.h"
 #include "event.h"
 #include "playlist.h"
 
@@ -50,14 +51,13 @@
 #endif
 
 
-static struct {
+struct xui_lirc_s {
   struct lirc_config   *config;
   int                   fd;
   pthread_t             thread;
-} lirc;
+};
 
-static void lirc_get_playlist(char *from) {
-  gGui_t *gui = gGui;
+static void lirc_get_playlist (gGui_t *gui, char *from) {
   int    i;
   char **autoscan_plugins = (char **)xine_get_autoplay_input_plugin_ids (gui->xine);
 
@@ -94,19 +94,19 @@ static __attribute__((noreturn)) void *xine_lirc_loop (void *data) {
   while (gui->running) {
 
     FD_ZERO(&set);
-    FD_SET(lirc.fd, &set);
+    FD_SET (gui->lirc->fd, &set);
 
     tv.tv_sec  = 0;
     tv.tv_usec = 500000;
 
-    select(lirc.fd + 1, &set, NULL, NULL, &tv);
+    select (gui->lirc->fd + 1, &set, NULL, NULL, &tv);
 
     while((ret = lirc_nextcode(&code)) == 0) {
 
       if(code == NULL)
 	break;
 
-      while((ret = lirc_code2char(lirc.config, code, &c)) == 0
+      while((ret = lirc_code2char (gui->lirc->config, code, &c)) == 0
 	    && c != NULL) {
 #if 0
 	fprintf(stdout, "Command Received = '%s'\n", c);
@@ -123,7 +123,7 @@ static __attribute__((noreturn)) void *xine_lirc_loop (void *data) {
 	  memset(&from, 0, sizeof(from));
           if(sscanf(c, "PlaylistFrom:%255s", &from[0]) == 1) {
 	    if(strlen(from))
-	      lirc_get_playlist(from);
+	      lirc_get_playlist (gui, from);
 	  }
 	}
       }
@@ -145,37 +145,50 @@ static __attribute__((noreturn)) void *xine_lirc_loop (void *data) {
   pthread_exit(NULL);
 }
 
-void lirc_start(void) {
+void lirc_start (gGui_t *gui) {
   int flags;
   int err;
 
-  if((lirc.fd = lirc_init("xine", LIRC_VERBOSE)) == -1) {
-    __xineui_global_lirc_enable = 0;
+  gui->lirc = malloc (sizeof (*gui->lirc));
+  if (!gui->lirc) {
+    gui->lirc_enable = 0;
     return;
   }
 
-  fcntl(lirc.fd, F_SETFD, FD_CLOEXEC);
-  fcntl(lirc.fd, F_SETOWN, getpid());
-  flags = fcntl(lirc.fd, F_GETFL, 0);
-  if(flags != -1)
-    fcntl(lirc.fd, F_SETFL, flags|O_NONBLOCK);
+  if ((gui->lirc->fd = lirc_init ("xine", LIRC_VERBOSE)) == -1) {
+    gui->lirc_enable = 0;
+    return;
+  }
 
-  if(lirc_readconfig(NULL, &lirc.config, NULL) != 0) {
-    __xineui_global_lirc_enable = 0;
+  fcntl (gui->lirc->fd, F_SETFD, FD_CLOEXEC);
+  fcntl (gui->lirc->fd, F_SETOWN, getpid());
+  flags = fcntl (gui->lirc->fd, F_GETFL, 0);
+  if (flags != -1)
+    fcntl (gui->lirc->fd, F_SETFL, flags|O_NONBLOCK);
+
+  if (lirc_readconfig (NULL, &gui->lirc->config, NULL) != 0) {
+    gui->lirc_enable = 0;
     lirc_deinit();
     return;
   }
 
-  if ((err = pthread_create (&(lirc.thread), NULL, xine_lirc_loop, gGui)) != 0) {
+  if ((err = pthread_create (&(gui->lirc->thread), NULL, xine_lirc_loop, gui)) != 0) {
     printf(_("%s(): can't create new thread (%s)\n"), __XINE_FUNCTION__, strerror(err));
-    lirc_freeconfig(lirc.config);
+    lirc_freeconfig (gui->lirc->config);
     lirc_deinit();
-    __xineui_global_lirc_enable = 0;
+    free (gui->lirc);
+    gui->lirc = NULL;
+    gui->lirc_enable = 0;
   }
 }
 
-void lirc_stop(void) {
-  pthread_join(lirc.thread, NULL);
-  lirc_freeconfig(lirc.config);
-  lirc_deinit();
+void lirc_stop (gGui_t *gui) {
+  if (gui->lirc) {
+    pthread_join (gui->lirc->thread, NULL);
+    lirc_freeconfig (gui->lirc->config);
+    lirc_deinit ();
+    free (gui->lirc);
+    gui->lirc = NULL;
+  }
 }
+
