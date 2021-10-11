@@ -33,7 +33,6 @@
 #include <xine.h>
 
 #include "common.h"
-#include "globals.h"
 #include "../videowin.h"
 #include "../actions.h"
 
