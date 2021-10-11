@@ -162,7 +162,7 @@ static void _too_slow_done (void *data, int state) {
   gGui_t *gui = data;
 
   if (state & XITK_WINDOW_DIALOG_CHECKED)
-    config_update_num ("gui.dropped_frames_warning", 0);
+    config_update_num (gui->xine, "gui.dropped_frames_warning", 0);
 
   if ((state & XITK_WINDOW_DIALOG_BUTTONS_MASK) == 2) {
     /* FIXME: how to properly open the system browser?

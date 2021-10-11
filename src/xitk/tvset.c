@@ -171,6 +171,7 @@ static void tvset_update (xitk_widget_t *w, void *data, int state) {
 
 
 static void tvset_exit (xitk_widget_t *w, void *data, int state) {
+  gGui_t *gui = gGui;
   window_info_t wi;
 
   if ( ! tvset.running ) return;
@@ -178,12 +179,12 @@ static void tvset_exit (xitk_widget_t *w, void *data, int state) {
     tvset.running = 0;
     tvset.visible = 0;
 
-    if ((xitk_get_window_info (gGui->xitk, tvset.widget_key, &wi))) {
-      config_update_num ("gui.tvset_x", wi.x);
-      config_update_num ("gui.tvset_y", wi.y);
+    if ((xitk_get_window_info (gui->xitk, tvset.widget_key, &wi))) {
+      config_update_num (gui->xine, "gui.tvset_x", wi.x);
+      config_update_num (gui->xine, "gui.tvset_y", wi.y);
     }
 
-    xitk_unregister_event_handler (gGui->xitk, &tvset.widget_key);
+    xitk_unregister_event_handler (gui->xitk, &tvset.widget_key);
 
     xitk_window_destroy_window(tvset.xwin);
     tvset.xwin = NULL;
@@ -196,7 +197,7 @@ static void tvset_exit (xitk_widget_t *w, void *data, int state) {
     tvset.chann_entries = NULL;
     tvset.vidstd_entries = NULL;
 
-    video_window_set_input_focus(gGui->vwin);
+    video_window_set_input_focus (gui->vwin);
 }
 
 static int tvset_event (void *data, const xitk_be_event_t *e) {
@@ -263,6 +264,7 @@ static void system_combo_select(xitk_widget_t *w, void *data, int select) {
 
 
 void tvset_panel(void) {
+  gGui_t *gui = gGui;
   xitk_labelbutton_widget_t   lb;
   xitk_label_widget_t         lbl;
   xitk_intbox_widget_t        ib;
@@ -273,14 +275,14 @@ void tvset_panel(void) {
   int                         x, y, w;
   xitk_widget_t              *widget;
 
-  x = xine_config_register_num (__xineui_global_xine_instance, "gui.tvset_x",
+  x = xine_config_register_num (gui->xine, "gui.tvset_x",
 				80,
 				CONFIG_NO_DESC,
 				CONFIG_NO_HELP,
 				CONFIG_LEVEL_DEB,
 				CONFIG_NO_CB,
 				CONFIG_NO_DATA);
-  y = xine_config_register_num (__xineui_global_xine_instance, "gui.tvset_y",
+  y = xine_config_register_num (gui->xine, "gui.tvset_y",
 				80,
 				CONFIG_NO_DESC,
 				CONFIG_NO_HELP,

@@ -295,8 +295,8 @@ void event_sender_move (gGui_t *gui, int x, int y) {
 
       gui->eventer->x = x;
       gui->eventer->y = y;
-      config_update_num ("gui.eventer_x", x);
-      config_update_num ("gui.eventer_y", y);
+      config_update_num (gui->xine, "gui.eventer_x", x);
+      config_update_num (gui->xine, "gui.eventer_y", y);
       xitk_window_move_resize (gui->eventer->xwin, &wr);
     }
   }

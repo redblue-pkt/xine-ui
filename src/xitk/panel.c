@@ -174,8 +174,8 @@ static void panel_store_new_position (void *data, const xitk_rect_t *wr) {
     panel->x = wr->x;
     panel->y = wr->y;
     /*
-    config_update_num ("gui.panel_x", wr->x);
-    config_update_num ("gui.panel_y", wr->y); */
+    config_update_num (panel->gui->xine, "gui.panel_x", wr->x);
+    config_update_num (panel->gui->xine, "gui.panel_y", wr->y); */
 
     event_sender_move (panel->gui, wr->x + wr->width, wr->y);
   }
@@ -219,7 +219,7 @@ static void _update_logo (xui_panel_t *panel) {
 	goto __done;
     }
 
-    config_update_string("gui.logo_mrl", skin_logo);
+    config_update_string (panel->gui->xine, "gui.logo_mrl", skin_logo);
     goto __play_logo_now;
 
   }
@@ -235,7 +235,7 @@ static void _update_logo (xui_panel_t *panel) {
 #  define USE_XINE_LOGO_MRL XINE_LOGO_MRL
 #endif
     if (panel->logo_synthetic && (cfg_err_result) && (strcmp (cfg_entry.str_value, USE_XINE_LOGO_MRL))) {
-        config_update_string ("gui.logo_mrl", USE_XINE_LOGO_MRL);
+        config_update_string (panel->gui->xine, "gui.logo_mrl", USE_XINE_LOGO_MRL);
 
     __play_logo_now:
 
@@ -692,7 +692,7 @@ void panel_toggle_visibility (xitk_widget_t *w, void *data) {
   if (!panel)
     return;
   _panel_toggle_visibility (panel);
-  config_update_num ("gui.panel_visible", panel->visible > 1);
+  config_update_num (panel->gui->xine, "gui.panel_visible", panel->visible > 1);
 }
 
 void panel_raise_window (xui_panel_t *panel) {
@@ -1026,7 +1026,7 @@ void panel_add_autoplay_buttons (xui_panel_t *panel) {
   /*  The user don't want panel on startup */
   if (panel->visible && (actions_on_start (panel->gui->actions_on_start, ACTID_TOGGLE_VISIBLITY))) {
     panel->visible = 0;
-    config_update_num ("gui.panel_visible", 0);
+    config_update_num (panel->gui->xine, "gui.panel_visible", 0);
   }
   if (panel->gui->use_root_window || video_window_is_separate_display (panel->gui->vwin))
     panel->visible = 1;
@@ -1098,7 +1098,7 @@ void panel_deinit (xui_panel_t *panel) {
     return;
 
   _panel_get_visibility (panel);
-  config_update_num ("gui.panel_visible", panel->visible > 1);
+  config_update_num (panel->gui->xine, "gui.panel_visible", panel->visible > 1);
   if (panel->visible > 1) {
     panel->visible = 0;
     xitk_window_flags (panel->xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, 0);

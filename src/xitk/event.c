@@ -57,6 +57,7 @@
 #include "network.h"
 #include "tvout.h"
 #include "stdctl.h"
+#include "lirc.h"
 #include "oxine/oxine.h"
 
 /*
@@ -126,7 +127,7 @@ int hidden_file_cb (void *_gui, int action, int value) {
     return 0;
   if (xine_config_lookup_entry (gui->xine, "media.files.show_hidden_files", &cfg_entry)) {
     if(action)
-      config_update_bool("media.files.show_hidden_files", value);
+      config_update_bool (gui->xine, "media.files.show_hidden_files", value);
     else
       retval = cfg_entry.num_value;
   }
@@ -304,7 +305,7 @@ static void gui_signal_handler (int sig, void *data) {
     if(cur_pid == xine_pid) {
       printf("SIGHUP received: re-read config file\n");
       xine_config_reset (gui->xine);
-      xine_config_load (gui->xine, __xineui_global_config_file);
+      xine_config_load (gui->xine, gui->cfg_file);
     }
     break;
 
@@ -325,7 +326,7 @@ static void gui_signal_handler (int sig, void *data) {
     if(cur_pid == xine_pid) {
       struct sigaction action;
 
-      xine_config_save (gui->xine, __xineui_global_config_file);
+      xine_config_save (gui->xine, gui->cfg_file);
 
       action.sa_handler = dummy_sighandler;
       sigemptyset(&(action.sa_mask));
@@ -1528,7 +1529,7 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
 					 skin_server_url_cb,
 					 gui);
 
-  config_update_string("gui.skin_server_url",
+  config_update_string (gui->xine, "gui.skin_server_url",
 		       gui->skin_server_url ? gui->skin_server_url : server);
 
   gui->osd.enabled =
@@ -1777,10 +1778,9 @@ void gui_run(gGui_t *gui, char **session_opts) {
    * event loop
    */
 
-#ifdef HAVE_LIRC
-  if(__xineui_global_lirc_enable)
-    lirc_start();
-#endif
+  if (gui->lirc_enable) {
+    lirc_start (gui);
+  }
 
   if (gui->stdctl_enable)
     stdctl_start (gui);
@@ -1802,7 +1802,7 @@ void gui_run(gGui_t *gui, char **session_opts) {
 
     /* Popup setup window if there is no config file */
     if(actions_on_start(gui->actions_on_start, ACTID_SETUP)) {
-      xine_config_save (gui->xine, __xineui_global_config_file);
+      xine_config_save (gui->xine, gui->cfg_file);
       gui_execute_action_id (gui, ACTID_SETUP);
     }
 
@@ -1896,3 +1896,4 @@ void gui_run(gGui_t *gui, char **session_opts) {
    */
   xitk_free(&gui->xitk);
 }
+
