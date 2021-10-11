@@ -39,8 +39,6 @@
 /* input_pvr functionality needs this */
 #define XINE_ENABLE_EXPERIMENTAL_FEATURES
 
-#include "dump.h"
-
 #include "common.h"
 #include "event.h"
 #include "actions.h"
@@ -1896,4 +1894,3 @@ void gui_run(gGui_t *gui, char **session_opts) {
    */
   xitk_free(&gui->xitk);
 }
-

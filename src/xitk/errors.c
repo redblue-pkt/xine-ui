@@ -72,10 +72,13 @@ void gui_msg (gGui_t *gui, unsigned int flags, const char *message, ...) {
   if (gui->stdctl_enable || !gui->xitk) {
     printf ("%s\n", text);
   } else {
-    if (type == XUI_MSG_ERROR)
-      dump_error (text);
-    else
-      dump_info (text);
+    if (type == XUI_MSG_ERROR) {
+      if (gui->verbosity > 0)
+        dump_error (text);
+    } else {
+      if (gui->verbosity > 1)
+        dump_info (text);
+    }
     if (gui->nongui_error_msg) {
       gui->nongui_error_msg (text);
     } else {
@@ -108,12 +111,14 @@ void gui_handle_xine_error (gGui_t *gui, xine_stream_t *stream, const char *mrl)
   switch(err) {
 
   case XINE_ERROR_NONE:
-    dump_error("got XINE_ERROR_NONE.");
+    if (gui->verbosity > 0)
+      dump_error ("got XINE_ERROR_NONE.");
     /* noop */
     break;
 
   case XINE_ERROR_NO_INPUT_PLUGIN:
-    dump_error("got XINE_ERROR_NO_INPUT_PLUGIN.");
+    if (gui->verbosity > 0)
+      dump_error ("got XINE_ERROR_NO_INPUT_PLUGIN.");
     gui_msg (gui, XUI_MSG_ERROR | XUI_MSG_MORE,
       _("- xine engine error -\n\n"
         "There is no input plugin available to handle '%s'.\n"
@@ -121,7 +126,8 @@ void gui_handle_xine_error (gGui_t *gui, xine_stream_t *stream, const char *mrl)
     break;
 
   case XINE_ERROR_NO_DEMUX_PLUGIN:
-    dump_error("got XINE_ERROR_NO_DEMUX_PLUGIN.");
+    if (gui->verbosity > 0)
+      dump_error ("got XINE_ERROR_NO_DEMUX_PLUGIN.");
     gui_msg (gui, XUI_MSG_ERROR | XUI_MSG_MORE,
       _("- xine engine error -\n\n"
         "There is no demuxer plugin available to handle '%s'.\n"
@@ -129,28 +135,32 @@ void gui_handle_xine_error (gGui_t *gui, xine_stream_t *stream, const char *mrl)
     break;
 
   case XINE_ERROR_DEMUX_FAILED:
-    dump_error("got XINE_ERROR_DEMUX_FAILED.");
+    if (gui->verbosity > 0)
+      dump_error ("got XINE_ERROR_DEMUX_FAILED.");
     gui_msg (gui, XUI_MSG_ERROR | XUI_MSG_MORE,
       _("- xine engine error -\n\n"
         "Demuxer failed. Maybe '%s' is a broken file?\n"), _mrl);
     break;
 
   case XINE_ERROR_MALFORMED_MRL:
-    dump_error("got XINE_ERROR_MALFORMED_MRL.");
+    if (gui->verbosity > 0)
+      dump_error ("got XINE_ERROR_MALFORMED_MRL.");
     gui_msg (gui, XUI_MSG_ERROR | XUI_MSG_MORE,
       _("- xine engine error -\n\n"
         "Malformed mrl. Mrl '%s' seems malformed/invalid.\n"), _mrl);
     break;
 
   case XINE_ERROR_INPUT_FAILED:
-    dump_error("got XINE_ERROR_INPUT_FAILED.");
+    if (gui->verbosity > 0)
+      dump_error ("got XINE_ERROR_INPUT_FAILED.");
     gui_msg (gui, XUI_MSG_ERROR | XUI_MSG_MORE,
       _("- xine engine error -\n\n"
         "Input plugin failed to open mrl '%s'\n"), _mrl);
     break;
 
   default:
-    dump_error("got unhandle error.");
+    if (gui->verbosity > 0)
+      dump_error ("got unhandled error.");
     gui_msg (gui, XUI_MSG_ERROR | XUI_MSG_MORE, _("- xine engine error -\n\n!! Unhandled error !!\n"));
     break;
   }
@@ -181,7 +191,8 @@ void too_slow_window (gGui_t *gui) {
 
   message = _("The amount of dropped frame is too high, your system might be slow, not properly optimized or just too loaded.\n\nhttp://www.xine-project.org/faq#SPEEDUP");
 
-  dump_error(message);
+  if (gui->verbosity > 0)
+    dump_error (message);
 
   display_warning = xine_config_register_bool (gui->xine, "gui.dropped_frames_warning",
 		     1,
@@ -204,4 +215,3 @@ void too_slow_window (gGui_t *gui) {
     _("Done"), _("Learn More..."), NULL, _("Disable this warning."), 0, ALIGN_CENTER, "%s", message);
   video_window_set_transient_for (gui->vwin, xitk_get_window (gui->xitk, key));
 }
-

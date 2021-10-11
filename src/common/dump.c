@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -37,7 +37,6 @@
 #endif
 
 #include "dump.h"
-#include "globals.h"
 
 void dump_host_info(void) {
 #ifdef HAVE_SYS_UTSNAME_H
@@ -100,17 +99,14 @@ void dump_cpu_infos(void) {
 }
 
 void dump_error(const char *msg) {
-  if(!__xineui_global_verbosity) return;
-
   fprintf(stderr, "%s", "\n---------------------- (ERROR) ----------------------\n");
   fputs(msg, stderr);
   fprintf(stderr, "%s","\n------------------ (END OF ERROR) -------------------\n\n");
 }
 
 void dump_info(const char *msg) {
-  if(!__xineui_global_verbosity) return;
-
   fprintf(stderr, "%s", "\n---------------------- (INFO) ----------------------\n");
   fputs(msg, stderr);
   fprintf(stderr, "%s", "\n------------------- (END OF INFO) ------------------\n\n");
 }
+
