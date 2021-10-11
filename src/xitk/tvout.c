@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -31,8 +31,9 @@
 #define TVOUT_DEBUG 1
 
 
-struct tvout_s {
-  int    (*init)(void **private);
+struct xui_tvout_s {
+  gGui_t *gui;
+  int    (*init) (xui_tvout_t *tvout);
   int    (*setup)(void *private);
   void   (*get_size_and_aspect)(int *width, int *height, double *pixaspect, void *private);
   int    (*set_fullscreen)(int fullscreen, int width, int height, void *private);
@@ -41,25 +42,29 @@ struct tvout_s {
   void   *private;
 };
 
-typedef tvout_t *(*backend_init_t)(void);
+typedef xui_tvout_t *(*backend_init_t) (gGui_t *gui);
 
 /* Backend init prototypes */
 #ifdef HAVE_NVTVSIMPLE
-static tvout_t *nvtv_backend(void);
+static xui_tvout_t *nvtv_backend (gGui_t *gui);
 #endif
-static tvout_t *ati_backend(void);
+static xui_tvout_t *ati_backend (gGui_t *gui);
 
-static const struct {
-  char            name[8];
-  backend_init_t  init;
-} backends[] = {
+static const char * const tvout_names[] = {
 #ifdef HAVE_NVTVSIMPLE
-  { "nvtv", nvtv_backend },
+  "nvtv",
 #endif
-  { "ati",  ati_backend  },
-  { "",     NULL         }
+  "ati",
+  NULL
 };
 
+static const backend_init_t tvout_backends[] = {
+#ifdef HAVE_NVTVSIMPLE
+  nvtv_backend,
+#endif
+  ati_backend,
+  NULL
+};
 
 #ifdef HAVE_NVTVSIMPLE
 
@@ -74,19 +79,21 @@ typedef struct {
 
 
 /* ===== NVTV ===== */
-static int nvtv_tvout_init(void **data) {
-  gGui_t *gui = gGui;
+static int nvtv_tvout_init (xui_tvout_t *tvout) {
   int             ret;
 
   if((ret = nvtv_simple_init())) {
     static const char *const tv_systems[] = { "PAL", "NTSC", NULL };
-
     nvtv_private_t *private = (nvtv_private_t *) calloc(1, sizeof(nvtv_private_t));
 
-    *data = private;
+    if (!private) {
+      nvtv_simple_exit ();
+      return 0;
+    }
+    tvout->private = private;
 
     private->tv_system = (int)
-      xine_config_register_enum (gui->xine, "gui.tvout_nvtv_tv_system",
+      xine_config_register_enum (tvout->gui->xine, "gui.tvout_nvtv_tv_system",
 				0,
 				tv_systems,
 				_("nvtv TV output system"),
@@ -95,7 +102,7 @@ static int nvtv_tvout_init(void **data) {
 				CONFIG_NO_CB,
 				CONFIG_NO_DATA);
     private->xrandr =
-      xine_config_register_bool(gui->xine, "gui.tvout_nvtv_xrandr",
+      xine_config_register_bool (tvout->gui->xine, "gui.tvout_nvtv_xrandr",
 				1,
 				_("Enable XRandr extension"),
 				_("Enable the use of xrandr to autofit the screen "
@@ -171,18 +178,22 @@ static void nvtv_tvout_deinit(void *data) {
   free(private);
 }
 
-static tvout_t *nvtv_backend(void) {
-  static tvout_t tvout;
+static xui_tvout_t *nvtv_backend (gGui_t *gui) {
+  xui_tvout_t *tvout = malloc (sizeof (*tvout);
 
-  tvout.init                = nvtv_tvout_init;
-  tvout.setup               = nvtv_tvout_setup;
-  tvout.get_size_and_aspect = nvtv_get_size_and_aspect;
-  tvout.set_fullscreen      = nvtv_tvout_set_fullscreen_mode;
-  tvout.get_fullscreen      = nvtv_tvout_get_fullscreen_mode;
-  tvout.deinit              = nvtv_tvout_deinit;
-  tvout.private             = NULL;
+  if (!tvout)
+    return NULL;
 
-  return &tvout;
+  tvout->gui                 = gui;
+  tvout->init                = nvtv_tvout_init;
+  tvout->setup               = nvtv_tvout_setup;
+  tvout->get_size_and_aspect = nvtv_get_size_and_aspect;
+  tvout->set_fullscreen      = nvtv_tvout_set_fullscreen_mode;
+  tvout->get_fullscreen      = nvtv_tvout_get_fullscreen_mode;
+  tvout->deinit              = nvtv_tvout_deinit;
+  tvout->private             = NULL;
+
+  return tvout;
 }
 #endif
 
@@ -192,14 +203,16 @@ typedef struct {
   int     fullscreen;
 } ati_private_t;
 
-static int ati_tvout_init(void **data) {
-  gGui_t *gui = gGui;
+static int ati_tvout_init (xui_tvout_t *tvout) {
   ati_private_t *private = (ati_private_t *) calloc(1, sizeof(ati_private_t));
 
-  *data = private;
+  if (!private)
+    return 0;
+
+  tvout->private = private;
 
   private->atitvout_cmds[0] = (char *)
-    xine_config_register_string (gui->xine, "gui.tvout_ati_cmd_off",
+    xine_config_register_string (tvout->gui->xine, "gui.tvout_ati_cmd_off",
 				 "sudo /usr/local/sbin/atitvout c",
 				 _("Command to turn off TV out"),
 				 _("atitvout command line used to turn on TV output."),
@@ -208,7 +221,7 @@ static int ati_tvout_init(void **data) {
 				 CONFIG_NO_DATA);
 
   private->atitvout_cmds[1] = (char *)
-    xine_config_register_string (gui->xine, "gui.tvout_ati_cmd_on",
+    xine_config_register_string (tvout->gui->xine, "gui.tvout_ati_cmd_on",
 				 "sudo /usr/local/sbin/atitvout pal ct",
 				 _("Command to turn on TV out"),
 				 _("atitvout command line used to turn on TV output."),
@@ -221,16 +234,23 @@ static int ati_tvout_init(void **data) {
   return 1;
 }
 
-static int ati_tvout_setup(void *data) {
+static int ati_tvout_setup (void *data) {
+  (void)data;
   return 1;
 }
 
-static void ati_get_size_and_aspect(int *width, int *height, double *pixaspect, void *private) {
+static void ati_get_size_and_aspect (int *width, int *height, double *pixaspect, void *private) {
+  (void)width;
+  (void)height;
+  (void)pixaspect;
+  (void)private;
 }
 
 static int ati_tvout_set_fullscreen_mode(int fullscreen, int width, int height, void *data) {
   ati_private_t *private = (ati_private_t *) data;
 
+  (void)width;
+  (void)height;
   if(private->atitvout_cmds[fullscreen] && strlen(private->atitvout_cmds[fullscreen])) {
     int err;
 
@@ -264,24 +284,28 @@ static void ati_tvout_deinit(void *data) {
   free(private);
 }
 
-static tvout_t *ati_backend(void) {
-  static tvout_t tvout;
+static xui_tvout_t *ati_backend (gGui_t *gui) {
+  xui_tvout_t *tvout = malloc (sizeof (*tvout));
 
-  tvout.init                = ati_tvout_init;
-  tvout.setup               = ati_tvout_setup;
-  tvout.get_size_and_aspect = ati_get_size_and_aspect;
-  tvout.set_fullscreen      = ati_tvout_set_fullscreen_mode;
-  tvout.get_fullscreen      = ati_tvout_get_fullscreen_mode;
-  tvout.deinit              = ati_tvout_deinit;
-  tvout.private             = NULL;
+  if (!tvout)
+    return NULL;
 
-  return &tvout;
+  tvout->gui                 = gui;
+  tvout->init                = ati_tvout_init;
+  tvout->setup               = ati_tvout_setup;
+  tvout->get_size_and_aspect = ati_get_size_and_aspect;
+  tvout->set_fullscreen      = ati_tvout_set_fullscreen_mode;
+  tvout->get_fullscreen      = ati_tvout_get_fullscreen_mode;
+  tvout->deinit              = ati_tvout_deinit;
+  tvout->private             = NULL;
+
+  return tvout;
 }
 /* ===== ATI END ===== */
 
 
 /* ===== Wrapper ===== */
-tvout_t *tvout_init(char *backend) {
+xui_tvout_t *tvout_init (gGui_t *gui, const char *backend) {
   if(backend) {
     int i;
 
@@ -289,13 +313,15 @@ tvout_t *tvout_init(char *backend) {
     printf("Looking for %s tvout backend\n", backend);
 #endif
 
-    for(i = 0; backends[i].init; i++) {
-      if(!strcasecmp(backends[i].name, backend)) {
-	tvout_t *tvout = backends[i].init();
+    for (i = 0; tvout_backends[i]; i++) {
+      if (!strcasecmp (tvout_names[i], backend)) {
+        xui_tvout_t *tvout = tvout_backends[i] (gui);
 
 	if(tvout) {
-	  if(!tvout->init(&(tvout->private)))
-	    tvout = NULL;
+          if (!tvout->init (tvout)) {
+            free (tvout);
+            tvout = NULL;
+          }
 #ifdef TVOUT_DEBUG
 	  else
 	    printf(" ***Initialized\n");
@@ -310,47 +336,39 @@ tvout_t *tvout_init(char *backend) {
   return NULL;
 }
 
-int tvout_setup(tvout_t *tvout) {
+int tvout_setup(xui_tvout_t *tvout) {
   if(tvout)
     return (tvout->setup(tvout->private));
 
   return 0;
 }
 
-void tvout_get_size_and_aspect(tvout_t *tvout, int *width, int *height, double *pix_aspect) {
+void tvout_get_size_and_aspect(xui_tvout_t *tvout, int *width, int *height, double *pix_aspect) {
   if(tvout)
     tvout->get_size_and_aspect(width, height, pix_aspect, tvout->private);
 }
 
-int tvout_set_fullscreen_mode(tvout_t *tvout, int fullscreen, int width, int height) {
+int tvout_set_fullscreen_mode(xui_tvout_t *tvout, int fullscreen, int width, int height) {
   if(tvout)
     return (tvout->set_fullscreen(fullscreen, width, height, tvout->private));
 
   return 0;
 }
 
-int tvout_get_fullscreen_mode(tvout_t *tvout) {
+int tvout_get_fullscreen_mode(xui_tvout_t *tvout) {
   if(tvout)
     return (tvout->get_fullscreen(tvout->private));
 
   return 0;
 }
 
-void tvout_deinit(tvout_t *tvout) {
-  if(tvout)
-    tvout->deinit(tvout->private);
+void tvout_deinit(xui_tvout_t *tvout) {
+  if (tvout) {
+    tvout->deinit (tvout->private);
+    free (tvout);
+  }
 }
 
-const char **tvout_get_backend_names(void) {
-  static const char *bckends[(sizeof(backends) / sizeof(backends[0]))];
-  int i = 0;
-
-  while(backends[i].init) {
-    bckends[i] = backends[i].name;
-    i++;
-  }
-
-  bckends[i] = NULL;
-
-  return bckends;
+const char * const *tvout_get_backend_names (void) {
+  return tvout_names;
 }

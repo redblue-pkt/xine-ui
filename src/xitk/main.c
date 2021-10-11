@@ -463,7 +463,8 @@ static void show_usage (void) {
   const char   *const *driver_ids;
   const char   *driver_id;
   xine_t       *xine;
-  const char  **backends, *backend;
+  const char * const *backends;
+  const char *backend;
 
   xine = xine_new();
   _config_load(xine);
@@ -1319,6 +1320,8 @@ int main(int argc, char *argv[]) {
   gui->eventer                = NULL;
   gui->keyedit                = NULL;
   gui->streaminfo             = NULL;
+  gui->tvset                  = NULL;
+  gui->tvout                  = NULL;
 
   gui->mmkedit                = NULL;
   gui->plwin                  = NULL;
@@ -2074,7 +2077,7 @@ int main(int argc, char *argv[]) {
   xine_event_create_listener_thread (gui->event_queue, event_listener, gui);
 
   if(tvout && strlen(tvout)) {
-    if((gui->tvout = tvout_init(tvout)))
+    if ((gui->tvout = tvout_init (gui, tvout)))
       tvout_setup(gui->tvout);
   }
 
@@ -2191,3 +2194,4 @@ void gui_save_window_pos (gGui_t *gui, const char *name, xitk_register_key_t key
     config_update_num (gui->xine, buf, wi.y);
   }
 }
+

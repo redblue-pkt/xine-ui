@@ -49,7 +49,8 @@ typedef struct xui_playlist_st xui_playlist_t;
 typedef struct xui_setup_st xui_setup_t;
 typedef struct xui_viewlog_s xui_viewlog_t;
 typedef struct filebrowser_s filebrowser_t;
-typedef struct tvout_s tvout_t;
+typedef struct xui_tvset_s xui_tvset_t;
+typedef struct xui_tvout_s xui_tvout_t;
 typedef struct xui_skdloader_s xui_skdloader_t;
 typedef struct xui_sinfo_s xui_sinfo_t;
 typedef struct xui_lirc_s xui_lirc_t;
@@ -143,8 +144,6 @@ struct gGui_st {
   xine_video_port_t        *vo_port;
   xine_video_port_t        *vo_none;
   xine_audio_port_t        *ao_none;
-
-  tvout_t                  *tvout;
 
   int                       verbosity;
   int                       post_video_enable;
@@ -351,6 +350,8 @@ struct gGui_st {
   xui_playlist_t            *plwin;
   xui_mmkedit_t             *mmkedit;
   xui_sinfo_t               *streaminfo;
+  xui_tvset_t               *tvset;
+  xui_tvout_t               *tvout;
   xui_lirc_t                *lirc;
   filebrowser_t             *pl_load;
   filebrowser_t             *pl_save;
