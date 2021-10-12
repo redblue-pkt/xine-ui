@@ -58,6 +58,8 @@
 #include "lirc.h"
 #include "oxine/oxine.h"
 
+#define _ZERO_TO_MAX_MINUS_1(_val,_max) ((unsigned int)(_val) < (unsigned int)(_max))
+
 /*
  * global variables
  */
@@ -348,34 +350,53 @@ static void gui_signal_handler (int sig, void *data) {
 /*
  * convert pts value to string
  */
-static const char *pts2str(int64_t pts) {
-  static char  buf[40];
-  int64_t      min;
-  double       sec;
-  int          ds;
-  int          sign;
+static const char *pts2str (char *buf, int pts) {
+  uint8_t *q = (uint8_t *)buf + 40;
+  uint32_t minus, val, v2;
 
-  if((sign = (pts < 0)) != 0)
-    pts = -pts;
+  if (pts < 0)
+    minus = 1, val = -pts;
+  else
+    minus = 0, val = pts;
 
-  min = pts / (90000 * 60);
-  sec = (double)pts / 90000 - 60 * min;
-  ds  = sec / 10;
-  sec -= 10 * ds;
+  q -= 6;
+  memcpy (q, " pts)", 6);
+  v2 = val;
+  do {
+    *--q = '0' + (v2 % 10u);
+    v2 /= 10u;
+  } while (v2);
+  if (minus)
+    *--q = '-';
+  q -= 2;
+  memcpy (q, " (", 2);
 
-  snprintf(buf, sizeof(buf), "%s%02" PRIi64 ":%d%.2f (%" PRIi64 " pts)", sign ? "-" : "", min, ds, sec, pts);
+  val /= 900;
+  v2 = val % 6000; /* 1/100s */
+  val /= 6000; /* mins */
+  *--q = '0' + (v2 % 10u); v2 /= 10u;
+  *--q = '0' + (v2 % 10u); v2 /= 10u;
+  *--q = '.';
+  *--q = '0' + (v2 % 10u); v2 /= 10u;
+  *--q = '0' + v2;
+  *--q = ':';
+  do {
+    *--q = '0' + (val % 10u);
+    val /= 10u;
+  } while (val);
+  if (minus)
+    *--q = '-';
 
-  return buf;
+  return (const char *)q;
 }
-
 
 /*
  *
  */
 void gui_execute_action_id (gGui_t *gui, action_id_t action) {
   xine_event_t   xine_event;
-  int narg = -1;
-  char *sarg = NULL;
+  char *sarg = NULL, buf[40];
+  int val, numeric_set, numeric_arg;
 
   if (gui->event_reject)
     return;
@@ -389,27 +410,27 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
 
   gui->event_pending++;
 
-  if(action & ACTID_IS_INPUT_EVENT) {
+  if (action & ACTID_IS_INPUT_EVENT) {
+    val = action;
+    val -= ACTID_EVENT_NUMBER_0;
 
     /* Note: In the following overflow checks, we must test against INT_MAX */
     /* carefully. Otherwise, the comparison term may overflow itself and    */
     /* detecting the overflow condition will fail (never true or true by    */
     /* chance, depending on expression and rearranging by the compiler).    */
 
-    if((action >= ACTID_EVENT_NUMBER_0) && (action <= ACTID_EVENT_NUMBER_9)) {
-      int n = action - ACTID_EVENT_NUMBER_0;
-
+    if (_ZERO_TO_MAX_MINUS_1 (val, 10)) {
       if (!gui->numeric.set) {
         gui->numeric.set = 1;
-        gui->numeric.arg = n;
+        gui->numeric.arg = val;
+      } else {
+        unsigned int v = gui->numeric.arg;
+        v = 10u * v + val;
+        if (v <= INT_MAX)
+          gui->numeric.arg = v;
+        else
+          fprintf (stderr, "xine-ui: Input number overflow, using %d\n", gui->numeric.arg);
       }
-      else if (gui->numeric.arg <= ((INT_MAX - n) / 10)) {
-        gui->numeric.arg *= 10;
-        gui->numeric.arg += n;
-      }
-      else
-        fprintf (stderr, "xine-ui: Input number overflow, using %d\n", gui->numeric.arg);
-
     }
     else if(action == ACTID_EVENT_NUMBER_10_ADD) {
 
@@ -456,17 +477,17 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
     return;
   }
 
-  if (gui->numeric.set)
-    narg = gui->numeric.arg;
-  gui->numeric.set = 0;
-  gui->numeric.arg = 0;
-
   if (gui->alphanum.set) {
     if ((action == ACTID_OSD_WTEXT) || (action == ACTID_PVR_SETNAME) || (action == ACTID_PLAYLIST_OPEN))
       sarg = strdup (gui->alphanum.arg ? gui->alphanum.arg : "");
   }
   gui->alphanum.set = 0;
   gui->alphanum.arg = "";
+
+  numeric_set = gui->numeric.set;
+  numeric_arg = gui->numeric.arg;
+  gui->numeric.set = 0;
+  gui->numeric.arg = 0;
 
   pthread_mutex_unlock (&gui->event_mutex);
 
@@ -529,17 +550,17 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
     break;
 
   case ACTID_SPU_NEXT:
-    if (narg < 0)
+    if (!numeric_set)
       gui_nextprev_spu_channel (NULL, GUI_NEXT (gui));
     else
-      gui_direct_change_spu_channel (NULL, gui, narg);
+      gui_direct_change_spu_channel (NULL, gui, numeric_arg);
     break;
 
   case ACTID_SPU_PRIOR:
-    if (narg < 0)
+    if (!numeric_set)
       gui_nextprev_spu_channel (NULL, GUI_PREV (gui));
     else
-      gui_direct_change_spu_channel (NULL, gui, narg);
+      gui_direct_change_spu_channel (NULL, gui, numeric_arg);
     break;
 
   case ACTID_CONTROLSHOW:
@@ -559,17 +580,17 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
     break;
 
   case ACTID_AUDIOCHAN_NEXT:
-    if (narg < 0)
+    if (!numeric_set)
       gui_nextprev_audio_channel (NULL, GUI_NEXT (gui));
     else
-      gui_direct_change_audio_channel (NULL, gui, narg);
+      gui_direct_change_audio_channel (NULL, gui, numeric_arg);
     break;
 
   case ACTID_AUDIOCHAN_PRIOR:
-    if (narg < 0)
+    if (!numeric_set)
       gui_nextprev_audio_channel (NULL, GUI_PREV (gui));
     else
-      gui_direct_change_audio_channel (NULL, gui, narg);
+      gui_direct_change_audio_channel (NULL, gui, numeric_arg);
     break;
 
   case ACTID_PAUSE:
@@ -585,12 +606,13 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
     break;
 
   case ACTID_TOGGLE_FULLSCREEN:
-    if (narg >= 0) {
-      int fullscreen = video_window_get_fullscreen_mode (gui->vwin) & FULLSCR_MODE;
-      if ((narg && !fullscreen) || (!narg && fullscreen))
+    {
+      int yes = numeric_set
+              ? ((!!numeric_arg) ^ (!!(video_window_get_fullscreen_mode (gui->vwin) & FULLSCR_MODE)))
+              : 1;
+      if (yes)
         gui_set_fullscreen_mode (NULL, gui);
-    } else
-      gui_set_fullscreen_mode (NULL, gui);
+    }
     break;
 
 #ifdef HAVE_XINERAMA
@@ -600,7 +622,7 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
 #endif
 
   case ACTID_TOGGLE_ASPECT_RATIO:
-    gui_toggle_aspect (gui, narg < 0 ? -1 : narg);
+    gui_toggle_aspect (gui, numeric_set ? numeric_arg : -1);
     break;
 
   case ACTID_STREAM_INFOS:
@@ -637,18 +659,15 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
     break;
 
   case ACTID_MRL_NEXT:
-    gui_step_mrl (gui, narg < 0 ? 1 : narg);
+    gui_step_mrl (gui, numeric_set ? numeric_arg : 1);
     break;
 
   case ACTID_MRL_PRIOR:
-    gui_step_mrl (gui, narg < 0 ? -1 : -narg);
+    gui_step_mrl (gui, numeric_set ? -numeric_arg : -1);
     break;
 
   case ACTID_MRL_SELECT:
-    if (narg < 0)
-      gui_playlist_play (gui, 0);
-    else
-      gui_playlist_play (gui, narg);
+    gui_playlist_play (gui, numeric_set ? numeric_arg : 0);
     break;
 
   case ACTID_SETUP:
@@ -660,12 +679,10 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
     break;
 
   case ACTID_SET_CURPOS:
-    if (narg >= 0) {
-      /* Number is a percentage, range [0..100] */
-      if (narg > 100)
-        narg = 100;
-      gui_set_current_position (gui, (65535 * narg) / 100);
-    }
+    /* Number is a percentage, range [0..100] */
+    if (numeric_set)
+      gui_set_current_position (gui,
+        numeric_arg > 100 ? 65535 : (65535 * numeric_arg + 50) / 100);
     break;
 
   case ACTID_SET_CURPOS_0:
@@ -683,14 +700,13 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
     break;
 
   case ACTID_SEEK_REL_m:
-    if (narg >= 0) {
-      gui_seek_relative (gui, -narg);
-    }
+    if (numeric_set)
+      gui_seek_relative (gui, -numeric_arg);
     break;
 
   case ACTID_SEEK_REL_p:
-    if (narg >= 0)
-      gui_seek_relative (gui, narg);
+    if (numeric_set)
+      gui_seek_relative (gui, numeric_arg);
     break;
 
   case ACTID_SEEK_REL_m60:
@@ -716,72 +732,35 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
     break;
 
   case ACTID_AV_SYNC_m3600:
-    {
-      int av_offset = (xine_get_param(gui->stream, XINE_PARAM_AV_OFFSET) - 3600);
-
-      pthread_mutex_lock (&gui->event_mutex);
-      gui->mmk.av_offset = av_offset;
-      if (gui->playlist.num && gui->playlist.cur >= 0 && gui->playlist.mmk &&
-	  gui->playlist.mmk[gui->playlist.cur])
-	if (gui->playlist.cur < gui->playlist.num)
-	  gui->playlist.mmk[gui->playlist.cur]->av_offset = av_offset;
-      pthread_mutex_unlock (&gui->event_mutex);
-      xine_set_param(gui->stream, XINE_PARAM_AV_OFFSET, av_offset);
-      osd_display_info (gui, _("A/V offset: %s"), pts2str (av_offset));
-    }
-    break;
-
-  case ACTID_AV_SYNC_p3600:
-    {
-      int av_offset = (xine_get_param(gui->stream, XINE_PARAM_AV_OFFSET) + 3600);
-
-      pthread_mutex_lock (&gui->event_mutex);
-      gui->mmk.av_offset = av_offset;
-      if (gui->playlist.num && gui->playlist.cur >= 0 && gui->playlist.mmk &&
-	  gui->playlist.mmk[gui->playlist.cur])
-	if (gui->playlist.cur < gui->playlist.num)
-	  gui->playlist.mmk[gui->playlist.cur]->av_offset = av_offset;
-      pthread_mutex_unlock (&gui->event_mutex);
-      xine_set_param(gui->stream, XINE_PARAM_AV_OFFSET, av_offset);
-      osd_display_info (gui, _("A/V offset: %s"), pts2str (av_offset));
-    }
-    break;
-
   case ACTID_AV_SYNC_RESET:
+  case ACTID_AV_SYNC_p3600:
+    val = (int)(action - ACTID_AV_SYNC_m3600) * 3600 - 3600;
+    if (val)
+      val += xine_get_param (gui->stream, XINE_PARAM_AV_OFFSET);
     pthread_mutex_lock (&gui->event_mutex);
-    gui->mmk.av_offset = 0;
-    if (gui->playlist.num && gui->playlist.cur >= 0 && gui->playlist.mmk &&
-	gui->playlist.mmk[gui->playlist.cur])
-      if (gui->playlist.cur < gui->playlist.num)
-	gui->playlist.mmk[gui->playlist.cur]->av_offset = 0;
+    gui->mmk.av_offset = val;
+    if (_ZERO_TO_MAX_MINUS_1 (gui->playlist.cur, gui->playlist.num) && gui->playlist.mmk &&
+      gui->playlist.mmk[gui->playlist.cur])
+        gui->playlist.mmk[gui->playlist.cur]->av_offset = val;
     pthread_mutex_unlock (&gui->event_mutex);
-    xine_set_param(gui->stream, XINE_PARAM_AV_OFFSET, 0);
-    osd_display_info (gui, _("A/V Offset: reset."));
-    break;
-
-  case ACTID_SV_SYNC_p:
-    {
-      int spu_offset = xine_get_param(gui->stream, XINE_PARAM_SPU_OFFSET) + 3600;
-
-      xine_set_param(gui->stream, XINE_PARAM_SPU_OFFSET, spu_offset);
-
-      osd_display_info (gui, _("SPU Offset: %s"), pts2str (spu_offset));
-    }
+    xine_set_param (gui->stream, XINE_PARAM_AV_OFFSET, val);
+    if (val)
+      osd_display_info (gui, _("A/V offset: %s"), pts2str (buf, val));
+    else
+      osd_display_info (gui, _("A/V Offset: reset."));
     break;
 
   case ACTID_SV_SYNC_m:
-    {
-      int spu_offset = xine_get_param(gui->stream, XINE_PARAM_SPU_OFFSET) - 3600;
-
-      xine_set_param(gui->stream, XINE_PARAM_SPU_OFFSET, spu_offset);
-
-      osd_display_info (gui, _("SPU Offset: %s"), pts2str (spu_offset));
-    }
-    break;
-
   case ACTID_SV_SYNC_RESET:
-    xine_set_param(gui->stream, XINE_PARAM_SPU_OFFSET, 0);
-    osd_display_info (gui, _("SPU Offset: reset."));
+  case ACTID_SV_SYNC_p:
+    val = (int)(action - ACTID_SV_SYNC_m) * 3600 - 3600;
+    if (val)
+      val += xine_get_param (gui->stream, XINE_PARAM_SPU_OFFSET);
+    xine_set_param (gui->stream, XINE_PARAM_SPU_OFFSET, val);
+    if (val)
+      osd_display_info (gui, _("SPU Offset: %s"), pts2str (buf, val));
+    else
+      osd_display_info (gui, _("SPU Offset: reset."));
     break;
 
   case ACTID_SPEED_FAST:
@@ -884,10 +863,7 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
     break;
 
   case ACTID_KBENABLE:
-    if (narg >= 0)
-      gui->kbindings_enabled = narg;
-    else
-      gui->kbindings_enabled = 1;
+    gui->kbindings_enabled = numeric_set ? numeric_arg : 1;
     break;
 
   case ACTID_DPMSSTANDBY:
@@ -913,10 +889,10 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
     break;
 
   case ACTID_LOOPMODE:
-    if (narg < 0)
+    if (!numeric_set)
       gui->playlist.loop++;
     else
-      gui->playlist.loop = narg;
+      gui->playlist.loop = numeric_arg;
     if(gui->playlist.loop >= PLAYLIST_LOOP_MODES_NUM ||
        gui->playlist.loop <  PLAYLIST_LOOP_NO_LOOP)
       gui->playlist.loop = PLAYLIST_LOOP_NO_LOOP;
@@ -993,15 +969,14 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
     break;
 
   case ACTID_PLAYLIST_STOP:
-    if (narg < 0) {
+    if (!numeric_set) {
       gui->playlist.control ^= PLAYLIST_CONTROL_STOP;
       gui->playlist.control &= ~PLAYLIST_CONTROL_STOP_PERSIST;
-    }
-    else {
-      if (narg == 0)
-	gui->playlist.control &= ~PLAYLIST_CONTROL_STOP;
+    } else {
+      if (numeric_arg == 0)
+        gui->playlist.control &= ~PLAYLIST_CONTROL_STOP;
       else
-	gui->playlist.control |= PLAYLIST_CONTROL_STOP;
+        gui->playlist.control |= PLAYLIST_CONTROL_STOP;
       gui->playlist.control |= PLAYLIST_CONTROL_STOP_PERSIST;
     }
     osd_display_info (gui, _("Playlist: %s"),
@@ -1014,14 +989,13 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
 
   case ACTID_PVR_SETINPUT:
 
-    /* Parameter (integer, required): input
-    */
-    if (narg >= 0) {
+    /* Parameter (integer, required): input */
+    if (numeric_set) {
       xine_event_t         xine_event;
       xine_set_v4l2_data_t ev_data;
 
       /* set input */
-      ev_data.input = narg;
+      ev_data.input = numeric_arg;
 
       /* do not change tuning */
       ev_data.channel = -1;
@@ -1041,9 +1015,8 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
 
   case ACTID_PVR_SETFREQUENCY:
 
-    /* Parameter (integer, required): frequency
-    */
-    if (narg >= 0) {
+    /* Parameter (integer, required): frequency */
+    if (numeric_set) {
       xine_event_t         xine_event;
       xine_set_v4l2_data_t ev_data;
 
@@ -1052,7 +1025,7 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
 
       /* change tuning */
       ev_data.channel = -1;
-      ev_data.frequency = narg;
+      ev_data.frequency = numeric_arg;
 
       /* do not set session id */
       ev_data.session_id = -1;
@@ -1075,7 +1048,7 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
        an existing mark is provided, then the mark for that section
        is moved to the current position.
     */
-    if (narg >= 0) {
+    if (numeric_set) {
       xine_event_t         xine_event;
       xine_set_v4l2_data_t ev_data;
 
@@ -1087,7 +1060,7 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
       ev_data.frequency = -1;
 
       /* set session id */
-      ev_data.session_id = narg;
+      ev_data.session_id = numeric_arg;
 
       /* send event */
       xine_event.type = XINE_EVENT_SET_V4L2;
@@ -1134,10 +1107,10 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
          mode = 1 : save from last mark
          mode = 2 : save entire stream
     */
-    if (narg >= 0) {
+    if (numeric_set) {
       xine_event_t         xine_event;
       xine_pvr_save_data_t ev_data;
-      int                  mode = narg;
+      int                  mode = numeric_arg;
 
       /* set mode [0..2] */
       if(mode < 0)
@@ -1894,3 +1867,4 @@ void gui_run(gGui_t *gui, char **session_opts) {
    */
   xitk_free(&gui->xitk);
 }
+

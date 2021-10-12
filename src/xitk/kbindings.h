@@ -96,9 +96,11 @@ typedef enum {
   /* /keep order */
   ACTID_MRLBROWSER,
   ACTID_MUTE,
-  ACTID_AV_SYNC_p3600,
+  /* keep order */
   ACTID_AV_SYNC_m3600,
   ACTID_AV_SYNC_RESET,
+  ACTID_AV_SYNC_p3600,
+  /* /keep order */
   ACTID_SPEED_FAST,
   ACTID_SPEED_SLOW,
   ACTID_SPEED_RESET,
@@ -136,9 +138,11 @@ typedef enum {
   ACTID_OSD_WTEXT,
   ACTID_FILESELECTOR,
   ACTID_SUBSELECT,
-  ACTID_SV_SYNC_p,
+  /* keep order */
   ACTID_SV_SYNC_m,
   ACTID_SV_SYNC_RESET,
+  ACTID_SV_SYNC_p,
+  /* /keep order */
   /* keep order */
   ACTID_HUECONTROLp,
   ACTID_HUECONTROLm,
@@ -285,4 +289,3 @@ void kbedit_toggle_visibility (xitk_widget_t *w, void *kbedit);
 void kbedit_raise_window (xui_keyedit_t *kbedit);
 
 #endif
-
