@@ -51,6 +51,7 @@
 
 #include <xine.h>
 #include <xine/xineutils.h>
+#include <globals.h>
 
 #include "../xitk/common.h"
 
@@ -861,7 +862,7 @@ int main(int argc, char *argv[]) {
   if(!audio_driver_id)
     audio_driver_id = driver_name;
   else
-    config_update_string ("audio.driver", audio_driver_id);
+    config_update_string (__xineui_global_xine_instance, "audio.driver", audio_driver_id);
 
   aaxine.ao_port = xine_open_audio_driver(__xineui_global_xine_instance, audio_driver_id, NULL);
 
@@ -887,7 +888,7 @@ int main(int argc, char *argv[]) {
 	if(post_plugin_name) {
 	  if((aaxine.post_plugin = xine_post_init(__xineui_global_xine_instance, post_plugin_name,
 						  0, &aaxine.ao_port, &aaxine.vo_port)) != NULL) {
-	    config_update_string("aaxine.post_plugin", post_plugin_name);
+	    config_update_string(__xineui_global_xine_instance, "aaxine.post_plugin", post_plugin_name);
 	  }
 	}
 	else
@@ -901,9 +902,9 @@ int main(int argc, char *argv[]) {
 	else {
 	  /* reduce goom default values */
 	  if(!strcmp(aaxine.post_plugin_name, "goom")) {
-	    config_update_num("effects.goom.fps", 10);
-	    config_update_num("effects.goom.height", 120);
-	    config_update_num("effects.goom.width", 120);
+	    config_update_num(__xineui_global_xine_instance, "effects.goom.fps", 10);
+	    config_update_num(__xineui_global_xine_instance, "effects.goom.height", 120);
+	    config_update_num(__xineui_global_xine_instance, "effects.goom.width", 120);
 	  }
 	}
       }
