@@ -18,7 +18,7 @@ imlib_decode_lib = libImlib-light-decode.a
 endif
 
 bin_PROGRAMS = $(xine_ui)
-EXTRA_PROGRAMS = session_ctrl kbindings_man
+EXTRA_PROGRAMS = session_ctrl
 noinst_LIBRARIES = \
 	$(imlib_lib) \
 	$(imlib_decode_lib) \
