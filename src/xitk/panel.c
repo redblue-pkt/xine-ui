@@ -98,7 +98,13 @@ struct xui_panel_st {
   xitk_widget_t        *autoplay_buttons;
   xitk_widget_t        *spuid_label;
   xitk_register_key_t   widget_key;
-  pthread_t             slider_thread;
+
+  struct {
+    pthread_mutex_t     mutex;
+    pthread_cond_t      wake;
+    pthread_t           thread;
+    int                 run;
+  }                     sl;
 
   /* private vars to avoid useless updates */
   unsigned int          shown_time;
@@ -191,7 +197,15 @@ static void _panel_exit (xui_panel_t *panel) {
 #endif
   gui_save_window_pos (panel->gui, "panel", panel->widget_key);
   xitk_unregister_event_handler (panel->gui->xitk, &panel->widget_key);
-  pthread_join (panel->slider_thread, NULL);
+
+  pthread_mutex_lock (&panel->sl.mutex);
+  panel->sl.run = 0;
+  pthread_cond_signal (&panel->sl.wake);
+  pthread_mutex_unlock (&panel->sl.mutex);
+  pthread_join (panel->sl.thread, NULL);
+  pthread_cond_destroy (&panel->sl.wake);
+  pthread_mutex_destroy (&panel->sl.mutex);
+
   panel->title_label = NULL;
   xitk_window_destroy_window (panel->xwin);
   panel->xwin = NULL;
@@ -342,7 +356,7 @@ static void secs2str (char *s, unsigned int secs) {
 
 int panel_update_runtime_display (xui_panel_t *panel) {
   int seconds, pos, length;
-  int step = 500;
+  unsigned int step = 500;
   char timestr[16];
 
   if (panel_is_visible (panel) < 2)
@@ -383,20 +397,21 @@ int panel_update_runtime_display (xui_panel_t *panel) {
     panel->shown_time = msecs;
     speed = xine_get_param (panel->gui->stream, XINE_PARAM_FINE_SPEED);
     if (speed > XINE_FINE_SPEED_NORMAL * 3 / 4) {
-      /* how many ms of stream play in 0.5s of real time? */
-      step = speed / (XINE_FINE_SPEED_NORMAL / 500);
-      /* round to half seconds. */
-      step = (step + 250) / 500 * 500;
-      /* preferred next stop time. */
+      /* find a stream step that is a multiple of, and plays roughly, 0.5s. */
+      step = 500u * (((unsigned int)speed + (XINE_FINE_SPEED_NORMAL >> 1)) / XINE_FINE_SPEED_NORMAL);
+      /* allow up to 4 updates/s on fast play. */
+      if (step > 1000)
+        step >>= 1;
+      /* round display value. */
+      secs = (msecs + 250u) / 1000u;
+      /* preferred next stop stream time. */
       step = panel->runtime_mode
-           ? msecs - ((int)msecs - step + (step >> 1)) / step * step
-           : ((int)msecs + step + (step >> 1)) / step * step - msecs;
-      /* and in real time, with overrun paranoia. */
+           ? msecs + step - (msecs + (step >> 1)) / step * step
+           : step + (msecs + (step >> 1)) / step * step - msecs;
+      /* and in real time. */
       step = step * XINE_FINE_SPEED_NORMAL / speed;
-      step &= 1023;
-      /* round time pos. */
-      secs = (msecs + 100u) / 1000u;
       secs2str (timestr, secs);
+      /* printf ("xine-ui: msecs=%u, step=%u.\n", msecs, step); */
     } else {
       secs   = msecs / 1000u;
       msecs %= 1000u;
@@ -440,14 +455,39 @@ static void panel_check_mute (xui_panel_t *panel) {
 /*
  * Update slider thread.
  */
-static __attribute__((noreturn)) void *slider_loop (void *data) {
+static void *slider_loop (void *data) {
   xui_panel_t *panel = data;
-  int screensaver_timer = 0;
-  int lastmsecs = -1;
-  int i = 0;
-  int step = 500;
+  int screensaver_timer = 0, lastmsecs = -1, i = -1, step = 0;
+  struct timespec wtime = {0, 0};
 
-  while (panel->gui->on_quit == 0) {
+  while (1) {
+    i++;
+    if (step > 0) {
+      wtime.tv_nsec += step * 1000000;
+      if (wtime.tv_nsec >= 1000000000) {
+        wtime.tv_nsec -= 1000000000;
+        wtime.tv_sec += 1;
+      }
+      pthread_mutex_lock (&panel->sl.mutex);
+      if (!panel->sl.run) {
+        pthread_mutex_unlock (&panel->sl.mutex);
+        break;
+      }
+      pthread_cond_timedwait (&panel->sl.wake, &panel->sl.mutex, &wtime);
+      pthread_mutex_unlock (&panel->sl.mutex);
+    }
+
+#if _POSIX_TIMERS > 0
+    clock_gettime (CLOCK_REALTIME, &wtime);
+#else
+    {
+      struct timeval tv = {0, 0};
+      gettimeofday (&tv, NULL);
+      wtime.tv_sec = tv.tv_sec;
+      wtime.tv_nsec = tv.tv_usec * 1000;
+    }
+#endif
+    step = 500;
 
     if (panel->gui->stream) {
 
@@ -471,7 +511,7 @@ static __attribute__((noreturn)) void *slider_loop (void *data) {
               panel->gui->ignore_next = 0;
               gui_playlist_start_next (panel->gui);
               /* pthread_mutex_unlock (&panel->gui->xe_mutex); */
-	      goto __next_iteration;
+              continue;
 	    }
 	  }
 
@@ -599,13 +639,9 @@ static __attribute__((noreturn)) void *slider_loop (void *data) {
 
     if (panel->gui->logo_has_changed)
       _update_logo (panel);
-
-  __next_iteration:
-    xine_usec_sleep (step * 1000);
-    i++;
   }
 
-  pthread_exit(NULL);
+  return NULL;
 }
 
 static int _panel_get_visibility (xui_panel_t *panel) {
@@ -1425,6 +1461,11 @@ xui_panel_t *panel_init (gGui_t *gui) {
     XITK_WINF_TASKBAR | XITK_WINF_PAGER | XITK_WINF_DND, XITK_WINF_TASKBAR | XITK_WINF_PAGER | XITK_WINF_DND);
   panel->widget_key = xitk_be_register_event_handler ("panel", panel->xwin, panel_event, panel, NULL, NULL);
 
+  pthread_mutex_init (&panel->sl.mutex, NULL);
+  pthread_cond_init (&panel->sl.wake, NULL);
+  pthread_mutex_lock (&panel->sl.mutex);
+  panel->sl.run = 1;
+  pthread_mutex_unlock (&panel->sl.mutex);
   {
     pthread_attr_t       pth_attrs;
 #if defined(_POSIX_THREAD_PRIORITY_SCHEDULING) && (_POSIX_THREAD_PRIORITY_SCHEDULING > 0)
@@ -1440,7 +1481,7 @@ xui_panel_t *panel_init (gGui_t *gui) {
     pthread_attr_setschedparam(&pth_attrs, &pth_params);
 #endif
 
-    pthread_create (&panel->slider_thread, &pth_attrs, slider_loop, panel);
+    pthread_create (&panel->sl.thread, &pth_attrs, slider_loop, panel);
     pthread_attr_destroy (&pth_attrs);
   }
 
