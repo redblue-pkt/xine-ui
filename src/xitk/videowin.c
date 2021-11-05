@@ -1937,7 +1937,7 @@ void video_window_get_window_size (xui_vwin_t *vwin, int *window_width, int *win
     *window_height = wr.height;
 }
 
-void video_window_set_mrl (xui_vwin_t *vwin, char *mrl) {
+void video_window_set_mrl (xui_vwin_t *vwin, const char *mrl) {
   if (!vwin || !mrl)
     return;
   if (!mrl[0])
