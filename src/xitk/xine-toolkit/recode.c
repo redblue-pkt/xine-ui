@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -312,33 +312,6 @@ void xitk_recode_done (xitk_recode_t *xrt) {
       pthread_mutex_destroy (&xrt->mutex);
     free (xrt);
   }
-}
-
-char *xitk_recode (xitk_recode_t *xrt, const char *src) {
-  char *buffer = NULL;
-
-  if (xrt) {
-    size_t inbytes  = strlen(src);
-    size_t outbytes = 2 * inbytes;
-    ICONV_CONST char *inbuf = (ICONV_CONST char *)src;
-    char *outbuf    = calloc(outbytes + 1, sizeof(char));
-
-    if (xrt->use_mutex)
-      pthread_mutex_lock (&xrt->mutex);
-    iconv (xrt->iconv_handle, NULL, &inbytes, NULL, &outbytes);
-    buffer = outbuf;
-    while (inbytes) {
-      if (iconv (xrt->iconv_handle, &inbuf, &inbytes, &outbuf, &outbytes) == (size_t)-1) {
-	free(buffer);
-	buffer = NULL;
-	break;
-      }
-    }
-    if (xrt->use_mutex)
-      pthread_mutex_unlock (&xrt->mutex);
-  }
-
-  return buffer ? buffer : strdup(src);
 }
 
 void xitk_recode2_do (xitk_recode_t *xrt, xitk_recode_string_t *s) {
