@@ -85,6 +85,18 @@ static inline void xitk_short_string_deinit (xitk_short_string_t *s) {
   }
 }
 
+/* the versioned string feature. */
+typedef struct {
+  char *s;
+  unsigned int bsize;   /** << if not 0, s points to a user allocated buf of this size. */
+  int          version; /** << how many changes since init. */
+} xitk_vers_string_t;
+void xitk_vers_string_init (xitk_vers_string_t *vs, char *user_buf, size_t user_bsize);
+/* return whether or not there was a change. */
+int xitk_vers_string_set (xitk_vers_string_t *vs, const char *s);
+int xitk_vers_string_get (xitk_vers_string_t *to, const xitk_vers_string_t *from);
+void xitk_vers_string_deinit (xitk_vers_string_t *vs);
+
 /* this will pad the return with 8 zero bytes both before and after.
  * filesize, if set, is the size limit before and the actual size after the call. */
 char *xitk_cfg_load (const char *filename, size_t *filesize);
