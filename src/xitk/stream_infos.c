@@ -219,16 +219,24 @@ struct xui_sinfo_s {
   xitk_register_key_t   widget_key;
 
   const char            *yes, *no, *unavail;
-  char                  *temp, buf[32];
+  char                  temp[1024], buf[32];
 };
 
 static const char *sinf_get_string (xui_sinfo_t *sinfo, sinf_index_t type) {
+  xitk_recode_string_t rs;
   const char *s = xine_get_meta_info (sinfo->gui->stream, sinf_xine_type[type]);
+
   if (!s)
     return sinfo->unavail;
-  free (sinfo->temp);
-  sinfo->temp = xitk_recode (sinfo->xr, s);
-  return sinfo->temp;
+
+  rs.buf = sinfo->temp;
+  rs.bsize = sizeof (sinfo->temp) - 1;
+  rs.src = s;
+  rs.ssize = strlen (s);
+  xitk_recode2_do (sinfo->xr, &rs);
+  if (rs.res == sinfo->temp)
+    sinfo->temp[rs.rsize] = 0;
+  return rs.res;
 }
 
 static const char *sinf_get_int (xui_sinfo_t *sinfo, sinf_index_t type) {
@@ -334,68 +342,150 @@ static void stream_infos_update (xitk_widget_t *w, void *data, int state) {
   stream_infos_update_infos (sinfo);
 }
 
-char *stream_infos_get_ident_from_stream(xine_stream_t *stream) {
-  const char *artist1, *title1, *album1;
-  char       *artist2 = NULL, *title2 = NULL, *album2 = NULL, *ident = NULL;
-  xitk_recode_t *xr;
+struct stream_infos_ident_s {
+  xitk_vers_string_t raw_title, raw_artist, raw_album, ident;
+  char buf[2048];
+};
 
-  if(!stream)
+stream_infos_ident_t *stream_infos_ident_new (void) {
+  stream_infos_ident_t *ident = malloc (sizeof (*ident));
+
+  if (!ident)
     return NULL;
+  xitk_vers_string_init (&ident->raw_title, NULL, 0);
+  xitk_vers_string_init (&ident->raw_artist, NULL, 0);
+  xitk_vers_string_init (&ident->raw_album, NULL, 0);
+  xitk_vers_string_init (&ident->ident, ident->buf, sizeof (ident->buf));
+  return ident;
+}
 
-  title1  = xine_get_meta_info (stream, XINE_META_INFO_TITLE);
-  artist1 = xine_get_meta_info (stream, XINE_META_INFO_ARTIST);
-  album1  = xine_get_meta_info (stream, XINE_META_INFO_ALBUM);
+static size_t _stream_infos_ident_make (char *buf, size_t bsize, const char *title, const char *artist, const char *album) {
+  xitk_recode_t *xr;
+  xitk_recode_string_t rs;
+  char *p, *q;
+  size_t arlen, allen;
 
   xr = xitk_recode_init (METAINFO_CHARSET, NULL, 0);
-  if (title1)
-    title2 = xitk_recode (xr, title1);
-  if (artist1)
-    artist2 = xitk_recode (xr, artist1);
-  if (album1)
-    album2 = xitk_recode (xr, album1);
-  xitk_recode_done (xr);
+  q = buf;
+  rs.bsize = bsize - 8;
 
-  /*
-   * Since meta info can be corrupted/wrong/ugly
-   * we need to clean and check them before using.
-   * Note: atoa() modify the string, so we work on a copy.
-   */
-  artist1 = artist2 ? atoa (artist2) : "";
-  title1 = title2 ? atoa (title2) : "";
-  album1 = album2 ? atoa (album2) : "";
-
-  if (title1[0]) {
-    char *p;
-    size_t tlen = strlen (title1);
-    size_t alen = strlen (artist1);
-    size_t llen = strlen (album1);
-
-    ident = (char *)malloc (tlen + 2 + alen + 3 + llen + 1 + 1);
-    if (!ident)
-      return NULL;
-    p = ident;
-
-    memcpy (p, title1, tlen); p += tlen;
-    if (alen || llen) {
-      memcpy (p, " (", 2); p += 2;
-      if (alen) {
-        memcpy (p, artist1, alen); p += alen;
-      }
-      if (alen && llen) {
-        memcpy (p, " - ", 3); p += 3;
-      }
-      if (llen) {
-        memcpy (p, album1, llen); p += llen;
-      }
-      *p++ = ')';
-    }
-    *p = 0;
+  rs.buf = q;
+  rs.src = title ? title : "";
+  rs.ssize = strlen (rs.src);
+  xitk_recode2_do (xr, &rs);
+  if (rs.res == rs.src) {
+    rs.rsize = rs.ssize < rs.bsize ? rs.ssize : rs.bsize;
+    if (rs.rsize > 0)
+      memcpy (q, rs.src, rs.rsize);
   }
-  free (album2);
-  free (title2);
-  free (artist2);
+  q[rs.rsize] = 0;
+  /* Since meta info can be corrupted/wrong/ugly
+   * we need to clean and check them before using.
+   * Note: atoa() modify the string, so we work on a copy. */
+  p = atoa (q);
+  arlen = strlen (p);
+  if (p > q)
+    memmove (q, p, arlen);
+  q += arlen;
+  rs.bsize -= arlen;
 
-  return ident;
+  memcpy (q, " (", 2); q += 2;
+
+  rs.buf = q;
+  rs.src = artist ? artist : "";
+  rs.ssize = strlen (rs.src);
+  xitk_recode2_do (xr, &rs);
+  if (rs.res == rs.src) {
+    rs.rsize = rs.ssize < rs.bsize ? rs.ssize : rs.bsize;
+    if (rs.rsize > 0)
+      memcpy (q, rs.src, rs.rsize);
+  }
+  q[rs.rsize] = 0;
+  p = atoa (q);
+  arlen = strlen (p);
+  if (p > q)
+    memmove (q, p, arlen);
+  q += arlen;
+  rs.bsize -= arlen;
+
+  if (arlen) {
+    memcpy (q, " - ", 3); q += 3;
+  }
+
+  rs.buf = q;
+  rs.src = album ? album : "";
+  rs.ssize = strlen (rs.src);
+  xitk_recode2_do (xr, &rs);
+  if (rs.res == rs.src) {
+    rs.rsize = rs.ssize < rs.bsize ? rs.ssize : rs.bsize;
+    if (rs.rsize > 0)
+      memcpy (q, rs.src, rs.rsize);
+  }
+  q[rs.rsize] = 0;
+  p = atoa (q);
+  allen = strlen (p);
+  if (p > q)
+    memmove (q, p, allen);
+  q += allen;
+  rs.bsize -= allen;
+
+  if (arlen && !allen)
+    q -= 3;
+  if (arlen + allen)
+    *q++ = ')';
+  else
+    q -= 2;
+  xitk_recode2_done (xr, &rs);
+  xitk_recode_done (xr);
+  *q = 0;
+  return q - buf;
+}
+
+int stream_infos_ident_get (stream_infos_ident_t *ident, xitk_vers_string_t *to, xine_stream_t *stream) {
+  int changed;
+
+  if (!ident || !stream)
+    return 0;
+
+  changed = xitk_vers_string_set (&ident->raw_title, xine_get_meta_info (stream, XINE_META_INFO_TITLE))
+          + xitk_vers_string_set (&ident->raw_artist, xine_get_meta_info (stream, XINE_META_INFO_ARTIST))
+          + xitk_vers_string_set (&ident->raw_album, xine_get_meta_info (stream, XINE_META_INFO_ALBUM));
+
+  if (changed) {
+    ident->ident.version += 1;
+    _stream_infos_ident_make (ident->buf, sizeof (ident->buf), ident->raw_title.s, ident->raw_artist.s, ident->raw_album.s);
+  }
+
+  return xitk_vers_string_get (to, &ident->ident);
+}
+
+void stream_infos_ident_delete (stream_infos_ident_t **ident) {
+  stream_infos_ident_t *_ident;
+
+  if (!ident)
+    return;
+  _ident = *ident;
+  xitk_vers_string_deinit (&_ident->ident);
+  xitk_vers_string_deinit (&_ident->raw_album);
+  xitk_vers_string_deinit (&_ident->raw_artist);
+  xitk_vers_string_deinit (&_ident->raw_title);
+  free (_ident);
+  *ident = NULL;
+}
+
+char *stream_infos_get_ident_from_stream(xine_stream_t *stream) {
+  char buf[2048], *ret;
+  size_t l = _stream_infos_ident_make (buf, sizeof (buf),
+    xine_get_meta_info (stream, XINE_META_INFO_TITLE),
+    xine_get_meta_info (stream, XINE_META_INFO_ARTIST),
+    xine_get_meta_info (stream, XINE_META_INFO_ALBUM)) + 1;
+
+  if (l < 2)
+    return NULL;
+  ret = malloc (l);
+  if (ret)
+    memcpy (ret, buf, l);
+  return ret;
 }
 
 static void stream_infos_exit (xitk_widget_t *w, void *data, int state) {
@@ -417,8 +507,6 @@ static void stream_infos_exit (xitk_widget_t *w, void *data, int state) {
 
   xitk_recode_done (sinfo->xr);
   sinfo->xr = NULL;
-  free (sinfo->temp);
-  sinfo->temp = NULL;
 
   video_window_set_input_focus (sinfo->gui->vwin);
   sinfo->gui->streaminfo = NULL;
@@ -530,7 +618,6 @@ void stream_infos_panel (gGui_t *gui) {
   sinfo->widget_list = xitk_window_widget_list (sinfo->xwin);
 
   sinfo->xr = xitk_recode_init (METAINFO_CHARSET, NULL, 0);
-  sinfo->temp = NULL;
   sinfo->yes = _("Yes");
   sinfo->no = _("No");
   sinfo->unavail = _("Unavailable");
@@ -589,9 +676,6 @@ void stream_infos_panel (gGui_t *gui) {
       sinf_w_defs[i].x, sinf_w_defs[i].y, sinf_w_defs[i].w, sinf_w_defs[i].h, fontname);
     xitk_add_widget (sinfo->widget_list, sinfo->video_resolution, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
   }
-
-  free (sinfo->temp);
-  sinfo->temp = NULL;
 
   {
     xitk_labelbutton_widget_t lb;

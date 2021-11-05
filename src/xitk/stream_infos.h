@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -28,6 +28,12 @@
 #include "xitk.h"
 
 const char *get_fourcc_string(char *dst, size_t dst_size, uint32_t f);
+
+typedef struct stream_infos_ident_s stream_infos_ident_t;
+stream_infos_ident_t *stream_infos_ident_new (void);
+/* return whether there was a change. */
+int stream_infos_ident_get (stream_infos_ident_t *ident, xitk_vers_string_t *to, xine_stream_t *stream);
+void stream_infos_ident_delete (stream_infos_ident_t **ident);
 
 char *stream_infos_get_ident_from_stream(xine_stream_t *stream);
 

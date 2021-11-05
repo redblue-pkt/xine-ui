@@ -104,6 +104,8 @@ struct xui_panel_st {
     pthread_cond_t      wake;
     pthread_t           thread;
     int                 run;
+    stream_infos_ident_t *ident;
+    xitk_vers_string_t  istr;
   }                     sl;
 
   /* private vars to avoid useless updates */
@@ -210,6 +212,7 @@ static void _panel_exit (xui_panel_t *panel) {
   xitk_window_destroy_window (panel->xwin);
   panel->xwin = NULL;
   /* xitk_dlist_init (&panel->widget_list->list); */
+
   panel->gui->panel = NULL;
   free (panel);
 }
@@ -460,6 +463,9 @@ static void *slider_loop (void *data) {
   int screensaver_timer = 0, lastmsecs = -1, i = -1, step = 0;
   struct timespec wtime = {0, 0};
 
+  xitk_vers_string_init (&panel->sl.istr, NULL, 0);
+  panel->sl.ident = stream_infos_ident_new ();
+
   while (1) {
     i++;
     if (step > 0) {
@@ -547,32 +553,30 @@ static void *slider_loop (void *data) {
 
       if ((status == XINE_STATUS_PLAY) &&
         ((speed != XINE_SPEED_PAUSE) || (msecs != lastmsecs))) {
-        char *ident = stream_infos_get_ident_from_stream (panel->gui->stream);
 
-        if (!pthread_mutex_trylock (&panel->gui->mmk_mutex)) {
-          if (ident) {
-            if (panel->gui->playlist.num &&
-                (panel->gui->playlist.cur >= 0) &&
-                panel->gui->playlist.mmk &&
-                panel->gui->playlist.mmk[panel->gui->playlist.cur] &&
-                (strcmp (panel->gui->mmk.ident, ident))) {
-              free (panel->gui->mmk.ident);
-              panel->gui->mmk.ident = strdup (ident);
-              free (panel->gui->playlist.mmk[panel->gui->playlist.cur]->ident);
-              panel->gui->playlist.mmk[panel->gui->playlist.cur]->ident = strdup (ident);
-              pthread_mutex_unlock (&panel->gui->mmk_mutex);
-              video_window_set_mrl (panel->gui->vwin, ident);
-              playlist_mrlident_toggle (panel->gui);
-              panel_update_mrl_display (panel);
+        if (stream_infos_ident_get (panel->sl.ident, &panel->sl.istr, panel->gui->stream)) {
+          if (!pthread_mutex_trylock (&panel->gui->mmk_mutex)) {
+            if (panel->sl.istr.s && panel->sl.istr.s[0]) {
+              if (panel->gui->playlist.num && (panel->gui->playlist.cur >= 0) &&
+                panel->gui->playlist.mmk && panel->gui->playlist.mmk[panel->gui->playlist.cur] &&
+                (strcmp (panel->gui->mmk.ident, panel->sl.istr.s))) {
+                free (panel->gui->mmk.ident);
+                panel->gui->mmk.ident = strdup (panel->sl.istr.s);
+                free (panel->gui->playlist.mmk[panel->gui->playlist.cur]->ident);
+                panel->gui->playlist.mmk[panel->gui->playlist.cur]->ident = strdup (panel->sl.istr.s);
+                pthread_mutex_unlock (&panel->gui->mmk_mutex);
+                video_window_set_mrl (panel->gui->vwin, panel->sl.istr.s);
+                playlist_mrlident_toggle (panel->gui);
+                panel_update_mrl_display (panel);
+              } else {
+                pthread_mutex_unlock (&panel->gui->mmk_mutex);
+              }
             } else {
+              video_window_set_mrl (panel->gui->vwin, panel->gui->mmk.mrl);
               pthread_mutex_unlock (&panel->gui->mmk_mutex);
             }
-          } else {
-            video_window_set_mrl (panel->gui->vwin, (char *)panel->gui->mmk.mrl);
-            pthread_mutex_unlock (&panel->gui->mmk_mutex);
           }
         }
-        free (ident);
 
         {
           if (video_window_is_visible (panel->gui->vwin) > 1) {
@@ -640,6 +644,9 @@ static void *slider_loop (void *data) {
     if (panel->gui->logo_has_changed)
       _update_logo (panel);
   }
+
+  stream_infos_ident_delete (&panel->sl.ident);
+  xitk_vers_string_deinit (&panel->sl.istr);
 
   return NULL;
 }
@@ -1493,3 +1500,4 @@ void panel_set_title (xui_panel_t *panel, char *title) {
   if(panel && panel->title_label)
     xitk_label_change_label(panel->title_label, title);
 }
+
