@@ -3101,3 +3101,56 @@ uint32_t xitk_get_color_name (const char *color) {
   }
   return ~0u;
 }
+
+void xitk_vers_string_init (xitk_vers_string_t *vs, char *user_buf, size_t user_bsize) {
+  if (vs) {
+    vs->version = 0;
+    if (user_buf && user_bsize) {
+      user_buf[0] = 0;
+      vs->s = user_buf;
+      vs->bsize = user_bsize;
+    } else {
+      vs->s = NULL;
+      vs->bsize = 0;
+    }
+  }
+}
+
+int xitk_vers_string_set (xitk_vers_string_t *vs, const char *s) {
+  if (!vs)
+    return 0;
+  if (!s)
+    s = "";
+  if (vs->s && !strcmp (vs->s, s))
+    return 0;
+  vs->version += 1;
+  if (vs->bsize) {
+    strlcpy (vs->s, s, vs->bsize);
+  } else {
+    free (vs->s);
+    vs->s = strdup (s);
+  }
+  return 1;
+}
+
+int xitk_vers_string_get (xitk_vers_string_t *to, const xitk_vers_string_t *from) {
+  if (!to || !from)
+    return 0;
+  if (to->version == from->version)
+    return 0;
+  to->version = from->version;
+  if (to->bsize) {
+    strlcpy (to->s, from->s, to->bsize);
+  } else {
+    free (to->s);
+    to->s = strdup (from->s);
+  }
+  return 1;
+}
+
+void xitk_vers_string_deinit (xitk_vers_string_t *vs) {
+  if (vs && !vs->bsize) {
+    free (vs->s);
+    vs->s = NULL;
+  }
+}
