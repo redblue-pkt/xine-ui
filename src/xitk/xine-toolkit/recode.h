@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -43,11 +43,6 @@ typedef struct {
 xitk_recode_t *xitk_recode_init (const char *src_encoding, const char *dst_encoding, int threadsafe);
 
 /**
- * recode string 'src' into 'dst' according to prepared 'xr'
- */
-char *xitk_recode(xitk_recode_t *xr, const char *src);
-
-/**
  * destroy recoding
  */
 void xitk_recode_done(xitk_recode_t *xr);
@@ -57,12 +52,9 @@ void xitk_recode2_done (xitk_recode_t *xr, xitk_recode_string_t *s);
 
 #else
 
-/* If we're not using iconv(), just define everything as no-op, and
- * xitk_recode as strdup.
- */
+/* If we're not using iconv(), just define everything as no-op. */
 
 #define xitk_recode_init(src_encoding, dst_encoding, threadsafe) NULL
-#define xitk_recode(xr, src) strdup(src)
 #define xitk_recode_done(xr)
 #define xitk_recode2_do(xr, rs) do {(rs)->res = (rs)->src; (rs)->rsize = (rs)->ssize;} while (0)
 #define xitk_recode2_done(xr, rs) (rs)->res = NULL
