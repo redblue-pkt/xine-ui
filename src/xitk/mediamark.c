@@ -949,23 +949,19 @@ static mediamark_t **xml_asx_playlist (_lf_t *lf, xml_node_t *xml_tree) {
 		asx_ref = asx_ref->next;
 	      }
 
-	      if(href && strlen(href)) {
-		/* Use the _orig pointers to store the string before
-		   using atoa() that changes the pointer */
-		char *atitle     = NULL, *atitle_orig  = NULL;
-		char *aauthor    = NULL, *aauthor_orig = NULL;
-		char *real_title = NULL;
-		int   len        = 0;
+              if (href && href[0]) {
+                char *atitle     = NULL;
+                char *aauthor    = NULL;
+                char *real_title = NULL;
+                int   len        = 0;
 
-		if(title && strlen(title)) {
-		  atitle_orig = atitle = strdup(title);
-		  atitle = atoa(atitle);
-		  len = strlen(atitle);
+                if (title && title[0]) {
+                  atitle = strdup (title);
+                  len = str_unquote (atitle);
 
-		  if(author && strlen(author)) {
-		    aauthor_orig = aauthor = strdup(author);
-		    aauthor = atoa(aauthor);
-		    len += strlen(aauthor) + 3;
+                  if (author && author[0]) {
+                    aauthor = strdup (author);
+                    len += str_unquote (aauthor) + 3;
 		  }
 
 		  len++;
@@ -985,8 +981,8 @@ static mediamark_t **xml_asx_playlist (_lf_t *lf, xml_node_t *xml_tree) {
 		lf->num_entries = ++entries_asx;
 
 		SAFE_FREE(real_title);
-		SAFE_FREE(atitle_orig);
-		SAFE_FREE(aauthor_orig);
+                SAFE_FREE (atitle);
+                SAFE_FREE (aauthor);
 	      }
 
 	      href = title = author = NULL;
@@ -1094,14 +1090,14 @@ static void __gx_get_entries (_lf_t *lf, mediamark_t ***mmk, int *entries, xml_n
       if(href && strlen(href)) {
 	char *atitle = NULL;
 
-	if(title && strlen(title)) {
+        if (title && title[0]) {
 	  atitle = strdup(title);
-	  atitle = atoa(atitle);
+          str_unquote (atitle);
 	}
 
 	(*mmk) = (mediamark_t **) realloc((*mmk), sizeof(mediamark_t *) * (*entries + 2));
 
-	mediamark_store_mmk(&(*mmk)[*entries], href, (atitle && strlen(atitle)) ? atitle : NULL, NULL, start, -1, 0, 0);
+        mediamark_store_mmk (&(*mmk)[*entries], href, (atitle && atitle[0]) ? atitle : NULL, NULL, start, -1, 0, 0);
 	lf->num_entries = ++(*entries);
 
 	free(atitle);
@@ -2920,25 +2916,29 @@ void mmk_editor_set_mmk (gGui_t *gui, mediamark_t **mmk) {
 
 static void _mmkedit_apply (xitk_widget_t *w, void *data, int state) {
   xui_mmkedit_t *mmkedit = data;
-  const char *sub;
-  char       *ident, *mrl;
-  int         start, end, av_offset, spu_offset;
 
   (void)w;
   (void)state;
   if (mmkedit->mmk) {
+    const char *r, *sub;
+    char *ident, *mrl;
+    int start, end, av_offset, spu_offset;
 
-    mrl = atoa (xitk_inputtext_get_text (mmkedit->mrl));
-    if (!mrl[0])
+    r = xitk_inputtext_get_text (mmkedit->mrl);
+    if (r && r[0]) {
+      mrl = strdup (r);
+      str_unquote (mrl);
+    } else {
       mrl = strdup ((*mmkedit->mmk)->mrl);
-    else
-      mrl = strdup (mrl);
+    }
 
-    ident = atoa (xitk_inputtext_get_text (mmkedit->ident));
-    if (!ident[0])
+    r = xitk_inputtext_get_text (mmkedit->ident);
+    if (r && r[0]) {
+      ident = strdup (r);
+      str_unquote (ident);
+    } else {
       ident = strdup (mrl);
-    else
-      ident = strdup (ident);
+    }
 
     sub = xitk_inputtext_get_text (mmkedit->sub);
     if (sub && (!sub[0]))

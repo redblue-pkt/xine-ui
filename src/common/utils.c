@@ -87,75 +87,75 @@ int xine_system(int dont_run_as_root, const char *command) {
 /*
  * cleanup the str string, take care about '
  */
-char *atoa (char *str) {
+size_t str_unquote (char *str) {
   uint8_t *b1, *b2, *e, *q;
 
   if (!str)
-    return NULL;
+    return 0;
   b1 = (uint8_t *)str;
-  /* skip leading whitespace */
+  /* skip leading whitespace. */
   while ((b1[0] > 0) && (b1[0] <= ' '))
     b1++;
-  if (!b1[0])
-    return (char *)b1;
-  /* cut trailing whitespace */
+  if (!b1[0]) {
+    str[0] = 0;
+    return 0;
+  }
+  /* cut trailing whitespace. */
   e = b1 + strlen ((char *)b1);
   while ((e[-1] > 0) && (e[-1] <= ' '))
     e--;
   e[0] = 0;
   /* are we quoted? */
   if (((b1[0] == '"') || (b1[0] == '\'')) && (b1[0] == e[-1])) {
-    /* yes we are */
+    /* yes we are. */
     if (b1 + 1 == e) {
-      /* just the quote sign, maybe intended, keep it */
-      return (char *)b1;
+      /* just the quote sign, maybe intended, keep it. */
+      str[0] = (char)b1[0];
+      str[1] = 0;
+      return 1;
     }
-    /* skip leading whitespace again */
+    /* skip leading whitespace again. */
     b2 = b1 + 1;
     while ((b2[0] > 0) && (b2[0] <= ' '))
       b2++;
     if (b2 + 1 == e) {
-      /* nothing serious in it, settle with a plain "" */
-      b1[1] = b1[0];
-      b1[2] = 0;
-      return (char *)b1;
+      /* nothing serious in it, settle with a plain "". */
+      str[0] = str[1] = (char)b1[0];
+      str[2] = 0;
+      return 2;
     }
-    /* removr thn quote */
+    /* removr thn quote. */
     b1 = b2;
     e--;
-    /* cut trailing whitespace again */
+    /* cut trailing whitespace again. */
     while ((e[-1] > 0) && (e[-1] <= ' '))
       e--;
     e[0] = 0;
   }
-  /* test all embedded whitespace is single plain */
-  q = b2 = b1;
+  /* test all embedded whitespace is single plain, or make it that way. */
+  q = b1;
   while (1) {
-    while (b2[0] > ' ')
-      b2++;
-    if (!b2[0])
-      break;
-    q = b2;
-    while ((b2[0] > 0) && (b2[0] <= ' '))
-      b2++;
-    if ((q[0] != ' ') || (q + 1 != b2))
-      break;
-  }
-  /* well, make it that way */
-  if (b2[0]) {
-    while (1) {
-      *q++ = ' ';
-      while (b2[0] > ' ')
-        *q++ = *b2++;
-      if (!b2[0])
-        break;
-      while ((b2[0] > 0) && (b2[0] <= ' '))
-        b2++;
+    if (q == b1) {
+      /* skip real text */
+      while (b1[0] > ' ')
+        b1++;
+      q = b1;
+    } else {
+      /* move veal text */
+      while (b1[0] > ' ')
+        *q++ = *b1++;
     }
-    /* e = q; */
-    q[0] = 0;
+    if (!b1[0])
+      break;
+    /* skip whitespace */
+    while ((b1[0] > 0) && (b1[0] <= ' '))
+      b1++;
+    /* reduce */
+    *q++ = ' ';
   }
-  return (char *)b1;
+  /* e = q; */
+  q[0] = 0;
+  return q - (uint8_t *)str;
 }
 
 /*
