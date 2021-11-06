@@ -47,9 +47,9 @@
 int xine_system(int dont_run_as_root, const char *command);
 
 /*
- * cleanup the str string, take care about '
+ * trim/reduce quoting and whitespace, return new strlen ().
  */
-char *atoa(char *str);
+size_t str_unquote (char *str);
 
 /*
  * Create directories recursively

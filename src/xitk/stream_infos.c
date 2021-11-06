@@ -27,8 +27,6 @@
 #include <errno.h>
 #include <pthread.h>
 
-
-
 #include "common.h"
 #include "stream_infos.h"
 #include "videowin.h"
@@ -362,7 +360,7 @@ stream_infos_ident_t *stream_infos_ident_new (void) {
 static size_t _stream_infos_ident_make (char *buf, size_t bsize, const char *title, const char *artist, const char *album) {
   xitk_recode_t *xr;
   xitk_recode_string_t rs;
-  char *p, *q;
+  char *q;
   size_t arlen, allen;
 
   xr = xitk_recode_init (METAINFO_CHARSET, NULL, 0);
@@ -381,11 +379,8 @@ static size_t _stream_infos_ident_make (char *buf, size_t bsize, const char *tit
   q[rs.rsize] = 0;
   /* Since meta info can be corrupted/wrong/ugly
    * we need to clean and check them before using.
-   * Note: atoa() modify the string, so we work on a copy. */
-  p = atoa (q);
-  arlen = strlen (p);
-  if (p > q)
-    memmove (q, p, arlen);
+   * Note: str_unqote () may modify the string, so we work on a copy. */
+  arlen = str_unquote (q);
   q += arlen;
   rs.bsize -= arlen;
 
@@ -401,10 +396,7 @@ static size_t _stream_infos_ident_make (char *buf, size_t bsize, const char *tit
       memcpy (q, rs.src, rs.rsize);
   }
   q[rs.rsize] = 0;
-  p = atoa (q);
-  arlen = strlen (p);
-  if (p > q)
-    memmove (q, p, arlen);
+  arlen = str_unquote (q);
   q += arlen;
   rs.bsize -= arlen;
 
@@ -422,10 +414,7 @@ static size_t _stream_infos_ident_make (char *buf, size_t bsize, const char *tit
       memcpy (q, rs.src, rs.rsize);
   }
   q[rs.rsize] = 0;
-  p = atoa (q);
-  allen = strlen (p);
-  if (p > q)
-    memmove (q, p, allen);
+  allen = str_unquote (q);
   q += allen;
   rs.bsize -= allen;
 
