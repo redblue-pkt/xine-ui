@@ -734,12 +734,12 @@ int session_handle_subopt(char *suboptarg, const char *enqueue_mrl, int *session
 
     while(audio_next) {
       remote_cmd(*session, CMD_AUDIO_NEXT);
-      playlist_next--;
+      audio_next--;
     }
 
     while(audio_prev) {
       remote_cmd(*session, CMD_AUDIO_PREV);
-      playlist_next--;
+      audio_prev--;
     }
 
     while(spu_next) {
