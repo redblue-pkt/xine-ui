@@ -850,7 +850,7 @@ static void _kbindings_check_redundancy(kbinding_t *kbt) {
         kmsg = nmsg;
         memcpy (kmsg + msglen, footer, flen + 1);
       }
-      if (kbt->gui->verbosity > 0)
+      if (kmsg && kbt->gui->verbosity > 0)
         dump_error (kmsg);
       key = xitk_window_dialog_3 (kbt->gui->xitk, NULL,
         get_layer_above_video (kbt->gui), 450, _("Keybindings error!"), _kbinding_done, kbt,
