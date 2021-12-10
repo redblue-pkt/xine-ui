@@ -3154,7 +3154,7 @@ static int xitk_x11_change_vmode(xitk_be_display_t *_d, xitk_be_window_t *_w, in
 
   d->d.lock(&d->d);
 
-  if (min_width < 0 || min_width < 0) {
+  if (min_width < 0 || min_height < 0) {
     xitk_x11_modelines_reset(d->display, &d->modelines);
   } else {
     xitk_x11_modelines_adjust(d->display, w ? w->w.id : None, &d->modelines, min_width, min_height);
