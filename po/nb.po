@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2019-12-06 14:19+0200\n"
+"POT-Creation-Date: 2021-12-11 19:35+0200\n"
 "PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Alexander Nicolaysen Sørnes <alex@thehandofagony.com>\n"
 "Language-Team:  <nb@li.org>\n"
@@ -78,6 +78,21 @@ msgstr ""
 msgid "%s: option `-W %s' doesn't allow an argument\n"
 msgstr ""
 
+msgid "xine audio control Window"
+msgstr ""
+
+msgid "Audio amplification"
+msgstr ""
+
+msgid "Neutral sound"
+msgstr ""
+
+msgid "Dismiss"
+msgstr "Vekk"
+
+msgid "Close control window"
+msgstr "Lukk kontrollervindu"
+
 #. TRANSLATORS: only ASCII characters (skin)
 msgctxt "skin"
 msgid "There is no MRL."
@@ -99,27 +114,24 @@ msgstr ""
 "Strømmen «%s» bruker en kodek som ikke støttes:\n"
 "\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "Video Codec: %s (%s)\n"
-msgstr "%sVideokodek: %s (%s)\n"
+msgstr ""
 
 msgid "Unavailable"
 msgstr "Ikke tilgjengelig"
 
-#, fuzzy, c-format
+#, c-format
 msgid "Audio Codec: %s (%s)\n"
-msgstr "%sLydkodek: %s (%s)\n"
+msgstr ""
 
 msgid "Start Playback ?"
 msgstr "Sarte avspilling?"
 
-#, fuzzy
 msgid ""
 "\n"
 "Start playback anyway ?\n"
 msgstr ""
-"%s\n"
-"Starte avspilling likevel?\n"
 
 msgid "No MRL (input stream) specified"
 msgstr "Ingen MRL (inndatastrøm) er oppgitt"
@@ -142,9 +154,9 @@ msgstr "deaktivert"
 msgid "%s(): can't create new thread (%s)\n"
 msgstr "%s(): klarte ikke lage ny tråd (%s)\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "Video post plugins: %s."
-msgstr "Etterbehandlingsmoduler: %s."
+msgstr ""
 
 msgid "Amplification Level"
 msgstr "Forsterkingsnivå"
@@ -152,17 +164,13 @@ msgstr "Forsterkingsnivå"
 msgid "Audio Volume"
 msgstr "Lydvolum"
 
-#, fuzzy, c-format
+#, c-format
 msgid "Audio post plugins: %s."
-msgstr "Etterbehandlingsmoduler: %s."
+msgstr ""
 
 #, c-format
 msgid "TV Mode: %d"
 msgstr "TV-modus: %d"
-
-#, c-format
-msgid "XSendEvent(display, 0x%x ...) failed.\n"
-msgstr "«XSendEvent(display, 0x%x ...)» feilet.\n"
 
 msgid "Select"
 msgstr "Velg"
@@ -194,9 +202,8 @@ msgstr ""
 msgid "Sharpness"
 msgstr ""
 
-#, fuzzy
 msgid "Noise"
-msgstr "Ingen"
+msgstr ""
 
 msgid "Control HUE value"
 msgstr "Kontroller nyanse-verdi"
@@ -210,17 +217,14 @@ msgstr "Kontroller LYSSTYRKE-verdi"
 msgid "Control CONTRAST value"
 msgstr "Kontroller KONTRAST-verdi"
 
-#, fuzzy
 msgid "Control GAMMA value"
-msgstr "Kontroller nyanse-verdi"
+msgstr ""
 
-#, fuzzy
 msgid "Control SHARPNESS value"
-msgstr "Kontroller LYSSTYRKE-verdi"
+msgstr ""
 
-#, fuzzy
 msgid "Control NOISE REDUCTION value"
-msgstr "Kontroller metningsverdi"
+msgstr ""
 
 #. TRANSLATORS: only ASCII characters (skin).
 msgctxt "skin"
@@ -248,10 +252,9 @@ msgid "Gam"
 msgstr ""
 
 #. TRANSLATORS: only ASCII characters (skin).
-#, fuzzy
 msgctxt "skin"
 msgid "Sha"
-msgstr "Met"
+msgstr ""
 
 #. TRANSLATORS: only ASCII characters (skin).
 msgctxt "skin"
@@ -270,17 +273,14 @@ msgstr "Lysstyrke-verdi"
 msgid "contrast value"
 msgstr "Kontrast-verdi"
 
-#, fuzzy
 msgid "gamma value"
-msgstr "Nyanseverdi"
+msgstr ""
 
-#, fuzzy
 msgid "sharpness value"
-msgstr "Lysstyrke-verdi"
+msgstr ""
 
-#, fuzzy
 msgid "noise reduction value"
-msgstr "Metningsverdi"
+msgstr ""
 
 msgid "Hue value."
 msgstr "Nyanseverdi."
@@ -294,34 +294,25 @@ msgstr "Lysstyrke-verdi."
 msgid "Contrast value."
 msgstr "Kontrast-verdi."
 
-#, fuzzy
 msgid "Gamma value."
-msgstr "Nyanseverdi."
+msgstr ""
 
-#, fuzzy
 msgid "Sharpness value."
-msgstr "Lysstyrke-verdi."
+msgstr ""
 
-#, fuzzy
 msgid "Noise reduction value."
-msgstr "Ingen hjelpeseksjon er tilgjengelig"
-
-msgid "xine Control Window"
-msgstr "xine-kontrollervindu"
+msgstr ""
 
 msgid "control: couldn't find image for background\n"
 msgstr "Kontroller: klarte ikke finne bilde for bakgrunn\n"
+
+msgid "xine Control Window"
+msgstr "xine-kontrollervindu"
 
 #. TRANSLATORS: only ASCII characters (skin)
 msgctxt "skin"
 msgid "Choose a Skin"
 msgstr "Velg en hud"
-
-msgid "Dismiss"
-msgstr "Vekk"
-
-msgid "Close control window"
-msgstr "Lukk kontrollervindu"
 
 #, c-format
 msgid "%s(): couldn't find image for background\n"
@@ -341,9 +332,6 @@ msgstr "Ferdig"
 
 msgid "More..."
 msgstr "Mer . . ."
-
-msgid "Error"
-msgstr "Feil"
 
 #, c-format
 msgid ""
@@ -411,9 +399,6 @@ msgstr ""
 
 msgid "Opening mozilla web browser, this might take a while..."
 msgstr "Åpner Mozilla-nettleseren. Dette kan ta litt tid . . ."
-
-msgid "Warning"
-msgstr "Advarsel"
 
 msgid ""
 "The amount of dropped frame is too high, your system might be slow, not "
@@ -491,14 +476,6 @@ msgstr "Stopp"
 msgid "Continue"
 msgstr "Fortsett"
 
-#, c-format
-msgid "gui_main: selected visual %#lx does not exist, trying default visual\n"
-msgstr "«gui_main»: valgte visuell  %#lx finnes ikke, prøver standardvisuell\n"
-
-#, c-format
-msgid "gui_main: couldn't find true color visual.\n"
-msgstr "«gui_main»: klarte ikke finne sannfarge-visuell.\n"
-
 msgid "Enable extra XLib thread safety."
 msgstr ""
 
@@ -507,38 +484,6 @@ msgid ""
 "Otherwise, it may boost or brake performance - just try out."
 msgstr ""
 
-#, c-format
-msgid ""
-"\n"
-"XInitThreads failed - looks like you don't have a thread-safe xlib.\n"
-msgstr ""
-"\n"
-"«XInitThreads» feilet; det ser ut som du ikke har en trådsikker versjon av "
-"«xlib».\n"
-
-#, c-format
-msgid "Cannot open display\n"
-msgstr "Klarte ikke åpne visningsenhet\n"
-
-msgid "Name of video display"
-msgstr "Navn på visningsenhet"
-
-msgid ""
-"Use this setting to configure to which display xine will show videos. When "
-"left blank, the main display will be used. Setting this option to something "
-"like ':0.1' or ':1' makes possible to display video and control on different "
-"screens (very useful for TV presentations)."
-msgstr ""
-"Bruk denne innstillingen for å velge hvilken visningsenhet xine skal vise "
-"videoer på. Hvis feltet er tomt brukes standardenheten. Å velge noe sånt som "
-"«:0.1» eller «:1» gjør det mulig å vise video og kontroller på forskjellige "
-"skjermer (nyttig for TV-presentasjoner, for eksempel)."
-
-#, c-format
-msgid "Cannot open display '%s' for video. Falling back to primary display.\n"
-msgstr ""
-"Klarte ikke åpne visningsenheten «%s» for video; bytter til hovedenhet.\n"
-
 msgid "Synchronized X protocol (debug)"
 msgstr "Synkronisert X-protokoll (feilsøking)"
 
@@ -546,27 +491,21 @@ msgid ""
 "Do X transactions in synchronous mode. Very slow, use only for debugging!"
 msgstr ""
 
-#, c-format
-msgid "Warning! Synchronized X activated - this is very slow...\n"
-msgstr "Advarsel! Synkronisert X er aktivert; dette er veldig treigt . . .\n"
-
 msgid "Windows stacking"
 msgstr "Vindustabling"
 
-#, fuzzy
 msgid ""
 "Use WM layer property to place windows on top\n"
 "except for the video window in non-fullscreen mode."
-msgstr "Bruk «WM»-lag skikkelig for å plassere vinduer øverst."
+msgstr ""
 
 msgid "Windows stacking (more)"
 msgstr "Vindustabling (mer)"
 
-#, fuzzy
 msgid ""
 "Use WM layer property to place windows on top\n"
 "for all windows (surpasses the 'layer_above' setting)."
-msgstr "Bruk «WM»-lag skikkelig for å plassere vinduer øverst."
+msgstr ""
 
 msgid "Snapshot location"
 msgstr "Plassering for lagrede bilder"
@@ -699,9 +638,23 @@ msgstr "Stil for menysnarveier"
 msgid "Shortcut representation in menu, 'Ctrl,Alt' or 'C,M'."
 msgstr "Snarveioppsett i menyen, «Ctrl,Alt» eller «C,M»."
 
-#, c-format
-msgid "Unable to initialize Imlib\n"
-msgstr "Klarte ikke initalisere «Imlib»\n"
+msgid "Up"
+msgstr "Opp"
+
+msgid "Left"
+msgstr "Venstre"
+
+msgid "Right"
+msgstr "Høyre"
+
+msgid "Down"
+msgstr "Ned"
+
+msgid "Angle +"
+msgstr "Vinkel +"
+
+msgid "Angle -"
+msgstr "Vinkel -"
 
 msgid "Menu toggle"
 msgstr "Meny på/av"
@@ -724,9 +677,8 @@ msgstr "Vinkel"
 msgid "Part"
 msgstr "Del"
 
-#, fuzzy
 msgid "Top Menu"
-msgstr "Menyer"
+msgstr ""
 
 msgid "Popup Menu"
 msgstr ""
@@ -746,6 +698,21 @@ msgstr "Meny 6"
 msgid "Menu 7"
 msgstr "Meny 7"
 
+msgid "Menu"
+msgstr ""
+
+msgid "Red"
+msgstr ""
+
+msgid "Green"
+msgstr ""
+
+msgid "Yellow"
+msgstr ""
+
+msgid "Blue"
+msgstr ""
+
 msgid "Menu 1"
 msgstr "Meny 1"
 
@@ -754,24 +721,6 @@ msgstr "Meny 2"
 
 msgid "xine Event Sender"
 msgstr "xines hendelsessender"
-
-msgid "Up"
-msgstr "Opp"
-
-msgid "Left"
-msgstr "Venstre"
-
-msgid "Right"
-msgstr "Høyre"
-
-msgid "Down"
-msgstr "Ned"
-
-msgid "Angle +"
-msgstr "Vinkel +"
-
-msgid "Angle -"
-msgstr "Vinkel -"
 
 msgid "Close"
 msgstr "Lukk"
@@ -859,34 +808,23 @@ msgstr "Ingenting er valgt"
 msgid "None"
 msgstr "Ingen"
 
-msgid "You can only delete alias entries."
-msgstr "Du kan kun slette alias-oppføringer."
+msgid "Grab"
+msgstr "Ta"
 
 msgid "No more space for additional entries!"
 msgstr ""
-
-msgid "Press Keyboard Keys..."
-msgstr "Trykk på tastene . . ."
-
-msgid "Event Receiver Window:  Press keyboard keys to bind..."
-msgstr "Hendelsesmottakervindu:  Trykk på tastene..."
-
-msgid "Accept?"
-msgstr "Godta?"
-
-#, c-format
-msgid ""
-"Store %s as\n"
-"'%s' key binding ?"
-msgstr ""
-"Lagre «%s» som\n"
-"«%s»-tastebinding?"
 
 #, c-format
 msgid ""
 "This key binding is redundant with action:\n"
 "\"%s\".\n"
 msgstr "Denne tastebindingen er overføldig med handlingen «%s».\n"
+
+msgid "Store new key binding"
+msgstr ""
+
+msgid "Press keyboard keys to bind..."
+msgstr ""
 
 msgid "Key Binding Editor"
 msgstr "Tastebindingsredigerer"
@@ -927,15 +865,564 @@ msgstr "mod4"
 msgid "mod5"
 msgstr "mod5"
 
-msgid "Grab"
-msgstr "Ta"
+msgid "start playback"
+msgstr ""
+
+msgid "playback pause toggle"
+msgstr ""
+
+msgid "stop playback"
+msgstr ""
+
+msgid "close stream"
+msgstr ""
+
+msgid "take a snapshot"
+msgstr ""
+
+msgid "eject the current medium"
+msgstr ""
+
+msgid "select and play next MRL in the playlist"
+msgstr ""
+
+msgid "select and play previous MRL in the playlist"
+msgstr ""
+
+msgid "select and play MRL in the playlist"
+msgstr ""
+
+msgid "loop mode toggle"
+msgstr ""
+
+msgid "stop playback after played stream"
+msgstr ""
+
+msgid "scan playlist to grab stream infos"
+msgstr ""
+
+msgid "add a mediamark from current playback"
+msgstr ""
+
+msgid "edit selected mediamark"
+msgstr ""
+
+msgid "set position to -60 seconds in current stream"
+msgstr ""
+
+msgid "set position to +60 seconds in current stream"
+msgstr ""
+
+msgid "set position to -30 seconds in current stream"
+msgstr ""
+
+msgid "set position to +30 seconds in current stream"
+msgstr ""
+
+msgid "set position to -15 seconds in current stream"
+msgstr ""
+
+msgid "set position to +15 seconds in current stream"
+msgstr ""
+
+msgid "set position to -7 seconds in current stream"
+msgstr ""
+
+msgid "set position to +7 seconds in current stream"
+msgstr ""
+
+msgid "set position to beginning of current stream"
+msgstr ""
+
+msgid "set position to 1/10 of current stream"
+msgstr ""
+
+msgid "set position to 2/10 of current stream"
+msgstr ""
+
+msgid "set position to 3/10 of current stream"
+msgstr ""
+
+msgid "set position to 4/10 of current stream"
+msgstr ""
+
+msgid "set position to 5/10 of current stream"
+msgstr ""
+
+msgid "set position to 6/10 of current stream"
+msgstr ""
+
+msgid "set position to 7/10 of current stream"
+msgstr ""
+
+msgid "set position to 8/10 of current stream"
+msgstr ""
+
+msgid "set position to 9/10 of current stream"
+msgstr ""
+
+msgid "set position to end of current stream"
+msgstr ""
+
+msgid "increment playback speed"
+msgstr ""
+
+msgid "decrement playback speed"
+msgstr ""
+
+msgid "reset playback speed"
+msgstr ""
+
+msgid "increment audio volume"
+msgstr ""
+
+msgid "decrement audio volume"
+msgstr ""
+
+msgid "increment amplification level"
+msgstr ""
+
+msgid "decrement amplification level"
+msgstr ""
+
+msgid "reset amplification to default value"
+msgstr ""
+
+msgid "audio muting toggle"
+msgstr ""
+
+msgid "select next audio channel"
+msgstr ""
+
+msgid "select previous audio channel"
+msgstr ""
+
+msgid "visibility toggle of audio post effect window"
+msgstr ""
+
+msgid "toggle post effect usage"
+msgstr ""
+
+msgid "select next sub picture (subtitle) channel"
+msgstr ""
+
+msgid "select previous sub picture (subtitle) channel"
+msgstr ""
+
+msgid "interlaced mode toggle"
+msgstr ""
+
+msgid "cycle aspect ratio values"
+msgstr ""
+
+msgid "reduce the output window size by factor 1.2"
+msgstr ""
+
+msgid "enlarge the output window size by factor 1.2"
+msgstr ""
+
+msgid "set video output window to 50%"
+msgstr ""
+
+msgid "set video output window to 100%"
+msgstr ""
+
+msgid "set video output window to 200%"
+msgstr ""
+
+msgid "zoom in"
+msgstr ""
+
+msgid "zoom out"
+msgstr ""
+
+msgid "zoom in horizontally"
+msgstr ""
+
+msgid "zoom out horizontally"
+msgstr ""
+
+msgid "zoom in vertically"
+msgstr ""
+
+msgid "zoom out vertically"
+msgstr ""
+
+msgid "reset zooming"
+msgstr ""
+
+msgid "resize output window to stream size"
+msgstr ""
+
+msgid "fullscreen toggle"
+msgstr ""
+
+msgid "Xinerama fullscreen toggle"
+msgstr ""
+
+msgid "jump to media Menu"
+msgstr ""
+
+msgid "jump to Title Menu"
+msgstr ""
+
+msgid "jump to Root Menu"
+msgstr ""
+
+msgid "jump to Subpicture Menu"
+msgstr ""
+
+msgid "jump to Audio Menu"
+msgstr ""
+
+msgid "jump to Angle Menu"
+msgstr ""
+
+msgid "jump to Part Menu"
+msgstr ""
+
+msgid "menu navigate up"
+msgstr ""
+
+msgid "menu navigate down"
+msgstr ""
+
+msgid "menu navigate left"
+msgstr ""
+
+msgid "menu navigate right"
+msgstr ""
+
+msgid "menu select"
+msgstr ""
+
+msgid "jump to next chapter"
+msgstr ""
+
+msgid "jump to previous chapter"
+msgstr ""
+
+msgid "select next angle"
+msgstr ""
+
+msgid "select previous angle"
+msgstr ""
+
+msgid "visibility toggle of help window"
+msgstr ""
+
+msgid "visibility toggle of video post effect window"
+msgstr ""
+
+msgid "visibility toggle of output window"
+msgstr ""
+
+msgid "bordered window toggle of output window"
+msgstr ""
+
+msgid "visibility toggle of UI windows"
+msgstr ""
+
+msgid "visibility toggle of control window"
+msgstr ""
+
+msgid "visibility toggle of audio control window"
+msgstr ""
+
+msgid "visibility toggle of mrl browser window"
+msgstr ""
+
+msgid "visibility toggle of playlist editor window"
+msgstr ""
+
+msgid "visibility toggle of the setup window"
+msgstr ""
+
+msgid "visibility toggle of the event sender window"
+msgstr ""
+
+msgid "visibility toggle of analog TV window"
+msgstr ""
+
+msgid "visibility toggle of log viewer"
+msgstr ""
+
+msgid "visibility toggle of stream info window"
+msgstr ""
+
+msgid "display stream information using OSD"
+msgstr ""
+
+msgid "display information using OSD"
+msgstr ""
+
+msgid "show OSD menu"
+msgstr ""
+
+msgid "enter key binding editor"
+msgstr ""
+
+msgid "enable key bindings (not useful to bind a key to it!)"
+msgstr ""
+
+msgid "open file selector"
+msgstr ""
+
+msgid "select a subtitle file"
+msgstr ""
+
+msgid "download a skin from the skin server"
+msgstr ""
+
+msgid "display MRL/Ident toggle"
+msgstr ""
+
+msgid "grab pointer toggle"
+msgstr ""
+
+msgid "enter the number 0"
+msgstr ""
+
+msgid "enter the number 1"
+msgstr ""
+
+msgid "enter the number 2"
+msgstr ""
+
+msgid "enter the number 3"
+msgstr ""
+
+msgid "enter the number 4"
+msgstr ""
+
+msgid "enter the number 5"
+msgstr ""
+
+msgid "enter the number 6"
+msgstr ""
+
+msgid "enter the number 7"
+msgstr ""
+
+msgid "enter the number 8"
+msgstr ""
+
+msgid "enter the number 9"
+msgstr ""
+
+msgid "add 10 to the next entered number"
+msgstr ""
+
+msgid "set position in current stream to numeric percentage"
+msgstr ""
+
+msgid "set position forward by numeric argument in current stream"
+msgstr ""
+
+msgid "set position back by numeric argument in current stream"
+msgstr ""
+
+msgid "change audio video syncing (delay video)"
+msgstr ""
+
+msgid "change audio video syncing (delay audio)"
+msgstr ""
+
+msgid "reset audio video syncing offset"
+msgstr ""
+
+msgid "change subtitle syncing (delay video)"
+msgstr ""
+
+msgid "change subtitle syncing (delay subtitles)"
+msgstr ""
+
+msgid "reset subtitle syncing offset"
+msgstr ""
+
+msgid "toggle TV modes (on the DXR3)"
+msgstr ""
+
+msgid "switch Monitor to DPMS standby mode"
+msgstr ""
+
+msgid "increase hue by 10"
+msgstr ""
+
+msgid "decrease hue by 10"
+msgstr ""
+
+msgid "increase saturation by 10"
+msgstr ""
+
+msgid "decrease saturation by 10"
+msgstr ""
+
+msgid "increase brightness by 10"
+msgstr ""
+
+msgid "decrease brightness by 10"
+msgstr ""
+
+msgid "increase contrast by 10"
+msgstr ""
+
+msgid "decrease contrast by 10"
+msgstr ""
+
+msgid "increase gamma by 10"
+msgstr ""
+
+msgid "decrease gamma by 10"
+msgstr ""
+
+msgid "increase sharpness by 10"
+msgstr ""
+
+msgid "decrease sharpness by 10"
+msgstr ""
+
+msgid "increase noise reduction by 10"
+msgstr ""
+
+msgid "decrease noise reduction by 10"
+msgstr ""
+
+msgid "quit the program"
+msgstr ""
+
+msgid "input_pvr: set input"
+msgstr ""
+
+msgid "input_pvr: set frequency"
+msgstr ""
+
+msgid "input_pvr: mark the start of a new stream section"
+msgstr ""
+
+msgid "input_pvr: set the name for the current stream section"
+msgstr ""
+
+msgid "input_pvr: save the stream section"
+msgstr ""
+
+msgid "Open playlist"
+msgstr ""
+
+msgid "VDR Red button"
+msgstr ""
+
+msgid "VDR Green button"
+msgstr ""
+
+msgid "VDR Yellow button"
+msgstr ""
+
+msgid "VDR Blue button"
+msgstr ""
+
+msgid "VDR Play"
+msgstr ""
+
+msgid "VDR Pause"
+msgstr ""
+
+msgid "VDR Stop"
+msgstr ""
+
+msgid "VDR Record"
+msgstr ""
+
+msgid "VDR Fast forward"
+msgstr ""
+
+msgid "VDR Fast rewind"
+msgstr ""
+
+msgid "VDR Power"
+msgstr ""
+
+msgid "VDR Channel +"
+msgstr ""
+
+msgid "VDR Channel -"
+msgstr ""
+
+msgid "VDR Schedule menu"
+msgstr ""
+
+msgid "VDR Channel menu"
+msgstr ""
+
+msgid "VDR Timers menu"
+msgstr ""
+
+msgid "VDR Recordings menu"
+msgstr ""
+
+msgid "VDR Setup menu"
+msgstr ""
+
+msgid "VDR Command menu"
+msgstr ""
+
+msgid "VDR Command back"
+msgstr ""
+
+msgid "VDR User command 0"
+msgstr ""
+
+msgid "VDR User command 1"
+msgstr ""
+
+msgid "VDR User command 2"
+msgstr ""
+
+msgid "VDR User command 3"
+msgstr ""
+
+msgid "VDR User command 4"
+msgstr ""
+
+msgid "VDR User command 5"
+msgstr ""
+
+msgid "VDR User command 6"
+msgstr ""
+
+msgid "VDR User command 7"
+msgstr ""
+
+msgid "VDR User command 8"
+msgstr ""
+
+msgid "VDR User command 9"
+msgstr ""
+
+msgid "VDR Volume +"
+msgstr ""
+
+msgid "VDR Volume -"
+msgstr ""
+
+msgid "VDR Mute audio"
+msgstr ""
+
+msgid "VDR Audio menu"
+msgstr ""
+
+msgid "VDR Command info"
+msgstr ""
+
+msgid "VDR Previous channel"
+msgstr ""
+
+msgid "VDR Subtiles menu"
+msgstr ""
 
 #, c-format
 msgid "xine-ui: Too many Alias entries in keymap file, entry ignored.\n"
 msgstr ""
-
-msgid "and"
-msgstr "og"
 
 msgid ""
 "The following key bindings pairs are identical:\n"
@@ -943,6 +1430,9 @@ msgid ""
 msgstr ""
 "Følgende tastepar er identiske\n"
 "\n"
+
+msgid "and"
+msgstr "og"
 
 msgid ""
 ".\n"
@@ -963,24 +1453,14 @@ msgid "Unknown"
 msgstr "Ukjent"
 
 #, c-format
-msgid "Bad geometry '%s'\n"
-msgstr "Ugyldig geometri «%s»\n"
-
-#, c-format
-msgid "Bad visual '%s'\n"
-msgstr "Dårlig visuell «%s»\n"
-
-#, c-format
 msgid "This is xine (X11 gui) - a free video player v%s"
 msgstr "Dette er xine (X11-grensesnitt) - en fri videospiller, versjon %s"
 
-#, fuzzy, c-format
+#, c-format
 msgid ""
 ".\n"
 "(c) %s The xine Team.\n"
 msgstr ""
-".\n"
-"Kopirett 2000-2007 tilhører xine-laget.\n"
 
 #, c-format
 msgid "Built with xine library %d.%d.%d (%s)\n"
@@ -1125,9 +1605,9 @@ msgstr "  -g, --hide-gui               skjul grensesnitt (panel etc.)\n"
 msgid "  -I, --no-gui                 disable GUI\n"
 msgstr "  -I, --no-gui                 deaktiver grensesnitt\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "      --no-mouse               disable mouse event\n"
-msgstr "  -I, --no-gui                 deaktiver grensesnitt\n"
+msgstr ""
 
 #, c-format
 msgid "  -H, --hide-video             hide video window\n"
@@ -1496,9 +1976,6 @@ msgstr ""
 "(Trommer) xine-lib vil ha oppmerksomheten din for å gi en viktig beskjed til "
 "deg ;-):"
 
-msgid "No information available."
-msgstr "Ingen tilgjengelig informasjon."
-
 msgid ""
 "The host you're trying to connect is unknown.\n"
 "Check the validity of the specified hostname."
@@ -1559,9 +2036,14 @@ msgstr ""
 msgid "Sorry, not implemented (authentication)"
 msgstr ""
 
-#, fuzzy
+msgid "The following stream has finished recording:"
+msgstr ""
+
 msgid "*sight*, unknown error."
-msgstr "En ukjent feil; de er alltid kjedelige."
+msgstr ""
+
+msgid "No information available."
+msgstr "Ingen tilgjengelig informasjon."
 
 #, c-format
 msgid "Require xine library version 1.0.0, found %d.%d.%d.\n"
@@ -1582,10 +2064,6 @@ msgstr "Aspektforholdet «%s» er ugyldig, see «xine --help»\n"
 #, c-format
 msgid "Bad port number: %d\n"
 msgstr "«%d» er ikke et gydlig portnummer\n"
-
-#, c-format
-msgid "Bad geometry '%s', see xine --help\n"
-msgstr "«%s» er ikke en gyldig geometri; see «xine --help»\n"
 
 #, c-format
 msgid "Bad loop mode '%s', see xine --help\n"
@@ -1660,17 +2138,29 @@ msgstr "Mediamerke-redigerer"
 msgid "Identifier"
 msgstr "Identifiserer"
 
-msgid "Mediamark Identifier"
-msgstr "Mediamerke-identifiserer"
-
 msgid "Mrl"
 msgstr "MRL"
 
-msgid "Mediamark Mrl"
-msgstr "Mediamerke-MRL"
-
 msgid "Subtitle"
 msgstr "Teksting"
+
+msgid "Start at"
+msgstr "Start ved"
+
+msgid "End at"
+msgstr "Slutt ved"
+
+msgid "A/V offset"
+msgstr "Lyd/Video-forskyvning"
+
+msgid "SPU offset"
+msgstr "SPU-forskyvning"
+
+msgid "Mediamark Identifier"
+msgstr "Mediamerke-identifiserer"
+
+msgid "Mediamark Mrl"
+msgstr "Mediamerke-MRL"
 
 msgid "Subtitle File"
 msgstr "Tekstingsfil"
@@ -1681,26 +2171,14 @@ msgstr "Tekstingsfil"
 msgid "Select a subtitle file to use together with the mrl."
 msgstr "Velg en tekstingsfil for bruk sammen med MRL'en."
 
-msgid "Start at"
-msgstr "Start ved"
-
 msgid "Mediamark start time (secs)."
 msgstr "Starttid for mediamerke (sekunder)."
-
-msgid "End at"
-msgstr "Slutt ved"
 
 msgid "Mediamark end time (secs)."
 msgstr "Sluttid for mediamerke (sekunder)."
 
-msgid "A/V offset"
-msgstr "Lyd/Video-forskyvning"
-
 msgid "Offset of Audio and Video."
 msgstr "Forskyvning av lyd og video."
-
-msgid "SPU offset"
-msgstr "SPU-forskyvning"
 
 msgid "Subpicture offset."
 msgstr "Forskyvning av underbilde."
@@ -1725,6 +2203,9 @@ msgstr "Vis videovindu"
 
 msgid "Fullscreen"
 msgstr "Fullskjerm"
+
+msgid "Window frame"
+msgstr ""
 
 msgid "Open"
 msgstr "Åpne"
@@ -1885,17 +2366,14 @@ msgstr "Lyd/Visualisering"
 msgid "Audio/SEP"
 msgstr "Lyd/SEP"
 
-#, fuzzy
 msgid "Audio/Postprocess"
-msgstr "Video/Etterbehandle"
+msgstr ""
 
-#, fuzzy
 msgid "Audio/Postprocess/Chain Reaction..."
-msgstr "Video/Etterbehandle/Kjedereaksjon . . ."
+msgstr ""
 
-#, fuzzy
 msgid "Audio/Postprocess/Enable Postprocessing"
-msgstr "Video/Etterbehandle/Aktiver etterbehandling"
+msgstr ""
 
 msgid "Subtitle/Channel"
 msgstr "Teksting/Kanal"
@@ -1914,6 +2392,9 @@ msgstr "Innstillinger/Tastekart-redigerer . . ."
 
 msgid "Settings/Video..."
 msgstr "Innstillinger/Video . . ."
+
+msgid "Settings/Audio..."
+msgstr ""
 
 msgid "Settings/TV Analog..."
 msgstr "Innstillinger/Analog TV . . ."
@@ -1982,9 +2463,8 @@ msgstr "Flytt ned"
 msgid "Reset video settings"
 msgstr ""
 
-#, fuzzy
 msgid "Video Control"
-msgstr "Kontroller"
+msgstr ""
 
 msgid "All extensions"
 msgstr "Alle utvidelser"
@@ -2047,6 +2527,9 @@ msgstr "Slutt på stillhet"
 msgid "Audio: %s"
 msgstr "Lyd: %s"
 
+msgid "gui panel visibility"
+msgstr "Visning av grensesnittpanel"
+
 msgid "Volume control"
 msgstr "Volumkontroller"
 
@@ -2059,14 +2542,32 @@ msgstr "xine-panel"
 msgid "panel: couldn't find image for background\n"
 msgstr "Panel: klarte ikke finne bilde for bakgrunn\n"
 
+msgid "panel: couldn't create window\n"
+msgstr ""
+
+msgid "Previous audio channel"
+msgstr "Forrige lydkanal"
+
+msgid "Previous SPU channel"
+msgstr "Forrige SPU-kanal"
+
+msgid "Slow motion"
+msgstr "Sakte bevegelse"
+
+msgid "Next audio channel"
+msgstr "Neste lydkanal"
+
+msgid "Next SPU channel"
+msgstr "Neste SPU-kanal"
+
+msgid "Fast motion"
+msgstr "Rask bevegelse"
+
 msgid "Stop playback"
 msgstr "Stopp avspilling"
 
 msgid "Play selected entry"
 msgstr "Spill av valgte oppføring"
-
-msgid "Pause/Resume playback"
-msgstr "Pause/Fortsett avspilling"
 
 msgid "Eject current medium"
 msgstr "Løs ut gjeldende medium"
@@ -2077,23 +2578,23 @@ msgstr "Oppsettsvindu"
 msgid "Navigator"
 msgstr "Navigerer"
 
-msgid "Hide GUI"
-msgstr "Skjul grensesnitt"
-
 msgid "Fullscreen/Window mode"
 msgstr "Fullskjerm/Vindu"
 
-msgid "Next audio channel"
-msgstr "Neste lydkanal"
+msgid "Control"
+msgstr "Kontroller"
 
-msgid "Previous audio channel"
-msgstr "Forrige lydkanal"
+msgid "Audio control"
+msgstr ""
 
-msgid "Next SPU channel"
-msgstr "Neste SPU-kanal"
+msgid "Open Location"
+msgstr "Åpne plassering"
 
-msgid "Previous SPU channel"
-msgstr "Forrige SPU-kanal"
+msgid "Hide GUI"
+msgstr "Skjul grensesnitt"
+
+msgid "Take a snapshot"
+msgstr "Ta et bilde"
 
 msgid "Total time: --:--:--"
 msgstr "Total tid: --:--:--"
@@ -2101,20 +2602,8 @@ msgstr "Total tid: --:--:--"
 msgid "Stream playback position slider"
 msgstr "Søkelinje for posisjon i strømmen"
 
-msgid "Take a snapshot"
-msgstr "Ta et bilde"
-
-msgid "Slow motion"
-msgstr "Sakte bevegelse"
-
-msgid "Fast motion"
-msgstr "Rask bevegelse"
-
-msgid "Control"
-msgstr "Kontroller"
-
-msgid "Open Location"
-msgstr "Åpne plassering"
+msgid "Pause/Resume playback"
+msgstr "Pause/Fortsett avspilling"
 
 msgid "gui tips visibility"
 msgstr "Visning av tips i grensesnittet"
@@ -2127,9 +2616,6 @@ msgstr "Varighet for tips (ms)"
 
 msgid "Persistence time of tooltips, in milliseconds."
 msgstr "Hvor lenge tips vises, i millisekunder."
-
-msgid "gui panel visibility"
-msgstr "Visning av grensesnittpanel"
 
 msgid "Load"
 msgstr "Åpne"
@@ -2215,13 +2701,11 @@ msgstr ""
 "Det er ingen tilgjengelige parametere tilgjengelige for denne "
 "tilleggsmodulen."
 
-#, fuzzy
 msgid "Video Chain Reaction"
-msgstr "Kjedereaksjon"
+msgstr ""
 
-#, fuzzy
 msgid "Audio Chain Reaction"
-msgstr "Kjedereaksjon"
+msgstr ""
 
 msgid "Enable"
 msgstr "Aktiver"
@@ -2262,6 +2746,9 @@ msgstr "Oppsett av xine"
 msgid "(*)  you need to restart xine for this setting to take effect"
 msgstr "* xine må startes på nytt for at innstillingen skal tre i kraft"
 
+msgid "Skin theme"
+msgstr ""
+
 #, c-format
 msgid "Failed to load %s/%s. Load fallback skin %s\n"
 msgstr "Klarte ikke åpne «%s/%s». Faller tilbake på huden «%s»\n"
@@ -2275,15 +2762,17 @@ msgid "Failed to load %s, wrong version. Load fallback skin '%s'.\n"
 msgstr "Klarte ikke åpne «%s»; feil versjon. Faller tilbake på huden «%s».\n"
 
 #, c-format
-msgid "Ooch, skin not found, use fallback '%s'.\n"
-msgstr "Den huden ble ikke funnet, nei; faller tilbake på «%s».\n"
-
-#, c-format
 msgid "No available skin found. Say goodbye.\n"
 msgstr "Fant ingen tilgjengelig hud. Si adjø.\n"
 
 msgid "gui skin theme"
 msgstr "Hudtema for grensesnittet"
+
+msgid "Grapics quality"
+msgstr ""
+
+msgid "Trade speed for quality with some screen modes."
+msgstr ""
 
 #, c-format
 msgid "Ooch, gui.skin config entry isn't registered. Say goodbye.\n"
@@ -2320,12 +2809,12 @@ msgid "Unable to create '%s' directory: %s."
 msgstr "Klarte ikke opprette katalogen «%s»: %s."
 
 #, c-format
-msgid "Skin %s correctly installed"
-msgstr "Huden «%s» er riktig installert"
-
-#, c-format
 msgid "Unable to create '%s'."
 msgstr "Klarte ikke opprette «%s»."
+
+#, c-format
+msgid "Skin %s correctly installed"
+msgstr "Huden «%s» er riktig installert"
 
 msgid "Be patient..."
 msgstr "Vær tålmodig . . ."
@@ -2340,13 +2829,14 @@ msgstr "Velg en hud å laste ned . . ."
 msgid "Error: "
 msgstr "Feil: "
 
-#, fuzzy
-msgid "xine_grab_video_frame.grab () failed\n"
-msgstr "«xine_get_current_frame()» feilet\n"
+msgid "PNG Parsing failed\n"
+msgstr "Klarte ikke lese PNG\n"
 
-#, fuzzy
+msgid "xine_grab_video_frame.grab () failed\n"
+msgstr ""
+
 msgid "xine_new_grab_video_frame () failed\n"
-msgstr "«xine_get_current_frame()» feilet\n"
+msgstr ""
 
 msgid "Wrong image size: "
 msgstr "Feil bildestørrelse: "
@@ -2362,9 +2852,6 @@ msgstr "«png_create_write_struct()» feilet\n"
 
 msgid "png_create_info_struct() failed\n"
 msgstr "«png_create_info_struct()» feilet\n"
-
-msgid "PNG Parsing failed\n"
-msgstr "Klarte ikke lese PNG\n"
 
 msgid "File written: "
 msgstr "Skrev til fil: "
@@ -2390,11 +2877,11 @@ msgstr "«rgb_alloc()» feilet\n"
 msgid "xine Splash"
 msgstr "xine-oppstartsbilde"
 
-msgid "Stream Information"
-msgstr "Strøminformasjon"
-
 msgid "General"
 msgstr "Generelt"
+
+msgid "Misc"
+msgstr "Diverse"
 
 msgid "Title: "
 msgstr "Tittel: "
@@ -2413,9 +2900,6 @@ msgstr "År: "
 
 msgid "Album: "
 msgstr "Album: "
-
-msgid "Misc"
-msgstr "Diverse"
 
 msgid "Input Plugin: "
 msgstr "Tilleggsmodul for inndata:"
@@ -2473,6 +2957,15 @@ msgstr "Biter: "
 
 msgid "Samplerate: "
 msgstr "Prøvesamlingshastighet: "
+
+msgid "Stream Information"
+msgstr "Strøminformasjon"
+
+msgid "Yes"
+msgstr ""
+
+msgid "No"
+msgstr ""
 
 msgid "Update"
 msgstr "Oppdater"
@@ -2537,9 +3030,6 @@ msgid "videowin: output driver overrides selected visual to visual id 0x%lx\n"
 msgstr ""
 "«videowin»: visningsdriveren overstyrer valgte visuell til visuell-id 0x%lx\n"
 
-msgid "XF86VidMode Extension: modeline switching failed.\n"
-msgstr "«XF86VidMode»-utvidelse: moduslinjebytting feilet.\n"
-
 msgid ""
 "Screens to use in order to do a very fullscreen in xinerama mode. (example 0 "
 "2 3)"
@@ -2567,6 +3057,33 @@ msgstr "Bredde for «xinerama»-fullskjerm («-8192» for å oppdage automatisk)
 msgid "height for xinerama fullscreen (-8192 = autodetect)"
 msgstr "Høyde for «xinerama»-fullskjerm («-8192» for å oppdage automatisk)"
 
+msgid "Name of video display"
+msgstr "Navn på visningsenhet"
+
+msgid ""
+"Use this setting to configure to which display xine will show videos. When "
+"left blank, the main display will be used. Setting this option to something "
+"like ':0.1' or ':1' makes possible to display video and control on different "
+"screens (very useful for TV presentations)."
+msgstr ""
+"Bruk denne innstillingen for å velge hvilken visningsenhet xine skal vise "
+"videoer på. Hvis feltet er tomt brukes standardenheten. Å velge noe sånt som "
+"«:0.1» eller «:1» gjør det mulig å vise video og kontroller på forskjellige "
+"skjermer (nyttig for TV-presentasjoner, for eksempel)."
+
+#, c-format
+msgid "Cannot open display '%s' for video. Falling back to primary display.\n"
+msgstr ""
+"Klarte ikke åpne visningsenheten «%s» for video; bytter til hovedenhet.\n"
+
+#, c-format
+msgid "Cannot open any X11 display for video.\n"
+msgstr ""
+
+#, c-format
+msgid "Bad geometry '%s'\n"
+msgstr "Ugyldig geometri «%s»\n"
+
 msgid "xine Video Window"
 msgstr "Videovindu for xine"
 
@@ -2576,10 +3093,6 @@ msgstr "Fullskjermvideovindu for xine"
 msgid "xine Video Borderless Window"
 msgstr "Rammeløst videovindu for xine"
 
-#, c-format
-msgid "XAllocWMHints() failed\n"
-msgstr "«XAllocWMHints()» feilet\n"
-
 msgid "New stream sizes resize output window"
 msgstr "Nye strømstørrelser endrer visningsvinduet"
 
@@ -2588,29 +3101,6 @@ msgstr "Dobbel størrelse for små strømmer (krever «stream_resize_window»)"
 
 msgid "use XVidModeExtension when switching to fullscreen"
 msgstr "Bruk «XVidMode»-utvidelsen for bytting til fullskjermmodus"
-
-#, c-format
-msgid "XF86VidMode Extension (%d.%d) detected, trying to use it.\n"
-msgstr "Fant utvidelsen «XF86VidMode» (%d.%d), prøver å bruke den.\n"
-
-#, c-format
-msgid "XF86VidMode Extension: %d modelines found.\n"
-msgstr "Fant %d moduslinjer for «XF86VidMode»-utvidelsen.\n"
-
-#, c-format
-msgid "XF86VidModeModeLine %dx%d isn't valid: discarded.\n"
-msgstr "«XF86VidModeModeLine %dx%d» er ugyldig, og blir oversett.\n"
-
-#, c-format
-msgid ""
-"XF86VidMode Extension: could not get list of available modelines. Failed.\n"
-msgstr ""
-"«XF86VidMode»-utvidelse: klarte ikke hente liste over tilgjengelige "
-"moduslinjer. Feilet.\n"
-
-#, c-format
-msgid "XF86VidMode Extension: initialization failed, not using it.\n"
-msgstr "«XF86VidMode»-utvidelse: initaliseringen feilet, så den brukes ikke.\n"
 
 msgid "log info"
 msgstr "logginformasjon"
@@ -2625,11 +3115,100 @@ msgstr "Loggviser for xine"
 msgid "Refresh"
 msgstr "Oppdater"
 
-#, fuzzy
+#, c-format
+#~ msgid "XSendEvent(display, 0x%x ...) failed.\n"
+#~ msgstr "«XSendEvent(display, 0x%x ...)» feilet.\n"
+
+#~ msgid "Error"
+#~ msgstr "Feil"
+
+#~ msgid "Warning"
+#~ msgstr "Advarsel"
+
+#, c-format
+#~ msgid ""
+#~ "gui_main: selected visual %#lx does not exist, trying default visual\n"
+#~ msgstr ""
+#~ "«gui_main»: valgte visuell  %#lx finnes ikke, prøver standardvisuell\n"
+
+#, c-format
+#~ msgid "gui_main: couldn't find true color visual.\n"
+#~ msgstr "«gui_main»: klarte ikke finne sannfarge-visuell.\n"
+
+#, c-format
+#~ msgid ""
+#~ "\n"
+#~ "XInitThreads failed - looks like you don't have a thread-safe xlib.\n"
+#~ msgstr ""
+#~ "\n"
+#~ "«XInitThreads» feilet; det ser ut som du ikke har en trådsikker versjon "
+#~ "av «xlib».\n"
+
+#, c-format
+#~ msgid "Warning! Synchronized X activated - this is very slow...\n"
+#~ msgstr ""
+#~ "Advarsel! Synkronisert X er aktivert; dette er veldig treigt . . .\n"
+
+#, c-format
+#~ msgid "Unable to initialize Imlib\n"
+#~ msgstr "Klarte ikke initalisere «Imlib»\n"
+
+#~ msgid "You can only delete alias entries."
+#~ msgstr "Du kan kun slette alias-oppføringer."
+
+#~ msgid "Event Receiver Window:  Press keyboard keys to bind..."
+#~ msgstr "Hendelsesmottakervindu:  Trykk på tastene..."
+
+#~ msgid "Accept?"
+#~ msgstr "Godta?"
+
+#, c-format
+#~ msgid "Bad visual '%s'\n"
+#~ msgstr "Dårlig visuell «%s»\n"
+
+#, c-format
+#~ msgid "Bad geometry '%s', see xine --help\n"
+#~ msgstr "«%s» er ikke en gyldig geometri; see «xine --help»\n"
+
+#, c-format
+#~ msgid "Ooch, skin not found, use fallback '%s'.\n"
+#~ msgstr "Den huden ble ikke funnet, nei; faller tilbake på «%s».\n"
+
+#~ msgid "XF86VidMode Extension: modeline switching failed.\n"
+#~ msgstr "«XF86VidMode»-utvidelse: moduslinjebytting feilet.\n"
+
+#, c-format
+#~ msgid "XAllocWMHints() failed\n"
+#~ msgstr "«XAllocWMHints()» feilet\n"
+
+#, c-format
+#~ msgid "XF86VidMode Extension (%d.%d) detected, trying to use it.\n"
+#~ msgstr "Fant utvidelsen «XF86VidMode» (%d.%d), prøver å bruke den.\n"
+
+#, c-format
+#~ msgid "XF86VidMode Extension: %d modelines found.\n"
+#~ msgstr "Fant %d moduslinjer for «XF86VidMode»-utvidelsen.\n"
+
+#, c-format
+#~ msgid "XF86VidModeModeLine %dx%d isn't valid: discarded.\n"
+#~ msgstr "«XF86VidModeModeLine %dx%d» er ugyldig, og blir oversett.\n"
+
+#, c-format
+#~ msgid ""
+#~ "XF86VidMode Extension: could not get list of available modelines. "
+#~ "Failed.\n"
+#~ msgstr ""
+#~ "«XF86VidMode»-utvidelse: klarte ikke hente liste over tilgjengelige "
+#~ "moduslinjer. Feilet.\n"
+
+#, c-format
+#~ msgid "XF86VidMode Extension: initialization failed, not using it.\n"
+#~ msgstr ""
+#~ "«XF86VidMode»-utvidelse: initaliseringen feilet, så den brukes ikke.\n"
+
 #~ msgid "..."
 #~ msgstr "Mer . . ."
 
-#, fuzzy
 #~ msgid "More sources..."
 #~ msgstr "Mer . . ."
 
