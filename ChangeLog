@@ -12,6 +12,7 @@ xine-ui (0.99.13)
   * Xinetic skin update.
   * Many small fixes and optinizations.
   * Update german translation.
+  * Update french translation.
   * Build fixes.
   * Faster build.
   * Separate xitk and X11 stuff pt 1.
