@@ -426,7 +426,7 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
     lb.state_callback    = tabs_select;
 
     for (i = 0; i < wp->num_entries; i++) {
-      int fwidth = xitk_font_get_string_length (fs, t->entries[i]) + 20;
+      int fwidth = xitk_font_get_string_length (fs, entries[i]) + 20;
 
       xa[i] = xx;
       wp->ref[i]  = i;
