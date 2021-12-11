@@ -351,7 +351,7 @@ static void gui_signal_handler (int sig, void *data) {
  * convert pts value to string
  */
 static const char *pts2str (char *buf, int pts) {
-  uint8_t *q = (uint8_t *)buf + 40;
+  char *q = buf + 40;
   uint32_t minus, val, v2;
 
   if (pts < 0)
@@ -387,7 +387,7 @@ static const char *pts2str (char *buf, int pts) {
   if (minus)
     *--q = '-';
 
-  return (const char *)q;
+  return q;
 }
 
 /*
