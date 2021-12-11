@@ -475,7 +475,7 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
       wp->right->type &= ~WIDGET_TABABLE;
       xitk_dlist_add_tail (&wl->list, &wp->right->node);
       xitk_widget_set_parent (wp->right, &wp->w);
-      xitk_widgets_state (&wp->left, 1, XITK_WIDGET_STATE_ENABLE, ~0u);
+      xitk_widgets_state (&wp->right, 1, XITK_WIDGET_STATE_ENABLE, ~0u);
     }
 
     right = wp->w.x + wp->w.width - 40;
