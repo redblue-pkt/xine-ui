@@ -5,15 +5,33 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui (xitk) 0.9.8\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2019-11-25 19:47+0100\n"
+"POT-Creation-Date: 2021-12-11 19:08+0200\n"
 "PO-Revision-Date: 2007-04-23 23:05+0200\n"
 "Last-Translator: Sergiy Kudryk <linux_ua@yahoo.com>\n"
 "Language-Team: Ukrainian <linux@linux.org.ua>\n"
+"Language: uk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=KOI8-U\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: uk\n"
 "X-Generator: KBabel 0.9.5\n"
+
+#, c-format
+msgid "Unable to initialize Imlib\n"
+msgstr ""
+
+#, c-format
+msgid "Cannot open display\n"
+msgstr ""
+
+#, c-format
+msgid "Warning! Synchronized X activated - this is very slow...\n"
+msgstr ""
+
+#, c-format
+msgid ""
+"\n"
+"XInitThreads failed - looks like you don't have a thread-safe xlib.\n"
+msgstr ""
 
 msgid "..."
 msgstr ""
@@ -21,32 +39,64 @@ msgstr ""
 msgid "More sources..."
 msgstr ""
 
-msgid "Select current entry"
-msgstr ""
-
-msgid "Play selected entry"
-msgstr ""
-
-msgid "Close MRL browser window"
-msgstr ""
-
 msgid "OK"
-msgstr "Так"
-
-msgid "Question?"
-msgstr "Питання?"
-
-msgid "Yes"
 msgstr "Так"
 
 msgid "No"
 msgstr "Н╕"
 
+msgid "Yes"
+msgstr "Так"
+
 msgid "Cancel"
 msgstr "В╕дмова"
+
+msgid "Question?"
+msgstr "Питання?"
+
+msgid "Select current entry"
+msgstr ""
+
+msgid "Close MRL browser window"
+msgstr ""
+
+msgid "Play selected entry"
+msgstr ""
+
+msgid "Information"
+msgstr ""
+
+msgid "Warning"
+msgstr ""
 
 msgid "Error"
 msgstr ""
 
-msgid "Information"
+#, c-format
+msgid "gui_main: selected visual %#lx does not exist, trying default visual\n"
+msgstr ""
+
+#, c-format
+msgid "gui_main: couldn't find true color visual.\n"
+msgstr ""
+
+#, c-format
+msgid "XF86VidMode Extension (%d.%d) detected, trying to use it.\n"
+msgstr ""
+
+#, c-format
+msgid "XF86VidMode Extension: %d modelines found.\n"
+msgstr ""
+
+#, c-format
+msgid "XF86VidModeModeLine %dx%d isn't valid: discarded.\n"
+msgstr ""
+
+#, c-format
+msgid ""
+"XF86VidMode Extension: could not get list of available modelines. Failed.\n"
+msgstr ""
+
+#, c-format
+msgid "XF86VidMode Extension: initialization failed, not using it.\n"
 msgstr ""

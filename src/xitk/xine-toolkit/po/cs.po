@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-0.9.9\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2019-11-25 19:47+0100\n"
+"POT-Creation-Date: 2021-12-11 19:08+0200\n"
 "PO-Revision-Date: 2007-04-23 23:05+0200\n"
 "Last-Translator: Frantisek Dvorak <valtri@atlas.cz>\n"
 "Language-Team: Czech <cs@li.org>\n"
@@ -15,38 +15,88 @@ msgstr ""
 "Content-Type: text/plain; charset=ISO-8859-2\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#, c-format
+msgid "Unable to initialize Imlib\n"
+msgstr ""
+
+#, c-format
+msgid "Cannot open display\n"
+msgstr ""
+
+#, c-format
+msgid "Warning! Synchronized X activated - this is very slow...\n"
+msgstr ""
+
+#, c-format
+msgid ""
+"\n"
+"XInitThreads failed - looks like you don't have a thread-safe xlib.\n"
+msgstr ""
+
 msgid "..."
 msgstr ""
 
 msgid "More sources..."
 msgstr ""
 
-msgid "Select current entry"
-msgstr "Vybrání aktuální polo¾ky"
-
-msgid "Play selected entry"
-msgstr "Pøehrání aktuální polo¾ky"
-
-msgid "Close MRL browser window"
-msgstr "Zavøení okna prohlí¾eèe MRL"
-
 msgid "OK"
 msgstr "OK"
-
-msgid "Question?"
-msgstr "Otázka?"
-
-msgid "Yes"
-msgstr "Ano"
 
 msgid "No"
 msgstr "Ne"
 
+msgid "Yes"
+msgstr "Ano"
+
 msgid "Cancel"
 msgstr "Zru¹it"
+
+msgid "Question?"
+msgstr "Otázka?"
+
+msgid "Select current entry"
+msgstr "Vybrání aktuální polo¾ky"
+
+msgid "Close MRL browser window"
+msgstr "Zavøení okna prohlí¾eèe MRL"
+
+msgid "Play selected entry"
+msgstr "Pøehrání aktuální polo¾ky"
+
+msgid "Information"
+msgstr "Informace"
+
+msgid "Warning"
+msgstr ""
 
 msgid "Error"
 msgstr "Chyba"
 
-msgid "Information"
-msgstr "Informace"
+#, c-format
+msgid "gui_main: selected visual %#lx does not exist, trying default visual\n"
+msgstr ""
+
+#, c-format
+msgid "gui_main: couldn't find true color visual.\n"
+msgstr ""
+
+#, c-format
+msgid "XF86VidMode Extension (%d.%d) detected, trying to use it.\n"
+msgstr ""
+
+#, c-format
+msgid "XF86VidMode Extension: %d modelines found.\n"
+msgstr ""
+
+#, c-format
+msgid "XF86VidModeModeLine %dx%d isn't valid: discarded.\n"
+msgstr ""
+
+#, c-format
+msgid ""
+"XF86VidMode Extension: could not get list of available modelines. Failed.\n"
+msgstr ""
+
+#, c-format
+msgid "XF86VidMode Extension: initialization failed, not using it.\n"
+msgstr ""
