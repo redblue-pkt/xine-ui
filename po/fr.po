@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.21\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2019-12-06 14:19+0200\n"
+"POT-Creation-Date: 2021-12-11 19:35+0200\n"
 "PO-Revision-Date: 2021-10-14 12:59+0200\n"
 "Last-Translator: Xavier Bachelot <xavier@bachelot.org>\n"
 "Language-Team: French <fr@li.org>\n"
@@ -79,6 +79,21 @@ msgstr "%s: l'option `-W %s' est ambigüe\n"
 #, c-format
 msgid "%s: option `-W %s' doesn't allow an argument\n"
 msgstr "%s: l'option `-W %s' ne permet pas d'argument\n"
+
+msgid "xine audio control Window"
+msgstr ""
+
+msgid "Audio amplification"
+msgstr ""
+
+msgid "Neutral sound"
+msgstr ""
+
+msgid "Dismiss"
+msgstr "Annuler"
+
+msgid "Close control window"
+msgstr "Ferme la fenêtre de contrôle"
 
 #. TRANSLATORS: only ASCII characters (skin)
 msgctxt "skin"
@@ -156,10 +171,6 @@ msgstr "Post plugins audio: %s."
 #, c-format
 msgid "TV Mode: %d"
 msgstr "Mode TV: %d"
-
-#, c-format
-msgid "XSendEvent(display, 0x%x ...) failed.\n"
-msgstr "XSendEvent(display, 0x%x ...) a échoué.\n"
 
 msgid "Select"
 msgstr "Choisir"
@@ -286,29 +297,22 @@ msgstr "Valeur du Contraste."
 msgid "Gamma value."
 msgstr "Valeur de la Teinte."
 
-#, fuzzy
 msgid "Sharpness value."
-msgstr "Valeur de la netteté."
+msgstr ""
 
 msgid "Noise reduction value."
 msgstr "Réduction du bruit."
 
-msgid "xine Control Window"
-msgstr "Fenêtre de contrôle de xine"
-
 msgid "control: couldn't find image for background\n"
 msgstr "control: ne trouve pas l'image de fond\n"
+
+msgid "xine Control Window"
+msgstr "Fenêtre de contrôle de xine"
 
 #. TRANSLATORS: only ASCII characters (skin)
 msgctxt "skin"
 msgid "Choose a Skin"
 msgstr "Choisir une apparence"
-
-msgid "Dismiss"
-msgstr "Annuler"
-
-msgid "Close control window"
-msgstr "Ferme la fenêtre de contrôle"
 
 #, c-format
 msgid "%s(): couldn't find image for background\n"
@@ -328,9 +332,6 @@ msgstr "Terminé"
 
 msgid "More..."
 msgstr "Plus..."
-
-msgid "Error"
-msgstr "Erreur"
 
 #, c-format
 msgid ""
@@ -399,9 +400,6 @@ msgstr ""
 msgid "Opening mozilla web browser, this might take a while..."
 msgstr "Execution du navigateur internet mozilla, soyez patient..."
 
-msgid "Warning"
-msgstr "Attention"
-
 msgid ""
 "The amount of dropped frame is too high, your system might be slow, not "
 "properly optimized or just too loaded.\n"
@@ -414,8 +412,7 @@ msgstr ""
 "http://www.xine-project.org/faq#SPEEDUP"
 
 msgid "Warn user when too much frames are dropped."
-msgstr ""
-"Prévenir l'utilisateur quand trop de trames sont perdues."
+msgstr "Prévenir l'utilisateur quand trop de trames sont perdues."
 
 msgid "Learn More..."
 msgstr "En Apprendre Plus..."
@@ -479,16 +476,6 @@ msgstr "Arrêt"
 msgid "Continue"
 msgstr "Continue"
 
-#, c-format
-msgid "gui_main: selected visual %#lx does not exist, trying default visual\n"
-msgstr ""
-"gui_main: visuel sélectionné %#lx inexistant, utilisation du visuel par "
-"défaut\n"
-
-#, c-format
-msgid "gui_main: couldn't find true color visual.\n"
-msgstr "gui_main: ne trouve pas de visuel en vraies couleurs.\n"
-
 msgid "Enable extra XLib thread safety."
 msgstr ""
 
@@ -499,40 +486,6 @@ msgstr ""
 "Nécessaire pour certaines très vieilles versions de XLib/XCB.\n"
 "Dans les autres cas, il peut améliorer ou réduire les performances - Essayez."
 
-#, c-format
-msgid ""
-"\n"
-"XInitThreads failed - looks like you don't have a thread-safe xlib.\n"
-msgstr ""
-"\n"
-"XInitThreads a échoué - il semble que vous ne possédiez pas une xlib sûre.\n"
-
-#, c-format
-msgid "Cannot open display\n"
-msgstr "Impossible d'ouvrir l'affichage\n"
-
-msgid "Name of video display"
-msgstr "Nom de l'affichage vidéo"
-
-msgid ""
-"Use this setting to configure to which display xine will show videos. When "
-"left blank, the main display will be used. Setting this option to something "
-"like ':0.1' or ':1' makes possible to display video and control on different "
-"screens (very useful for TV presentations)."
-msgstr ""
-"Utilisez ce paramètre pour configurer quel écran xine devras utiliser pour "
-"afficher les vidéos.\n"
-"Quand il est laissé vide, l'écran principal est utilisé. Le définir à "
-"':0.1' ou ':1' rends possible\n"
-"l'affichage et le contrôle de différents écrans (très utile pour les "
-"présentations TV)."
-
-#, c-format
-msgid "Cannot open display '%s' for video. Falling back to primary display.\n"
-msgstr ""
-"Impossible d'ouvrir l'affichage '%s' pour la vidéo. Utilise l'affichage "
-"principal.\n"
-
 msgid "Synchronized X protocol (debug)"
 msgstr "Protocole X synchronisé (debug)"
 
@@ -541,10 +494,6 @@ msgid ""
 msgstr ""
 "Effectue les transactions X en mode synchrone. Très lent, à n'utiliser que "
 "pour debogger !"
-
-#, c-format
-msgid "Warning! Synchronized X activated - this is very slow...\n"
-msgstr "Attention ! Synchronisation X activée - cela ralenti l'exécution...\n"
 
 msgid "Windows stacking"
 msgstr "Empilement des fenêtres"
@@ -703,9 +652,23 @@ msgstr "Style de raccourcis"
 msgid "Shortcut representation in menu, 'Ctrl,Alt' or 'C,M'."
 msgstr "Représentation des raccourcis dans les menus, 'Ctrl,Alt' ou 'C,M'."
 
-#, c-format
-msgid "Unable to initialize Imlib\n"
-msgstr "Impossible d'initialiser Imlib\n"
+msgid "Up"
+msgstr "Haut"
+
+msgid "Left"
+msgstr "Gauche"
+
+msgid "Right"
+msgstr "Droite"
+
+msgid "Down"
+msgstr "Bas"
+
+msgid "Angle +"
+msgstr "Angle +"
+
+msgid "Angle -"
+msgstr "Angle -"
 
 msgid "Menu toggle"
 msgstr "Bascule menu"
@@ -749,6 +712,21 @@ msgstr "Menu 6"
 msgid "Menu 7"
 msgstr "Menu 7"
 
+msgid "Menu"
+msgstr ""
+
+msgid "Red"
+msgstr ""
+
+msgid "Green"
+msgstr ""
+
+msgid "Yellow"
+msgstr ""
+
+msgid "Blue"
+msgstr ""
+
 msgid "Menu 1"
 msgstr "Menu 1"
 
@@ -757,24 +735,6 @@ msgstr "Menu 2"
 
 msgid "xine Event Sender"
 msgstr "Générateur d'évènement de xine"
-
-msgid "Up"
-msgstr "Haut"
-
-msgid "Left"
-msgstr "Gauche"
-
-msgid "Right"
-msgstr "Droite"
-
-msgid "Down"
-msgstr "Bas"
-
-msgid "Angle +"
-msgstr "Angle +"
-
-msgid "Angle -"
-msgstr "Angle -"
 
 msgid "Close"
 msgstr "Fermer"
@@ -862,29 +822,11 @@ msgstr "Aucune entrée sélectionnée"
 msgid "None"
 msgstr "Aucune"
 
-msgid "You can only delete alias entries."
-msgstr "Vous ne pouvez supprimer que les entrées alias."
+msgid "Grab"
+msgstr "Capture"
 
 msgid "No more space for additional entries!"
 msgstr "Plus de place pour des entrées additionnelles !"
-
-msgid "Press Keyboard Keys..."
-msgstr "Appuyez sur les touches du clavier..."
-
-msgid "Event Receiver Window:  Press keyboard keys to bind..."
-msgstr ""
-"Fenêtre de réception d'évènements:  Appuyez sur les touches du clavier..."
-
-msgid "Accept?"
-msgstr "Accepter ?"
-
-#, c-format
-msgid ""
-"Store %s as\n"
-"'%s' key binding ?"
-msgstr ""
-"Enregistre %s comme raccourci de\n"
-"'%s' ?"
 
 #, c-format
 msgid ""
@@ -893,6 +835,12 @@ msgid ""
 msgstr ""
 "Cette séquence de touches est redondante avec l'action :\n"
 "\"%s\".\n"
+
+msgid "Store new key binding"
+msgstr ""
+
+msgid "Press keyboard keys to bind..."
+msgstr ""
 
 msgid "Key Binding Editor"
 msgstr "Editeur de raccourcis clavier"
@@ -933,15 +881,564 @@ msgstr "mod4"
 msgid "mod5"
 msgstr "mod5"
 
-msgid "Grab"
-msgstr "Capture"
+msgid "start playback"
+msgstr ""
+
+msgid "playback pause toggle"
+msgstr ""
+
+msgid "stop playback"
+msgstr ""
+
+msgid "close stream"
+msgstr ""
+
+msgid "take a snapshot"
+msgstr ""
+
+msgid "eject the current medium"
+msgstr ""
+
+msgid "select and play next MRL in the playlist"
+msgstr ""
+
+msgid "select and play previous MRL in the playlist"
+msgstr ""
+
+msgid "select and play MRL in the playlist"
+msgstr ""
+
+msgid "loop mode toggle"
+msgstr ""
+
+msgid "stop playback after played stream"
+msgstr ""
+
+msgid "scan playlist to grab stream infos"
+msgstr ""
+
+msgid "add a mediamark from current playback"
+msgstr ""
+
+msgid "edit selected mediamark"
+msgstr ""
+
+msgid "set position to -60 seconds in current stream"
+msgstr ""
+
+msgid "set position to +60 seconds in current stream"
+msgstr ""
+
+msgid "set position to -30 seconds in current stream"
+msgstr ""
+
+msgid "set position to +30 seconds in current stream"
+msgstr ""
+
+msgid "set position to -15 seconds in current stream"
+msgstr ""
+
+msgid "set position to +15 seconds in current stream"
+msgstr ""
+
+msgid "set position to -7 seconds in current stream"
+msgstr ""
+
+msgid "set position to +7 seconds in current stream"
+msgstr ""
+
+msgid "set position to beginning of current stream"
+msgstr ""
+
+msgid "set position to 1/10 of current stream"
+msgstr ""
+
+msgid "set position to 2/10 of current stream"
+msgstr ""
+
+msgid "set position to 3/10 of current stream"
+msgstr ""
+
+msgid "set position to 4/10 of current stream"
+msgstr ""
+
+msgid "set position to 5/10 of current stream"
+msgstr ""
+
+msgid "set position to 6/10 of current stream"
+msgstr ""
+
+msgid "set position to 7/10 of current stream"
+msgstr ""
+
+msgid "set position to 8/10 of current stream"
+msgstr ""
+
+msgid "set position to 9/10 of current stream"
+msgstr ""
+
+msgid "set position to end of current stream"
+msgstr ""
+
+msgid "increment playback speed"
+msgstr ""
+
+msgid "decrement playback speed"
+msgstr ""
+
+msgid "reset playback speed"
+msgstr ""
+
+msgid "increment audio volume"
+msgstr ""
+
+msgid "decrement audio volume"
+msgstr ""
+
+msgid "increment amplification level"
+msgstr ""
+
+msgid "decrement amplification level"
+msgstr ""
+
+msgid "reset amplification to default value"
+msgstr ""
+
+msgid "audio muting toggle"
+msgstr ""
+
+msgid "select next audio channel"
+msgstr ""
+
+msgid "select previous audio channel"
+msgstr ""
+
+msgid "visibility toggle of audio post effect window"
+msgstr ""
+
+msgid "toggle post effect usage"
+msgstr ""
+
+msgid "select next sub picture (subtitle) channel"
+msgstr ""
+
+msgid "select previous sub picture (subtitle) channel"
+msgstr ""
+
+msgid "interlaced mode toggle"
+msgstr ""
+
+msgid "cycle aspect ratio values"
+msgstr ""
+
+msgid "reduce the output window size by factor 1.2"
+msgstr ""
+
+msgid "enlarge the output window size by factor 1.2"
+msgstr ""
+
+msgid "set video output window to 50%"
+msgstr ""
+
+msgid "set video output window to 100%"
+msgstr ""
+
+msgid "set video output window to 200%"
+msgstr ""
+
+msgid "zoom in"
+msgstr ""
+
+msgid "zoom out"
+msgstr ""
+
+msgid "zoom in horizontally"
+msgstr ""
+
+msgid "zoom out horizontally"
+msgstr ""
+
+msgid "zoom in vertically"
+msgstr ""
+
+msgid "zoom out vertically"
+msgstr ""
+
+msgid "reset zooming"
+msgstr ""
+
+msgid "resize output window to stream size"
+msgstr ""
+
+msgid "fullscreen toggle"
+msgstr ""
+
+msgid "Xinerama fullscreen toggle"
+msgstr ""
+
+msgid "jump to media Menu"
+msgstr ""
+
+msgid "jump to Title Menu"
+msgstr ""
+
+msgid "jump to Root Menu"
+msgstr ""
+
+msgid "jump to Subpicture Menu"
+msgstr ""
+
+msgid "jump to Audio Menu"
+msgstr ""
+
+msgid "jump to Angle Menu"
+msgstr ""
+
+msgid "jump to Part Menu"
+msgstr ""
+
+msgid "menu navigate up"
+msgstr ""
+
+msgid "menu navigate down"
+msgstr ""
+
+msgid "menu navigate left"
+msgstr ""
+
+msgid "menu navigate right"
+msgstr ""
+
+msgid "menu select"
+msgstr ""
+
+msgid "jump to next chapter"
+msgstr ""
+
+msgid "jump to previous chapter"
+msgstr ""
+
+msgid "select next angle"
+msgstr ""
+
+msgid "select previous angle"
+msgstr ""
+
+msgid "visibility toggle of help window"
+msgstr ""
+
+msgid "visibility toggle of video post effect window"
+msgstr ""
+
+msgid "visibility toggle of output window"
+msgstr ""
+
+msgid "bordered window toggle of output window"
+msgstr ""
+
+msgid "visibility toggle of UI windows"
+msgstr ""
+
+msgid "visibility toggle of control window"
+msgstr ""
+
+msgid "visibility toggle of audio control window"
+msgstr ""
+
+msgid "visibility toggle of mrl browser window"
+msgstr ""
+
+msgid "visibility toggle of playlist editor window"
+msgstr ""
+
+msgid "visibility toggle of the setup window"
+msgstr ""
+
+msgid "visibility toggle of the event sender window"
+msgstr ""
+
+msgid "visibility toggle of analog TV window"
+msgstr ""
+
+msgid "visibility toggle of log viewer"
+msgstr ""
+
+msgid "visibility toggle of stream info window"
+msgstr ""
+
+msgid "display stream information using OSD"
+msgstr ""
+
+msgid "display information using OSD"
+msgstr ""
+
+msgid "show OSD menu"
+msgstr ""
+
+msgid "enter key binding editor"
+msgstr ""
+
+msgid "enable key bindings (not useful to bind a key to it!)"
+msgstr ""
+
+msgid "open file selector"
+msgstr ""
+
+msgid "select a subtitle file"
+msgstr ""
+
+msgid "download a skin from the skin server"
+msgstr ""
+
+msgid "display MRL/Ident toggle"
+msgstr ""
+
+msgid "grab pointer toggle"
+msgstr ""
+
+msgid "enter the number 0"
+msgstr ""
+
+msgid "enter the number 1"
+msgstr ""
+
+msgid "enter the number 2"
+msgstr ""
+
+msgid "enter the number 3"
+msgstr ""
+
+msgid "enter the number 4"
+msgstr ""
+
+msgid "enter the number 5"
+msgstr ""
+
+msgid "enter the number 6"
+msgstr ""
+
+msgid "enter the number 7"
+msgstr ""
+
+msgid "enter the number 8"
+msgstr ""
+
+msgid "enter the number 9"
+msgstr ""
+
+msgid "add 10 to the next entered number"
+msgstr ""
+
+msgid "set position in current stream to numeric percentage"
+msgstr ""
+
+msgid "set position forward by numeric argument in current stream"
+msgstr ""
+
+msgid "set position back by numeric argument in current stream"
+msgstr ""
+
+msgid "change audio video syncing (delay video)"
+msgstr ""
+
+msgid "change audio video syncing (delay audio)"
+msgstr ""
+
+msgid "reset audio video syncing offset"
+msgstr ""
+
+msgid "change subtitle syncing (delay video)"
+msgstr ""
+
+msgid "change subtitle syncing (delay subtitles)"
+msgstr ""
+
+msgid "reset subtitle syncing offset"
+msgstr ""
+
+msgid "toggle TV modes (on the DXR3)"
+msgstr ""
+
+msgid "switch Monitor to DPMS standby mode"
+msgstr ""
+
+msgid "increase hue by 10"
+msgstr ""
+
+msgid "decrease hue by 10"
+msgstr ""
+
+msgid "increase saturation by 10"
+msgstr ""
+
+msgid "decrease saturation by 10"
+msgstr ""
+
+msgid "increase brightness by 10"
+msgstr ""
+
+msgid "decrease brightness by 10"
+msgstr ""
+
+msgid "increase contrast by 10"
+msgstr ""
+
+msgid "decrease contrast by 10"
+msgstr ""
+
+msgid "increase gamma by 10"
+msgstr ""
+
+msgid "decrease gamma by 10"
+msgstr ""
+
+msgid "increase sharpness by 10"
+msgstr ""
+
+msgid "decrease sharpness by 10"
+msgstr ""
+
+msgid "increase noise reduction by 10"
+msgstr ""
+
+msgid "decrease noise reduction by 10"
+msgstr ""
+
+msgid "quit the program"
+msgstr ""
+
+msgid "input_pvr: set input"
+msgstr ""
+
+msgid "input_pvr: set frequency"
+msgstr ""
+
+msgid "input_pvr: mark the start of a new stream section"
+msgstr ""
+
+msgid "input_pvr: set the name for the current stream section"
+msgstr ""
+
+msgid "input_pvr: save the stream section"
+msgstr ""
+
+msgid "Open playlist"
+msgstr ""
+
+msgid "VDR Red button"
+msgstr ""
+
+msgid "VDR Green button"
+msgstr ""
+
+msgid "VDR Yellow button"
+msgstr ""
+
+msgid "VDR Blue button"
+msgstr ""
+
+msgid "VDR Play"
+msgstr ""
+
+msgid "VDR Pause"
+msgstr ""
+
+msgid "VDR Stop"
+msgstr ""
+
+msgid "VDR Record"
+msgstr ""
+
+msgid "VDR Fast forward"
+msgstr ""
+
+msgid "VDR Fast rewind"
+msgstr ""
+
+msgid "VDR Power"
+msgstr ""
+
+msgid "VDR Channel +"
+msgstr ""
+
+msgid "VDR Channel -"
+msgstr ""
+
+msgid "VDR Schedule menu"
+msgstr ""
+
+msgid "VDR Channel menu"
+msgstr ""
+
+msgid "VDR Timers menu"
+msgstr ""
+
+msgid "VDR Recordings menu"
+msgstr ""
+
+msgid "VDR Setup menu"
+msgstr ""
+
+msgid "VDR Command menu"
+msgstr ""
+
+msgid "VDR Command back"
+msgstr ""
+
+msgid "VDR User command 0"
+msgstr ""
+
+msgid "VDR User command 1"
+msgstr ""
+
+msgid "VDR User command 2"
+msgstr ""
+
+msgid "VDR User command 3"
+msgstr ""
+
+msgid "VDR User command 4"
+msgstr ""
+
+msgid "VDR User command 5"
+msgstr ""
+
+msgid "VDR User command 6"
+msgstr ""
+
+msgid "VDR User command 7"
+msgstr ""
+
+msgid "VDR User command 8"
+msgstr ""
+
+msgid "VDR User command 9"
+msgstr ""
+
+msgid "VDR Volume +"
+msgstr ""
+
+msgid "VDR Volume -"
+msgstr ""
+
+msgid "VDR Mute audio"
+msgstr ""
+
+msgid "VDR Audio menu"
+msgstr ""
+
+msgid "VDR Command info"
+msgstr ""
+
+msgid "VDR Previous channel"
+msgstr ""
+
+msgid "VDR Subtiles menu"
+msgstr ""
 
 #, c-format
 msgid "xine-ui: Too many Alias entries in keymap file, entry ignored.\n"
 msgstr "xine-ui: Trop d'entrées Alias dans le fichier keymap, entrée ignoré.\n"
-
-msgid "and"
-msgstr "et"
 
 msgid ""
 "The following key bindings pairs are identical:\n"
@@ -949,6 +1446,9 @@ msgid ""
 msgstr ""
 "Les séquences de touches suivantes sont redondantes :\n"
 "\n"
+
+msgid "and"
+msgstr "et"
 
 msgid ""
 ".\n"
@@ -967,14 +1467,6 @@ msgstr "Éditeur"
 
 msgid "Unknown"
 msgstr "Inconnu"
-
-#, c-format
-msgid "Bad geometry '%s'\n"
-msgstr "Mauvaise géométrie '%s'\n"
-
-#, c-format
-msgid "Bad visual '%s'\n"
-msgstr "Mauvais visuel '%s'\n"
 
 #, c-format
 msgid "This is xine (X11 gui) - a free video player v%s"
@@ -1153,8 +1645,8 @@ msgid ""
 "id.\n"
 msgstr ""
 "      --visual <classe-ou-nom> Utilise le visuel X11 spécifié.\n"
-"                               <classe-ou-nom> est une classe visuelle X11 ou"
-"                               un id de visuel.\n"
+"                               <classe-ou-nom> est une classe visuelle X11 "
+"ou                               un id de visuel.\n"
 
 #, c-format
 msgid "      --install                Install a private colormap.\n"
@@ -1173,18 +1665,18 @@ msgid ""
 "                                 -if no option is given, 'default' is "
 "selected.\n"
 msgstr ""
-"      --keymap [=option]       Affiche les séquences clavier. Les options"
-" sont :\n"
-"                                 'default' : affiche les séquences clavier"
-" originales,\n"
-"                                 'lirc' : affiche le brouillon d'un fichier"
-" de configuration .lircrc.\n"
-"                                 'remapped' : affiche les séquences"
-" modifiées.\n"
-"                                 'file:<fichier>' : utilise <fichier> comme"
-" fichier de séquences.\n"
-"                                 -si aucune option n'est donnée, 'default'"
-" sera sélectionné.\n"
+"      --keymap [=option]       Affiche les séquences clavier. Les options "
+"sont :\n"
+"                                 'default' : affiche les séquences clavier "
+"originales,\n"
+"                                 'lirc' : affiche le brouillon d'un fichier "
+"de configuration .lircrc.\n"
+"                                 'remapped' : affiche les séquences "
+"modifiées.\n"
+"                                 'file:<fichier>' : utilise <fichier> comme "
+"fichier de séquences.\n"
+"                                 -si aucune option n'est donnée, 'default' "
+"sera sélectionné.\n"
 
 #, c-format
 msgid "  -n, --network                Enable network remote control server.\n"
@@ -1250,12 +1742,12 @@ msgstr ""
 "                                Les modes sont:\n"
 "                                 'loop': boucle toute la liste.\n"
 "                                 'repeat': Répète la sélection courante.\n"
-"                                 'shuffle': sélection aléatoire d'une entrée"
-" \n"
+"                                 'shuffle': sélection aléatoire d'une "
+"entrée \n"
 "                                            non jouée.\n"
-"                                 'shuffle+': identique à shuffle, mais"
-"                                            rejoue indéfiniment la liste de"
-" lecture.\n"
+"                                 'shuffle+': identique à shuffle, "
+"mais                                            rejoue indéfiniment la liste "
+"de lecture.\n"
 
 #, c-format
 msgid "      --skin-server-url <url>  Define the skin server url.\n"
@@ -1265,9 +1757,8 @@ msgstr "      --skin-server-url <url>  Spécifie le serveur d'apparence.\n"
 msgid ""
 "      --enqueue <mrl> ...      Enqueue mrl of a running session (session 0)\n"
 msgstr ""
-"      --enqueue <mrl> ...      Ajoute la mrl à la session en cours"
-" d'exécution "
-"(session 0)\n"
+"      --enqueue <mrl> ...      Ajoute la mrl à la session en cours "
+"d'exécution (session 0)\n"
 
 #, c-format
 msgid ""
@@ -1411,8 +1902,8 @@ msgstr ""
 #, c-format
 msgid "      --disable-post           Don't enable post plugin(s).\n"
 msgstr ""
-"      --disable-post           Ne mets pas en fonction le(s) plugin(s) de"
-" post-traitement.\n"
+"      --disable-post           Ne mets pas en fonction le(s) plugin(s) de "
+"post-traitement.\n"
 
 #, c-format
 msgid "      --no-splash              Don't display the splash screen.\n"
@@ -1538,9 +2029,6 @@ msgstr ""
 "*roulement de tambour*, la bibliothèque xine requière votre attention afin "
 "de vous délivrer un message important ;-):"
 
-msgid "No information available."
-msgstr "Pas d'information disponible."
-
 msgid ""
 "The host you're trying to connect is unknown.\n"
 "Check the validity of the specified hostname."
@@ -1605,8 +2093,14 @@ msgstr ""
 msgid "Sorry, not implemented (authentication)"
 msgstr "Désolé, non implémenté (authentification)"
 
+msgid "The following stream has finished recording:"
+msgstr ""
+
 msgid "*sight*, unknown error."
 msgstr "*argl*, erreur inconnue."
+
+msgid "No information available."
+msgstr "Pas d'information disponible."
 
 #, c-format
 msgid "Require xine library version 1.0.0, found %d.%d.%d.\n"
@@ -1627,10 +2121,6 @@ msgstr "Mauvaise valeur de ration d'aspect '%s', voir xine --help\n"
 #, c-format
 msgid "Bad port number: %d\n"
 msgstr "Mauvais numéro de port: %d\n"
-
-#, c-format
-msgid "Bad geometry '%s', see xine --help\n"
-msgstr "Mauvaise géométrie '%s', voir xine --help\n"
 
 #, c-format
 msgid "Bad loop mode '%s', see xine --help\n"
@@ -1708,17 +2198,29 @@ msgstr "Editeur de Mediamark"
 msgid "Identifier"
 msgstr "Identificateur"
 
-msgid "Mediamark Identifier"
-msgstr "Identificateur du Mediamark"
-
 msgid "Mrl"
 msgstr "Mrl"
 
-msgid "Mediamark Mrl"
-msgstr "Mrl du  Mediamark"
-
 msgid "Subtitle"
 msgstr "Sous-titre"
+
+msgid "Start at"
+msgstr "Début à"
+
+msgid "End at"
+msgstr "Fin à"
+
+msgid "A/V offset"
+msgstr "Offset A/V"
+
+msgid "SPU offset"
+msgstr "Offset SPU"
+
+msgid "Mediamark Identifier"
+msgstr "Identificateur du Mediamark"
+
+msgid "Mediamark Mrl"
+msgstr "Mrl du  Mediamark"
 
 msgid "Subtitle File"
 msgstr "Fichier Sous-Titre"
@@ -1729,26 +2231,14 @@ msgstr "Sous-Titre"
 msgid "Select a subtitle file to use together with the mrl."
 msgstr "Sélectionnez un fichier de sous-titre à utiliser avec cette mrl."
 
-msgid "Start at"
-msgstr "Début à"
-
 msgid "Mediamark start time (secs)."
 msgstr "Début du mediamark (secs)."
-
-msgid "End at"
-msgstr "Fin à"
 
 msgid "Mediamark end time (secs)."
 msgstr "Fin du mediamark (secs)."
 
-msgid "A/V offset"
-msgstr "Offset A/V"
-
 msgid "Offset of Audio and Video."
 msgstr "Offset de l'Audio et de la Vidéo."
-
-msgid "SPU offset"
-msgstr "Offset SPU"
 
 msgid "Subpicture offset."
 msgstr "Offset sous-titre."
@@ -1773,6 +2263,9 @@ msgstr "Affiche la fenêtre de sortie vidéo"
 
 msgid "Fullscreen"
 msgstr "Plein écran"
+
+msgid "Window frame"
+msgstr ""
 
 msgid "Open"
 msgstr "Ouvrir"
@@ -1960,6 +2453,9 @@ msgstr "Réglages/Éditeur de Raccourcis Clavier..."
 msgid "Settings/Video..."
 msgstr "Réglages/Vidéo..."
 
+msgid "Settings/Audio..."
+msgstr ""
+
 msgid "Settings/TV Analog..."
 msgstr "Réglages/TV analogique..."
 
@@ -2091,6 +2587,9 @@ msgstr "Bruyant"
 msgid "Audio: %s"
 msgstr "Audio: %s"
 
+msgid "gui panel visibility"
+msgstr "visibilité du panneau"
+
 msgid "Volume control"
 msgstr "Contrôle du volume"
 
@@ -2103,14 +2602,32 @@ msgstr "Panneau de xine"
 msgid "panel: couldn't find image for background\n"
 msgstr "panel : image de fond non trouvée.\n"
 
+msgid "panel: couldn't create window\n"
+msgstr ""
+
+msgid "Previous audio channel"
+msgstr "Canal audio précédent"
+
+msgid "Previous SPU channel"
+msgstr "Canal sous-titre précédent"
+
+msgid "Slow motion"
+msgstr "Ralenti"
+
+msgid "Next audio channel"
+msgstr "Canal audio suivant"
+
+msgid "Next SPU channel"
+msgstr "Canal sous-titre suivant"
+
+msgid "Fast motion"
+msgstr "Accélère"
+
 msgid "Stop playback"
 msgstr "Stoppe la lecture"
 
 msgid "Play selected entry"
 msgstr "Joue l'entrée sélectionnée"
-
-msgid "Pause/Resume playback"
-msgstr "Pause/Reprise lecture"
 
 msgid "Eject current medium"
 msgstr "Éjecte le medium courant"
@@ -2121,23 +2638,23 @@ msgstr "Fenêtre de réglage"
 msgid "Navigator"
 msgstr "Navigateur"
 
-msgid "Hide GUI"
-msgstr "Cache l'interface utilisateur"
-
 msgid "Fullscreen/Window mode"
 msgstr "Mode plein écran/fenêtre"
 
-msgid "Next audio channel"
-msgstr "Canal audio suivant"
+msgid "Control"
+msgstr "Contrôle"
 
-msgid "Previous audio channel"
-msgstr "Canal audio précédent"
+msgid "Audio control"
+msgstr ""
 
-msgid "Next SPU channel"
-msgstr "Canal sous-titre suivant"
+msgid "Open Location"
+msgstr "Ouvrir Emplacement"
 
-msgid "Previous SPU channel"
-msgstr "Canal sous-titre précédent"
+msgid "Hide GUI"
+msgstr "Cache l'interface utilisateur"
+
+msgid "Take a snapshot"
+msgstr "Capture une image"
 
 msgid "Total time: --:--:--"
 msgstr "Temps total: --:--:--"
@@ -2145,20 +2662,8 @@ msgstr "Temps total: --:--:--"
 msgid "Stream playback position slider"
 msgstr "Curseur de position de lecture du flux"
 
-msgid "Take a snapshot"
-msgstr "Capture une image"
-
-msgid "Slow motion"
-msgstr "Ralenti"
-
-msgid "Fast motion"
-msgstr "Accélère"
-
-msgid "Control"
-msgstr "Contrôle"
-
-msgid "Open Location"
-msgstr "Ouvrir Emplacement"
+msgid "Pause/Resume playback"
+msgstr "Pause/Reprise lecture"
 
 msgid "gui tips visibility"
 msgstr "bulle d'aide visible"
@@ -2171,9 +2676,6 @@ msgstr "Timeout des bulles d'aide (ms)"
 
 msgid "Persistence time of tooltips, in milliseconds."
 msgstr "Temps de persistance des bulles d'aide, en millisecondes."
-
-msgid "gui panel visibility"
-msgstr "visibilité du panneau"
 
 msgid "Load"
 msgstr "Charge"
@@ -2310,6 +2812,9 @@ msgstr "Réglage de xine"
 msgid "(*)  you need to restart xine for this setting to take effect"
 msgstr "(*) vous devez relancer xine pour que ces réglages prennent effet"
 
+msgid "Skin theme"
+msgstr ""
+
 #, c-format
 msgid "Failed to load %s/%s. Load fallback skin %s\n"
 msgstr "Échec au chargement de %s/%s. Recharge apparence de secours '%s'.\n"
@@ -2325,15 +2830,17 @@ msgstr ""
 "'%s'.\n"
 
 #, c-format
-msgid "Ooch, skin not found, use fallback '%s'.\n"
-msgstr "Ouille, apparence non trouvée, utilise l'apparence de secours '%s'.\n"
-
-#, c-format
 msgid "No available skin found. Say goodbye.\n"
 msgstr "Pas d'apparence trouvée. Au revoir.\n"
 
 msgid "gui skin theme"
 msgstr "Thème visuel"
+
+msgid "Grapics quality"
+msgstr ""
+
+msgid "Trade speed for quality with some screen modes."
+msgstr ""
 
 #, c-format
 msgid "Ooch, gui.skin config entry isn't registered. Say goodbye.\n"
@@ -2375,12 +2882,12 @@ msgid "Unable to create '%s' directory: %s."
 msgstr "Impossible de créer le répertoire '%s': %s."
 
 #, c-format
-msgid "Skin %s correctly installed"
-msgstr "L'apparence %s a été correctement installée."
-
-#, c-format
 msgid "Unable to create '%s'."
 msgstr "Impossible de créer '%s'."
+
+#, c-format
+msgid "Skin %s correctly installed"
+msgstr "L'apparence %s a été correctement installée."
 
 msgid "Be patient..."
 msgstr "Soyez patient..."
@@ -2394,6 +2901,9 @@ msgstr "Choisissez une apparence à télécharger..."
 
 msgid "Error: "
 msgstr "Erreur: "
+
+msgid "PNG Parsing failed\n"
+msgstr "PNG Parsing a échoué\n"
 
 msgid "xine_grab_video_frame.grab () failed\n"
 msgstr "xine_grab_video_frame.grab () a échoué\n"
@@ -2415,9 +2925,6 @@ msgstr "png_create_write_struct() a échoué\n"
 
 msgid "png_create_info_struct() failed\n"
 msgstr "png_create_info_struct() a échoué\n"
-
-msgid "PNG Parsing failed\n"
-msgstr "PNG Parsing a échoué\n"
 
 msgid "File written: "
 msgstr "Le fichier a été crée: "
@@ -2443,11 +2950,11 @@ msgstr "rgb_alloc() a échoué\n"
 msgid "xine Splash"
 msgstr "xine Splash"
 
-msgid "Stream Information"
-msgstr "Information du flux"
-
 msgid "General"
 msgstr "Général"
+
+msgid "Misc"
+msgstr "Divers"
 
 msgid "Title: "
 msgstr "Titre: "
@@ -2466,9 +2973,6 @@ msgstr "Année: "
 
 msgid "Album: "
 msgstr "Album: "
-
-msgid "Misc"
-msgstr "Divers"
 
 msgid "Input Plugin: "
 msgstr "Plugin d'Entrée: "
@@ -2526,6 +3030,15 @@ msgstr "Bits: "
 
 msgid "Samplerate: "
 msgstr "Taux Echant.: "
+
+msgid "Stream Information"
+msgstr "Information du flux"
+
+msgid "Yes"
+msgstr ""
+
+msgid "No"
+msgstr ""
 
 msgid "Update"
 msgstr "MàJ"
@@ -2592,9 +3105,6 @@ msgstr ""
 msgid "videowin: output driver overrides selected visual to visual id 0x%lx\n"
 msgstr "videowin: le pilote de sortie a forcé le visuel sélectionné à 0x%lx\n"
 
-msgid "XF86VidMode Extension: modeline switching failed.\n"
-msgstr "Extension XF86VidMode: le changement de modeline a échoué.\n"
-
 msgid ""
 "Screens to use in order to do a very fullscreen in xinerama mode. (example 0 "
 "2 3)"
@@ -2620,6 +3130,36 @@ msgstr "Largeur pour le plein écran xinerama (-8192 = autodétection)"
 msgid "height for xinerama fullscreen (-8192 = autodetect)"
 msgstr "Hauteur pour le plein écran xinerama (-8192 = autodétection)"
 
+msgid "Name of video display"
+msgstr "Nom de l'affichage vidéo"
+
+msgid ""
+"Use this setting to configure to which display xine will show videos. When "
+"left blank, the main display will be used. Setting this option to something "
+"like ':0.1' or ':1' makes possible to display video and control on different "
+"screens (very useful for TV presentations)."
+msgstr ""
+"Utilisez ce paramètre pour configurer quel écran xine devras utiliser pour "
+"afficher les vidéos.\n"
+"Quand il est laissé vide, l'écran principal est utilisé. Le définir à ':0.1' "
+"ou ':1' rends possible\n"
+"l'affichage et le contrôle de différents écrans (très utile pour les "
+"présentations TV)."
+
+#, c-format
+msgid "Cannot open display '%s' for video. Falling back to primary display.\n"
+msgstr ""
+"Impossible d'ouvrir l'affichage '%s' pour la vidéo. Utilise l'affichage "
+"principal.\n"
+
+#, c-format
+msgid "Cannot open any X11 display for video.\n"
+msgstr ""
+
+#, c-format
+msgid "Bad geometry '%s'\n"
+msgstr "Mauvaise géométrie '%s'\n"
+
 msgid "xine Video Window"
 msgstr "Fenêtre Vidéo de xine"
 
@@ -2629,10 +3169,6 @@ msgstr "Fenêtre Vidéo plein-écran de xine"
 msgid "xine Video Borderless Window"
 msgstr "Fenêtre Vidéo sans bordure de xine"
 
-#, c-format
-msgid "XAllocWMHints() failed\n"
-msgstr "XAllocWMHints() a échoué\n"
-
 msgid "New stream sizes resize output window"
 msgstr "Nouvelle taille de flux redimensionne la fenêtre"
 
@@ -2641,29 +3177,6 @@ msgstr "Double la taille pour les petits flux (requière stream_resize_window)"
 
 msgid "use XVidModeExtension when switching to fullscreen"
 msgstr "utilise XVidModeExtension pour le plein-écran"
-
-#, c-format
-msgid "XF86VidMode Extension (%d.%d) detected, trying to use it.\n"
-msgstr "Extension XF86VidMode (%d.%d) détecté, tentative pour l'utiliser.\n"
-
-#, c-format
-msgid "XF86VidMode Extension: %d modelines found.\n"
-msgstr "Extension XF86VidMode: %d modeline(s) trouvé(s).\n"
-
-#, c-format
-msgid "XF86VidModeModeLine %dx%d isn't valid: discarded.\n"
-msgstr "XF86VidModeModeLine %dx%d n'est pas valide: ignoré.\n"
-
-#, c-format
-msgid ""
-"XF86VidMode Extension: could not get list of available modelines. Failed.\n"
-msgstr ""
-"Extension XF86VidMode: ne peux pas avoir la liste des modelines disponibles. "
-"Échec.\n"
-
-#, c-format
-msgid "XF86VidMode Extension: initialization failed, not using it.\n"
-msgstr "Extension XF86VidMode: échec à l'initialisation, ne l'utilise pas.\n"
 
 msgid "log info"
 msgstr "log info"
@@ -2678,14 +3191,106 @@ msgstr "Visualiseur des journaux de xine"
 msgid "Refresh"
 msgstr "Rafraîchir"
 
+#, c-format
+#~ msgid "XSendEvent(display, 0x%x ...) failed.\n"
+#~ msgstr "XSendEvent(display, 0x%x ...) a échoué.\n"
+
+#~ msgid "Error"
+#~ msgstr "Erreur"
+
+#~ msgid "Warning"
+#~ msgstr "Attention"
+
+#, c-format
+#~ msgid ""
+#~ "gui_main: selected visual %#lx does not exist, trying default visual\n"
+#~ msgstr ""
+#~ "gui_main: visuel sélectionné %#lx inexistant, utilisation du visuel par "
+#~ "défaut\n"
+
+#, c-format
+#~ msgid "gui_main: couldn't find true color visual.\n"
+#~ msgstr "gui_main: ne trouve pas de visuel en vraies couleurs.\n"
+
+#, c-format
+#~ msgid ""
+#~ "\n"
+#~ "XInitThreads failed - looks like you don't have a thread-safe xlib.\n"
+#~ msgstr ""
+#~ "\n"
+#~ "XInitThreads a échoué - il semble que vous ne possédiez pas une xlib "
+#~ "sûre.\n"
+
+#, c-format
+#~ msgid "Warning! Synchronized X activated - this is very slow...\n"
+#~ msgstr ""
+#~ "Attention ! Synchronisation X activée - cela ralenti l'exécution...\n"
+
+#, c-format
+#~ msgid "Unable to initialize Imlib\n"
+#~ msgstr "Impossible d'initialiser Imlib\n"
+
+#~ msgid "You can only delete alias entries."
+#~ msgstr "Vous ne pouvez supprimer que les entrées alias."
+
+#~ msgid "Event Receiver Window:  Press keyboard keys to bind..."
+#~ msgstr ""
+#~ "Fenêtre de réception d'évènements:  Appuyez sur les touches du clavier..."
+
+#~ msgid "Accept?"
+#~ msgstr "Accepter ?"
+
+#, c-format
+#~ msgid "Bad visual '%s'\n"
+#~ msgstr "Mauvais visuel '%s'\n"
+
+#, c-format
+#~ msgid "Bad geometry '%s', see xine --help\n"
+#~ msgstr "Mauvaise géométrie '%s', voir xine --help\n"
+
+#, c-format
+#~ msgid "Ooch, skin not found, use fallback '%s'.\n"
+#~ msgstr ""
+#~ "Ouille, apparence non trouvée, utilise l'apparence de secours '%s'.\n"
+
+#~ msgid "XF86VidMode Extension: modeline switching failed.\n"
+#~ msgstr "Extension XF86VidMode: le changement de modeline a échoué.\n"
+
+#, c-format
+#~ msgid "XAllocWMHints() failed\n"
+#~ msgstr "XAllocWMHints() a échoué\n"
+
+#, c-format
+#~ msgid "XF86VidMode Extension (%d.%d) detected, trying to use it.\n"
+#~ msgstr "Extension XF86VidMode (%d.%d) détecté, tentative pour l'utiliser.\n"
+
+#, c-format
+#~ msgid "XF86VidMode Extension: %d modelines found.\n"
+#~ msgstr "Extension XF86VidMode: %d modeline(s) trouvé(s).\n"
+
+#, c-format
+#~ msgid "XF86VidModeModeLine %dx%d isn't valid: discarded.\n"
+#~ msgstr "XF86VidModeModeLine %dx%d n'est pas valide: ignoré.\n"
+
+#, c-format
+#~ msgid ""
+#~ "XF86VidMode Extension: could not get list of available modelines. "
+#~ "Failed.\n"
+#~ msgstr ""
+#~ "Extension XF86VidMode: ne peux pas avoir la liste des modelines "
+#~ "disponibles. Échec.\n"
+
+#, c-format
+#~ msgid "XF86VidMode Extension: initialization failed, not using it.\n"
+#~ msgstr ""
+#~ "Extension XF86VidMode: échec à l'initialisation, ne l'utilise pas.\n"
+
 #~ msgid "Noise reduction"
 #~ msgstr "Réduction du bruit"
 
-#, fuzzy
 #~ msgid "..."
 #~ msgstr "Plus..."
 
-#, fuzzy
 #~ msgid "More sources..."
 #~ msgstr "Plus..."
 
