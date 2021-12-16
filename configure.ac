@@ -600,8 +600,10 @@ int n = my_strlen ("what");
 ])], [have_attr_iaso=yes], [have_attr_iaso=no])
 AC_MSG_RESULT([$have_attr_iaso])
 if test x"$have_attr_iaso" = x"yes" ; then
-    AC_DEFINE([ATTR_INLINE_ALL_STRINGOPS],
-        [__attribute__ ((__target__ ("inline-all-stringops")))],
+    AC_DEFINE([ATTR_INLINE_ALL_STRINGOPS], [__attribute__ ((__target__ ("inline-all-stringops")))],
+        [Define this to a function attribute that inlines string handling code])
+else
+    AC_DEFINE([ATTR_INLINE_ALL_STRINGOPS], [],
         [Define this to a function attribute that inlines string handling code])
 fi
 

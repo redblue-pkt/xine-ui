@@ -21,7 +21,7 @@
 #ifndef _COMMON_UTILS_H
 #define _COMMON_UTILS_H
 
-#ifndef HAVE_CONFIG_H
+#ifndef PACKAGE_NAME
 #error config.h not included
 #endif
 
