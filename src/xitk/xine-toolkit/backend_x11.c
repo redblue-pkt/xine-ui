@@ -30,7 +30,6 @@
 #include <strings.h>
 #include <unistd.h>
 #include <pthread.h>
-#include <malloc.h>
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
