@@ -2248,9 +2248,9 @@ static xitk_be_window_t *xitk_x11_window_new (xitk_be_display_t *_d, const xitk_
       const char *res_class = (const char *)win->props[XITK_X11_WT_RES_CLASS].value;
       const char *res_name = (const char *)win->props[XITK_X11_WT_RES_NAME].value;
 
-      if (res_class)
+      if (res_class && res_class != win->res_class)
         strlcpy (win->res_class, res_class, sizeof (win->res_class));
-      if (res_name)
+      if (res_name && res_name != win->res_name)
         strlcpy (win->res_name, res_name, sizeof (win->res_name));
       xclasshint->res_name  = win->res_name[0] ? win->res_name : "Xine Window";
       xclasshint->res_class = win->res_class[0] ? win->res_class : (char *)"Xitk";
