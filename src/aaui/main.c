@@ -69,6 +69,9 @@
 #  include <caca.h>
 #  ifdef CUCUL
 #    include <cucul.h>
+#    define caca_canvas_t cucul_canvas_t
+#    define caca_create_canvas cucul_create_canvas
+#    define caca_free_canvas cucul_free_canvas
 #  endif
 #endif
 
@@ -93,7 +96,7 @@ typedef struct {
   aa_context          *context;
 #endif
 #ifdef CACA
-  cucul_canvas_t      *canvas;
+  caca_canvas_t       *canvas;
   caca_display_t      *display;
 #endif
   char                *mrl[1024];
@@ -828,7 +831,7 @@ int main(int argc, char *argv[]) {
   if(!video_driver_id)
     video_driver_id = "caca";
 
-  aaxine.canvas = cucul_create_canvas(0, 0);
+  aaxine.canvas = caca_create_canvas(0, 0);
   aaxine.display = caca_create_display(aaxine.canvas);
   aaxine.vo_port = xine_open_video_driver(__xineui_global_xine_instance,
 					  video_driver_id,
@@ -1145,7 +1148,7 @@ int main(int argc, char *argv[]) {
 #ifdef CACA
   if(aaxine.display) {
     caca_free_display(aaxine.display);
-    cucul_free_canvas(aaxine.canvas);
+    caca_free_canvas(aaxine.canvas);
   }
 #endif
 
