@@ -231,6 +231,10 @@ static const struct {
     ACTID_ZOOM_RESET,                "ZoomReset",              "z",        KEYMOD_CONTROL | KEYMOD_META, 0, 0},
   { N_("resize output window to stream size"),
     ACTID_ZOOM_1_1,                  "Zoom1:1",                "s",        KEYMOD_NOMOD,    0, 0},
+  { N_("flip video sideways"),
+    ACTID_FLIP_H,                    "FlipH",                  "f",        KEYMOD_META,     0, 0},
+  { N_("flip video upside down"),
+    ACTID_FLIP_V,                    "FlipV",                  "F",        KEYMOD_META,     0, 0},
   { N_("fullscreen toggle"),
     ACTID_TOGGLE_FULLSCREEN,         "ToggleFullscreen",       "f",        KEYMOD_NOMOD,    0, 0},
 #ifdef HAVE_XINERAMA

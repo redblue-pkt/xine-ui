@@ -605,6 +605,28 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
     panel_toggle_visibility (NULL, gui->panel);
     break;
 
+  case ACTID_FLIP_V:
+  case ACTID_FLIP_H:
+#ifdef XINE_VO_TRANSFORM_FLIP_H
+    {
+      int flags = gui->transform.flags ^ (action == ACTID_FLIP_H ? 1 : 2);
+
+      flags = ((flags & 1) ? XINE_VO_TRANSFORM_FLIP_H : 0)
+            | ((flags & 2) ? XINE_VO_TRANSFORM_FLIP_V : 0);
+      xine_set_param (gui->stream, XINE_PARAM_VO_TRANSFORM, flags);
+      flags = xine_get_param (gui->stream, XINE_PARAM_VO_TRANSFORM);
+      if (flags != -1) {
+        flags = ((flags & XINE_VO_TRANSFORM_FLIP_H) ? 1 : 0)
+              | ((flags & XINE_VO_TRANSFORM_FLIP_V) ? 2 : 0);
+        if (flags != gui->transform.flags) {
+          gui->transform.flags = flags;
+          osd_display_info (gui, "%s", gui->transform.msg[flags & 3]);
+        }
+      }
+    }
+#endif
+    break;
+
   case ACTID_TOGGLE_FULLSCREEN:
     {
       int yes = numeric_set
@@ -1383,6 +1405,12 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
   /*
    *
    */
+
+  gui->transform.msg[0] = _("Video upright");
+  gui->transform.msg[1] = _("Video mirrored");
+  gui->transform.msg[2] = _("Video upside down");
+  gui->transform.msg[3] = _("Video upside down and mirrored");
+  gui->transform.flags = 0;
 
   use_x_lock_display =
     xine_config_register_bool (gui->xine, "gui.use_XLockDisplay", 1,

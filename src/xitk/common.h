@@ -269,6 +269,11 @@ struct gGui_st {
     int                     method;
   } mixer;
 
+  struct {
+    const char             *msg[4];
+    int                     flags;
+  } transform;
+
   int                       layer_above;
   int                       always_layer_above;
 
