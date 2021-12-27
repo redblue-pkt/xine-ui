@@ -6,14 +6,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.99.5\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2021-12-11 19:35+0200\n"
+"POT-Creation-Date: 2021-12-27 13:58+0100\n"
 "PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Torsten Jager <t.jager@gmx.de>\n"
 "Language-Team: German <de@li.org>\n"
-"Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ISO-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: de\n"
 
 #, c-format
 msgid ""
@@ -475,6 +475,18 @@ msgstr "Stopp"
 
 msgid "Continue"
 msgstr "Weiter"
+
+msgid "Video upright"
+msgstr "Bild aufrecht"
+
+msgid "Video mirrored"
+msgstr "Bild gespiegelt"
+
+msgid "Video upside down"
+msgstr "Bild kopfstehend"
+
+msgid "Video upside down and mirrored"
+msgstr "Bild kopfstehend und gespiegelt"
 
 msgid "Enable extra XLib thread safety."
 msgstr "Zusätzlicher XLib-Fehlerschutz."
@@ -1066,6 +1078,12 @@ msgstr "ganzes Bild"
 
 msgid "resize output window to stream size"
 msgstr "Fenster an Bildgröße anpassen"
+
+msgid "flip video sideways"
+msgstr "Bild spiegeln"
+
+msgid "flip video upside down"
+msgstr "Bild stürzen"
 
 msgid "fullscreen toggle"
 msgstr "Vollbild ein/aus"
@@ -2364,6 +2382,12 @@ msgstr "Video/100%"
 msgid "Video/50%"
 msgstr "Video/50%"
 
+msgid "Video/mirrored"
+msgstr "Video/gespiegelt"
+
+msgid "Video/upside down"
+msgstr "Video/kopfstehend"
+
 msgid "Video/Postprocess"
 msgstr "Video/Nachbearbeitung"
 
@@ -3061,8 +3085,8 @@ msgstr "videowin: Ausgabetreiber kann kein funktionierendes Visual auswählen\n"
 #, c-format
 msgid "videowin: output driver overrides selected visual to visual id 0x%lx\n"
 msgstr ""
-"videowin: Ausgabetreiber überschreibt ausgewähltes Visual mit Visual id 0x"
-"%lx\n"
+"videowin: Ausgabetreiber überschreibt ausgewähltes Visual mit Visual id 0x%"
+"lx\n"
 
 msgid ""
 "Screens to use in order to do a very fullscreen in xinerama mode. (example 0 "
