@@ -35,8 +35,8 @@
 #include "actions.h"
 
 /* refs string layout: [int32_t] (char)
- * [(-)(-)(count)(refs)] [(t)(e)(x)(t)] [( )(h)(e)(r)] [(e)(\0)(\0)(\0)] [0]
- *           ((char *)ptr)-^                     ((int32_t *)ptr + count)-^ */
+ * [(-)(is_fallback)(count)(refs)] [(t)(e)(x)(t)] [( )(h)(e)(r)] [(e)(\0)(\0)(\0)] [0]
+ *                     ((char *)ptr)-^                     ((int32_t *)ptr + count)-^ */
 
 typedef union {
   int32_t i[32];
@@ -54,19 +54,24 @@ static ATTR_INLINE_ALL_STRINGOPS char *refs_set_dummy (refs_dummy_t *dummy, cons
   return dummy->s + 4;
 }
 
-static ATTR_INLINE_ALL_STRINGOPS char *refs_strdup (const char *text) {
+static void refs_make_fallback (char *here) {
+  memcpy (here - 4, "\x00\x01\x01\x80\x00\x00\x00\x00\x00\x00\x00\x00", 12);
+}
+
+static ATTR_INLINE_ALL_STRINGOPS char *refs_strdup (const char *text, char *fallback) {
   size_t l, s;
   char *m;
 
   if (!text)
-    return NULL;
+    return fallback;
   l = strlen (text) + 1;
   s = (4 + l + 4 + 3) & ~3u;
   m = malloc (s);
   if (!m)
-    return NULL;
+    return fallback;
   memset (m + s - 8, 0, 8);
   m += 4;
+  m[-3] = 0;
   m[-2] = (s - 8) >> 2;
   m[-1] = 1;
   memcpy (m, text, l);
@@ -74,22 +79,17 @@ static ATTR_INLINE_ALL_STRINGOPS char *refs_strdup (const char *text) {
 }
   
 static char *refs_ref (char *refs) {
-  if (!refs)
-    return NULL;
   refs[-1] += 1;
   return refs;
 }
 
 static void refs_unref (char **refs) {
-  char *m;
-  if (!refs)
-    return;
-  m = *refs;
-  if (!m)
+  char *m = *refs;
+  *refs = NULL;
+  if (m[-3])
     return;
   if (--(m[-1]) == 0)
     free (m - 4);
-  *refs = NULL;
 }
   
 /*
@@ -501,9 +501,20 @@ static const struct {
 struct kbinding_s {
   gGui_t           *gui;
   int               num_entries;
+  char              refs_fallback[12];
   xine_sarray_t    *action_index, *key_index;
   kbinding_entry_t *last, base[KBT_NUM_BASE], *alias[MAX_ENTRIES - KBT_NUM_BASE];
 };
+
+static int _kbindings_key_is_void (const kbinding_entry_t *e) {
+  const union {
+    char z[4];
+    uint32_t v;
+  } _void = {{'v', 'o', 'i', 'd'}};
+  const uint32_t *v = (const uint32_t *)e->key;
+
+  return (*v | 0x20202020) == _void.v;
+}
 
 static int _kbindings_action_cmp (void *a, void *b) {
   kbinding_entry_t *d = (kbinding_entry_t *)a;
@@ -557,7 +568,7 @@ static int _kbindings_key_cmp (void *a, void *b) {
 static void kbindings_index_add (kbinding_t *kbt, kbinding_entry_t *entry) {
   if (entry->action)
     xine_sarray_add (kbt->action_index, entry);
-  if (entry->key && strcasecmp (entry->key, "void"))
+  if (entry->key && !_kbindings_key_is_void (entry))
     xine_sarray_add (kbt->key_index, entry);
 }
 
@@ -758,7 +769,7 @@ static void _kbinding_load_config(kbinding_t *kbt, const char *name) {
           n->is_gui     = k->is_gui;
           n->is_default = 0;
           n->comment    = k->comment;
-          n->key        = refs_strdup (key);
+          n->key        = refs_strdup (key, kbt->refs_fallback + 4);
           kbindings_index_add (kbt, n);
           kbt->alias[kbt->num_entries - KBT_NUM_BASE] = n;
           kbt->num_entries++;
@@ -771,7 +782,7 @@ static void _kbinding_load_config(kbinding_t *kbt, const char *name) {
         if (strcmp (e->key, key) || (e->modifier != modifier)) {
           kbindings_index_remove (kbt, e);
           refs_unref (&e->key);
-          e->key = refs_strdup (key);
+          e->key = refs_strdup (key, kbt->refs_fallback + 4);
           e->modifier = modifier;
           e->is_default = 0;
           if (e->index < KBT_NUM_BASE)
@@ -884,6 +895,7 @@ kbinding_t *kbindings_init_kbinding (gGui_t *gui, const char *keymap_file) {
 
   kbt->gui = gui;
   kbt->last = NULL;
+  refs_make_fallback (kbt->refs_fallback + 4);
   kbt->action_index = xine_sarray_new (MAX_ENTRIES, _kbindings_action_cmp);
   kbt->key_index = xine_sarray_new (MAX_ENTRIES, _kbindings_key_cmp);
   if (!kbt->action_index || !kbt->key_index) {
@@ -915,7 +927,7 @@ kbinding_t *kbindings_init_kbinding (gGui_t *gui, const char *keymap_file) {
     n->is_gui     = default_binding_table[i].is_gui;
     n->is_default = 1;
     n->comment    = gettext (default_binding_table[i].comment);
-    n->key        = refs_strdup (default_binding_table[i].key);
+    n->key        = refs_strdup (default_binding_table[i].key, kbt->refs_fallback + 4);
     kbindings_index_add (kbt, n);
   }
   kbt->num_entries = i;
@@ -1066,7 +1078,7 @@ int kbindings_entry_set (kbinding_t *kbt, int index, int modifier, const char *k
 
   if (!strcasecmp (key, "VOID")) {
     /* delete */
-    if (!strcasecmp (e->key, "VOID"))
+    if (_kbindings_key_is_void (e))
       return -2;
     if (index >= (int)KBT_NUM_BASE) {
       /* remove alias */
@@ -1115,7 +1127,7 @@ int kbindings_entry_set (kbinding_t *kbt, int index, int modifier, const char *k
       /* keep base entry, just reset */
       kbindings_index_remove (kbt, e);
       refs_unref (&e->key);
-      e->key = refs_strdup ("VOID");
+      e->key = refs_strdup ("VOID", kbt->refs_fallback + 4);
       e->modifier = 0;
       kbindings_index_add (kbt, e);
       e->is_default = (!strcmp (e->key, default_binding_table[index].key)
@@ -1144,7 +1156,7 @@ int kbindings_entry_set (kbinding_t *kbt, int index, int modifier, const char *k
     /* set new key */
     kbindings_index_remove (kbt, e);
     refs_unref (&e->key);
-    e->key = refs_strdup (key);
+    e->key = refs_strdup (key, kbt->refs_fallback + 4);
     e->modifier = modifier;
     kbindings_index_add (kbt, e);
     if (index < (int)KBT_NUM_BASE)
@@ -1192,7 +1204,7 @@ int kbindings_alias_add (kbinding_t *kbt, int index, int modifier, const char *k
     a->modifier = modifier;
     a->is_alias = 1;
     a->is_gui = e->is_gui;
-    a->key = refs_strdup (key);
+    a->key = refs_strdup (key, kbt->refs_fallback + 4);
     a->comment = e->comment;
     a->index = kbt->num_entries;
     kbt->alias[kbt->num_entries - KBT_NUM_BASE] = a;
@@ -1224,7 +1236,7 @@ int kbindings_reset (kbinding_t *kbt, int index) {
       kbt->base[index].modifier = default_binding_table[index].modifier;
       if (strcmp (kbt->base[index].key, default_binding_table[index].key)) {
         refs_unref (&kbt->base[index].key);
-        kbt->base[index].key = refs_strdup (default_binding_table[index].key);
+        kbt->base[index].key = refs_strdup (default_binding_table[index].key, kbt->refs_fallback + 4);
       }
     }
     for (; index < kbt->num_entries; index++) {
