@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2021 the xine project
+ * Copyright (C) 2000-2022 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -431,11 +431,24 @@ action_id_t kbindings_get_action_id (const kbinding_entry_t *kbt) {
   return kbt->action_id;
 }
 
+static int _kbindings_key_is_void (const kbinding_entry_t *kbe) {
+  const union {
+    char z[4];
+    uint32_t v;
+  } _void = {{'v', 'o', 'i', 'd'}};
+  uint32_t start;
+
+  memcpy (&start, kbe->key, 4);
+  return (start | 0x20202020) == _void.v;
+}
+
 static size_t _kbindings_get_shortcut_from_kbe (const kbinding_entry_t *kbe, char *shortcut, size_t shortcut_size, int style) {
   char *q = shortcut, *e = q + shortcut_size;
 
   do {
     if (!kbe)
+      break;
+    if (_kbindings_key_is_void (kbe))
       break;
     if (q + 1 >= e)
       break;
@@ -517,14 +530,11 @@ static size_t _kbindings_get_shortcut_from_kbe (const kbinding_entry_t *kbe, cha
 size_t kbindings_get_shortcut (kbinding_t *kbt, const char *action, char *buf, size_t buf_size, int style) {
   const kbinding_entry_t  *k;
 
-  if(kbt) {
-    if(action && (k = kbindings_lookup_action(kbt, action))) {
-      if(strcmp(k->key, "VOID")) {
-        return _kbindings_get_shortcut_from_kbe (k, buf, buf_size, style);
-      }
-    }
-  }
-  return 0;
+  if (!kbt || !action || !buf || !buf_size)
+    return 0;
+  if (!(k = kbindings_lookup_action (kbt, action)))
+    return 0;
+  return _kbindings_get_shortcut_from_kbe (k, buf, buf_size, style);
 }
 
 /*
@@ -656,8 +666,7 @@ static void kbedit_create_browser_entries (xui_keyedit_t *kbedit) {
     char  shortcut[256];
     const kbinding_entry_t *entry = _kbindings_get_entry (kbedit->kbt, i);
 
-    if (_kbindings_get_shortcut_from_kbe (entry, shortcut, sizeof (shortcut), kbedit->gui->shortcut_style) < 1)
-      strcpy(shortcut, "[VOID]");
+    _kbindings_get_shortcut_from_kbe (entry, shortcut, sizeof (shortcut), kbedit->gui->shortcut_style);
 
     kbedit->entries[i] = _dyn_string_get (&kbedit->ebuf);
     if (entry->is_alias) {
@@ -678,7 +687,7 @@ static void kbedit_display_kbinding (xui_keyedit_t *kbedit, const char *action, 
   if(action && kbe) {
 
     xitk_label_change_label (kbedit->w[_W_comment], action);
-    xitk_label_change_label (kbedit->w[_W_key], kbe->key);
+    xitk_label_change_label (kbedit->w[_W_key], _kbindings_key_is_void (kbe) ? _("None") : kbe->key);
 
     xitk_button_set_state (kbedit->w[_W_ctrl], (kbe->modifier & KEYMOD_CONTROL) ? 1 : 0);
     xitk_button_set_state (kbedit->w[_W_meta], (kbe->modifier & KEYMOD_META) ? 1 : 0);
