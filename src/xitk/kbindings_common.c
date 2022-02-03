@@ -35,8 +35,8 @@
 #include "actions.h"
 
 /* refs string layout: [int32_t] (char)
- * [(-)(is_fallback)(count)(refs)] [(t)(e)(x)(t)] [( )(h)(e)(r)] [(e)(\0)(\0)(\0)] [0]
- *                     ((char *)ptr)-^                     ((int32_t *)ptr + count)-^ */
+ * [(-)(is_void)(count)(refs)] [(t)(e)(x)(t)] [( )(h)(e)(r)] [(e)(\0)(\0)(\0)] [0]
+ *                 ((char *)ptr)-^                     ((int32_t *)ptr + count)-^ */
 
 typedef union {
   int32_t i[32];
@@ -54,8 +54,8 @@ static ATTR_INLINE_ALL_STRINGOPS char *refs_set_dummy (refs_dummy_t *dummy, cons
   return dummy->s + 4;
 }
 
-static void refs_make_fallback (char *here) {
-  memcpy (here - 4, "\x00\x01\x01\x80\x00\x00\x00\x00\x00\x00\x00\x00", 12);
+static void refs_make_void (char *here) {
+  memcpy (here - 4, "\x00\x01\x02\x80VOID\x00\x00\x00\x00\x00\x00\x00\x00", 16);
 }
 
 static ATTR_INLINE_ALL_STRINGOPS char *refs_strdup (const char *text, char *fallback) {
@@ -64,11 +64,25 @@ static ATTR_INLINE_ALL_STRINGOPS char *refs_strdup (const char *text, char *fall
 
   if (!text)
     return fallback;
+
   l = strlen (text) + 1;
+  if (l > 4) {
+    const union {
+      char z[4];
+      uint32_t v;
+    } _void = {{'v', 'o', 'i', 'd'}};
+    uint32_t start;
+
+    memcpy (&start, text, 4);
+    if ((start | 0x20202020) == _void.v)
+      return fallback;
+  }
+
   s = (4 + l + 4 + 3) & ~3u;
   m = malloc (s);
   if (!m)
     return fallback;
+
   memset (m + s - 8, 0, 8);
   m += 4;
   m[-3] = 0;
@@ -501,19 +515,13 @@ static const struct {
 struct kbinding_s {
   gGui_t           *gui;
   int               num_entries;
-  char              refs_fallback[12];
+  char              refs_void[16];
   xine_sarray_t    *action_index, *key_index;
   kbinding_entry_t *last, base[KBT_NUM_BASE], *alias[MAX_ENTRIES - KBT_NUM_BASE];
 };
 
 static int _kbindings_key_is_void (const kbinding_entry_t *e) {
-  const union {
-    char z[4];
-    uint32_t v;
-  } _void = {{'v', 'o', 'i', 'd'}};
-  const uint32_t *v = (const uint32_t *)e->key;
-
-  return (*v | 0x20202020) == _void.v;
+  return e->key[-3];
 }
 
 static int _kbindings_action_cmp (void *a, void *b) {
@@ -769,7 +777,7 @@ static void _kbinding_load_config(kbinding_t *kbt, const char *name) {
           n->is_gui     = k->is_gui;
           n->is_default = 0;
           n->comment    = k->comment;
-          n->key        = refs_strdup (key, kbt->refs_fallback + 4);
+          n->key        = refs_strdup (key, kbt->refs_void + 4);
           kbindings_index_add (kbt, n);
           kbt->alias[kbt->num_entries - KBT_NUM_BASE] = n;
           kbt->num_entries++;
@@ -782,7 +790,7 @@ static void _kbinding_load_config(kbinding_t *kbt, const char *name) {
         if (strcmp (e->key, key) || (e->modifier != modifier)) {
           kbindings_index_remove (kbt, e);
           refs_unref (&e->key);
-          e->key = refs_strdup (key, kbt->refs_fallback + 4);
+          e->key = refs_strdup (key, kbt->refs_void + 4);
           e->modifier = modifier;
           e->is_default = 0;
           if (e->index < KBT_NUM_BASE)
@@ -895,7 +903,7 @@ kbinding_t *kbindings_init_kbinding (gGui_t *gui, const char *keymap_file) {
 
   kbt->gui = gui;
   kbt->last = NULL;
-  refs_make_fallback (kbt->refs_fallback + 4);
+  refs_make_void (kbt->refs_void + 4);
   kbt->action_index = xine_sarray_new (MAX_ENTRIES, _kbindings_action_cmp);
   kbt->key_index = xine_sarray_new (MAX_ENTRIES, _kbindings_key_cmp);
   if (!kbt->action_index || !kbt->key_index) {
@@ -927,7 +935,7 @@ kbinding_t *kbindings_init_kbinding (gGui_t *gui, const char *keymap_file) {
     n->is_gui     = default_binding_table[i].is_gui;
     n->is_default = 1;
     n->comment    = gettext (default_binding_table[i].comment);
-    n->key        = refs_strdup (default_binding_table[i].key, kbt->refs_fallback + 4);
+    n->key        = refs_strdup (default_binding_table[i].key, kbt->refs_void + 4);
     kbindings_index_add (kbt, n);
   }
   kbt->num_entries = i;
@@ -997,6 +1005,7 @@ kbinding_t *_kbindings_duplicate_kbindings (kbinding_t *kbt) {
 
   k->gui = kbt->gui;
   k->last = NULL;
+  refs_make_void (k->refs_void + 4);
   k->action_index = xine_sarray_new (MAX_ENTRIES, _kbindings_action_cmp);
   k->key_index = xine_sarray_new (MAX_ENTRIES, _kbindings_key_cmp);
   if (!k->action_index || !k->key_index) {
@@ -1127,7 +1136,7 @@ int kbindings_entry_set (kbinding_t *kbt, int index, int modifier, const char *k
       /* keep base entry, just reset */
       kbindings_index_remove (kbt, e);
       refs_unref (&e->key);
-      e->key = refs_strdup ("VOID", kbt->refs_fallback + 4);
+      e->key = refs_strdup ("VOID", kbt->refs_void + 4);
       e->modifier = 0;
       kbindings_index_add (kbt, e);
       e->is_default = (!strcmp (e->key, default_binding_table[index].key)
@@ -1156,7 +1165,7 @@ int kbindings_entry_set (kbinding_t *kbt, int index, int modifier, const char *k
     /* set new key */
     kbindings_index_remove (kbt, e);
     refs_unref (&e->key);
-    e->key = refs_strdup (key, kbt->refs_fallback + 4);
+    e->key = refs_strdup (key, kbt->refs_void + 4);
     e->modifier = modifier;
     kbindings_index_add (kbt, e);
     if (index < (int)KBT_NUM_BASE)
@@ -1204,7 +1213,7 @@ int kbindings_alias_add (kbinding_t *kbt, int index, int modifier, const char *k
     a->modifier = modifier;
     a->is_alias = 1;
     a->is_gui = e->is_gui;
-    a->key = refs_strdup (key, kbt->refs_fallback + 4);
+    a->key = refs_strdup (key, kbt->refs_void + 4);
     a->comment = e->comment;
     a->index = kbt->num_entries;
     kbt->alias[kbt->num_entries - KBT_NUM_BASE] = a;
@@ -1236,7 +1245,7 @@ int kbindings_reset (kbinding_t *kbt, int index) {
       kbt->base[index].modifier = default_binding_table[index].modifier;
       if (strcmp (kbt->base[index].key, default_binding_table[index].key)) {
         refs_unref (&kbt->base[index].key);
-        kbt->base[index].key = refs_strdup (default_binding_table[index].key, kbt->refs_fallback + 4);
+        kbt->base[index].key = refs_strdup (default_binding_table[index].key, kbt->refs_void + 4);
       }
     }
     for (; index < kbt->num_entries; index++) {
@@ -1254,3 +1263,4 @@ int kbindings_reset (kbinding_t *kbt, int index) {
     return kbindings_entry_set (kbt, index, default_binding_table[index].modifier, default_binding_table[index].key);
   return kbindings_entry_set (kbt, index, 0, "VOID");
 }
+
