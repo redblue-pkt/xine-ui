@@ -573,11 +573,14 @@ CFLAGS="$wall $falias -D_FILE_OFFSET_BITS=64 $CFLAGS"
 AC_ARG_ENABLE([debug],
    AS_HELP_STRING([--enable-debug], [Compile with debug information]))
 
+LIBEXECINFO=""
 if test "x$enable_debug" = "xyes"; then
    CFLAGS="$CFLAGS -DDEBUG -g"
+   AC_CHECK_LIB(execinfo, backtrace, LIBEXECINFO="-lexecinfo",)
 else
    CFLAGS="$CFLAGS -DNDEBUG"
 fi
+AC_SUBST(LIBEXECINFO)
 
 AC_ARG_ENABLE([optlevel], [AS_HELP_STRING([--enable-optlevel=0|1|2|3|s], [Optimize this much, default 3.])])
 test x"$enable_optlevel" = x"yes" && enable_optlevel=3
