@@ -589,10 +589,10 @@ static void kbindings_index_remove (kbinding_t *kbt, kbinding_entry_t *entry) {
   int i;
   i = xine_sarray_binary_search (kbt->action_index, entry);
   if (i >= 0)
-    i = xine_sarray_remove (kbt->action_index, i);
+    xine_sarray_remove (kbt->action_index, i);
   i = xine_sarray_binary_search (kbt->key_index, entry);
   if (i >= 0)
-    i = xine_sarray_remove (kbt->key_index, i);
+    xine_sarray_remove (kbt->key_index, i);
 #endif
 }
 
