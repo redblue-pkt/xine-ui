@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2021 the xine project
+ * Copyright (C) 2000-2022 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -956,7 +956,7 @@ static int _inputtext_key (_inputtext_private_t *wp, const char *s, int modifier
       case XITK_KEY_NUMPAD_ENTER:
       case XITK_KEY_ISO_ENTER:
         _inputtext_exec_return (wp);
-        return 0;
+        return 1;
       case XITK_KEY_ESCAPE:
         _inputtext_exec_escape (wp);
         return 0;
