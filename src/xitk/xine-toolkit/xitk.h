@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2021 the xine project
+ * Copyright (C) 2000-2022 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -69,6 +69,40 @@
 
 size_t xitk_lower_strlcpy (char *dest, const char *src, size_t dlen);
 
+static inline uint32_t xitk_find_byte (const char *s, uint32_t byte) {
+  const uint32_t eor = ~((byte << 24) | (byte << 16) | (byte << 8) | byte);
+  const uint32_t left = (uintptr_t)s & 3;
+  const uint32_t *p = (const uint32_t *)(s - left);
+  static const union {
+    uint8_t b[4];
+    uint32_t v;
+  } mask[4] = {
+    {{0xff, 0xff, 0xff, 0xff}},
+    {{0x00, 0xff, 0xff, 0xff}},
+    {{0x00, 0x00, 0xff, 0xff}},
+    {{0x00, 0x00, 0x00, 0xff}},
+  };
+  static const uint8_t rest[32] = {
+    0, 1, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, /* big wndian */
+    0, 4, 3, 4, 2, 4, 3, 4, 1, 4, 3, 4, 2, 4, 3, 4  /* little endian */
+  };
+  const union {
+    uint32_t v;
+    uint8_t b[4];
+  } endian = {16};
+  uint32_t w = (*p++ ^ eor) & mask[left].v;
+  while (1) {
+    w = w & 0x80808080 & ((w & 0x7f7f7f7f) + 0x01010101);
+    if (w)
+      break;
+    w = *p++ ^ eor;
+  }
+  /* bits 31, 23, 15, 7 -> 3, 2, 1, 0 */
+  w = (w * 0x00204081) & 0xffffffff;
+  w >>= 28;
+  return ((const char *)p - s) - rest[endian.b[0] + w];
+}
+
 typedef struct {
   char *s, buf[64];
 } xitk_short_string_t;
@@ -103,10 +137,14 @@ char *xitk_cfg_load (const char *filename, size_t *filesize);
 void xitk_cfg_unload (char *buf);
 
 typedef struct {
-  int level;
+  /* 0 for root node tree[0] */
+  short int level;
+  /* byte length of key */
+  unsigned short int klen;
   /* array index. */
   int next, prev, parent, first_child, last_child;
-  /* offset into contents, converted to lowercase, or -1. */
+  /* root node: total count of nodes.
+   * otherwise: offset into contents, converted to lowercase, or -1. */
   int key;
   /* offset into contents, or -1. */
   int value;
