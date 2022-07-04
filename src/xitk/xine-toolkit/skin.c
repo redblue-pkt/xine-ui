@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2021 the xine project
+ * Copyright (C) 2000-2022 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -108,7 +108,7 @@ static void _skin_load_img (xitk_skin_config_t *skonfig, xitk_part_image_t *imag
 
   /* for part read and database keys, omit path. */
   nbuf[0] = 0;
-  nlen = strlen (pixmap);
+  nlen = xitk_find_byte (pixmap, 0);
   if (2 + skonfig->plen + 1 + nlen + 1 > sizeof (nbuf))
     return;
   key = nbuf + 2 + skonfig->plen + 1;
@@ -344,7 +344,7 @@ static uint32_t _expanded (xitk_skin_config_t *skonfig, const char *cmd) {
       val = xine_get_homedir ();
     }
     if (val) {
-      l = strlen (val);
+      l = xitk_find_byte (val, 0);
       if (l > e - q)
         l = e - q;
       if (l > 0) {
@@ -608,89 +608,237 @@ static void xitk_skin_free_config(xitk_skin_config_t *skonfig) {
   XITK_FREE(skonfig);
 }
 
-static int _skin_string_index (const char * const *list, size_t size, const char *s) {
-  uint32_t b = 0, e = size;
+typedef enum {
+  _K_NONE = 0,
+  _K_align,
+  _K_animation,
+  _K_author,
+  _K_browser,
+  _K_color,
+  _K_color_click,
+  _K_color_focus,
+  _K_coords,
+  _K_date,
+  _K_direction,
+  _K_enable,
+  _K_entries,
+  _K_font,
+  _K_label,
+  _K_length,
+  _K_load_command,
+  _K_logo,
+  _K_max_buttons,
+  _K_name,
+  _K_pixmap,
+  _K_pixmap_focus,
+  _K_pixmap_format,
+  _K_print,
+  _K_radius,
+  _K_slider,
+  _K_static,
+  _K_step,
+  _K_timer,
+  _K_type,
+  _K_unload_command,
+  _K_url,
+  _K_version,
+  _K_visible,
+  _K_x,
+  _K_y,
+  _K_LAST
+} _skin_key_t;
 
-  do {
-    uint32_t m = (b + e) >> 1;
-    int d = strcmp (s, list[m]);
-
-    if (d < 0)
-      e = m;
-    else if (d > 0)
-      b = m + 1;
-    else
-      return m;
-  } while (b != e);
-  return -1;
+static _skin_key_t _skin_key_index (const char *key, unsigned int klen) {
+  switch (klen) {
+    int d;
+    case 1:
+      if (key[0] == 'x')
+        return _K_x;
+      if (key[0] == 'y')
+        return _K_y;
+      break;
+    case 3:
+      if (!memcmp (key, "url", 3))
+        return _K_url;
+      break;
+    case 4:
+      d = memcmp (key, "logo", 4);
+      if (d == 0)
+        return _K_logo;
+      if (d < 0) {
+        if (!memcmp (key, "date", 4))
+          return _K_date;
+        if (!memcmp (key, "font", 4))
+          return _K_font;
+      } else {
+        if (!memcmp (key, "name", 4))
+          return _K_name;
+        if (!memcmp (key, "step", 4))
+          return _K_step;
+        if (!memcmp (key, "type", 4))
+          return _K_type;
+      }
+      break;
+    case 5:
+      d = memcmp (key, "label", 5);
+      if (d == 0)
+        return _K_label;
+      if (d < 0) {
+        if (!memcmp (key, "align", 5))
+          return _K_align;
+        if (!memcmp (key, "color", 5))
+          return _K_color;
+      } else {
+        if (!memcmp (key, "print", 5))
+          return _K_print;
+        if (!memcmp (key, "timer", 5))
+          return _K_timer;
+      }
+      break;
+    case 6:
+      d = memcmp (key, "length", 6);
+      if (d == 0)
+        return _K_length;
+      if (d < 0) {
+        d = memcmp (key, "coords", 6);
+        if (d == 0)
+          return _K_coords;
+        if (d < 0) {
+          if (!memcmp (key, "author", 6))
+            return _K_author;
+        } else {
+          if (!memcmp (key, "enable", 6))
+            return _K_enable;
+        }
+      } else {
+        d = memcmp (key, "slider", 6);
+        if (d == 0)
+          return _K_slider;
+        if (d < 0) {
+          if (!memcmp (key, "radius", 6))
+            return _K_radius;
+          if (!memcmp (key, "pixmap", 6))
+            return _K_pixmap;
+        } else {
+          if (!memcmp (key, "static", 6))
+            return _K_static;
+        }
+      }
+      break;
+    case 7:
+      if (!memcmp (key, "browser", 7))
+        return _K_browser;
+      if (!memcmp (key, "entries", 7))
+        return _K_entries;
+      if (!memcmp (key, "version", 7))
+        return _K_version;
+      if (!memcmp (key, "visible", 7))
+        return _K_visible;
+      break;
+    case 9:
+      if (!memcmp (key, "animation", 9))
+        return _K_animation;
+      if (!memcmp (key, "direction", 9))
+        return _K_direction;
+      break;
+    case 11:
+      if (!memcmp (key, "color_click", 11))
+        return _K_color_click;
+      if (!memcmp (key, "color_focus", 11))
+        return _K_color_focus;
+      if (!memcmp (key, "max_buttons", 11))
+        return _K_max_buttons;
+      break;
+    case 12:
+      if (!memcmp (key, "load_command", 12))
+        return _K_load_command;
+      if (!memcmp (key, "pixmap_focus", 12))
+        return _K_pixmap_focus;
+      break;
+    case 13:
+      if (!memcmp (key, "pixmap_format", 13))
+        return _K_pixmap_format;
+      break;
+    case 14:
+      if (!memcmp (key, "unload_command", 14))
+        return _K_unload_command;
+      break;
+    default: ;
+  }
+  return _K_NONE;
 }
 
+typedef enum {
+  _KT_string = 0,
+  _KT_int,
+  _KT_bool,
+  _KT_color,
+  _KT_LAST
+} _skin_key_type_t;
+
+static const uint8_t _skin_key_types[_K_LAST] = {
+  /* [_K_animation] can be string or bool. */
+  [_K_color] = _KT_color,
+  [_K_color_click] = _KT_color,
+  [_K_color_focus] = _KT_color,
+  [_K_enable] = _KT_bool,
+  [_K_entries] = _KT_int,
+  [_K_length] = _KT_int,
+  [_K_max_buttons] = _KT_int,
+  [_K_print] = _KT_bool,
+  [_K_radius] = _KT_int,
+  [_K_static] = _KT_bool,
+  [_K_step] = _KT_int,
+  [_K_timer] = _KT_int,
+  [_K_version] = _KT_int,
+  [_K_visible] = _KT_bool,
+  [_K_x] = _KT_int,
+  [_K_y] = _KT_int
+};
+
 static void _skin_parse_2 (xitk_skin_config_t *skonfig, char *text, xitk_cfg_parse_t *tree, xitk_cfg_parse_t *sub) {
-  const char *key = text + sub->key, *val = text + sub->value;
+  const char *val = text + sub->value;
   xitk_skin_element_t *s = skonfig->celement;
-  static const char * const list1[] = {
-    "browser",
-    "coords",
-    "direction",
-    "enable",
-    "label",
-    "max_buttons",
-    "pixmap",
-    "slider",
-    "visible"
-  };
-  int n = _skin_string_index (list1, sizeof (list1) / sizeof (list1[0]), key);
+  _skin_key_t n = sub->key;
 
   switch (n) {
-    case 0: { /* browser */
+    case _K_browser:
+      {
         xitk_cfg_parse_t *sub2;
 
-        for (sub2 = sub->first_child ? tree + sub->first_child : NULL; sub2; sub2 = sub2->next ? tree + sub2->next : NULL) {
-          const char *key2 = text + sub2->key, *val2 = text + sub2->value;
-
-          if (!strcmp (key2, "entries"))
-            s->info.browser_entries = xitk_str2int32 (&val2);
+        for (sub2 = tree + sub->first_child; sub2 != tree; sub2 = tree + sub2->next) {
+          if ((_skin_key_t)sub2->key == _K_entries)
+            s->info.browser_entries = sub2->value;
         }
       }
       break;
-    case 1: { /* coords */
+    case _K_coords:
+      {
         xitk_cfg_parse_t *sub2;
 
-        for (sub2 = sub->first_child ? tree + sub->first_child : NULL; sub2; sub2 = sub2->next ? tree + sub2->next : NULL) {
-          const char *key2 = text + sub2->key, *val2 = text + sub2->value;
-
-          if (!strcmp (key2, "x"))
-            s->info.x = xitk_str2int32 (&val2);
-          else if (!strcmp (key2, "y"))
-            s->info.y = xitk_str2int32 (&val2);
+        for (sub2 = tree + sub->first_child; sub2 != tree; sub2 = tree + sub2->next) {
+          n = sub2->key;
+          switch (n) {
+            case _K_x:
+              s->info.x = sub2->value;
+              break;
+            case _K_y:
+              s->info.y = sub2->value;
+              break;
+            default: ;
+          }
         }
       }
       break;
-    case 2: /* direction */
+    case _K_direction:
       s->info.direction = skin_get_direction (val);
       break;
-    case 3: /* enable */
-      s->info.enability = xitk_get_bool_value (val);
+    case _K_enable:
+      s->info.enability = sub->value;
       break;
-    case 4: { /* label */
+    case _K_label:
+      {
         xitk_cfg_parse_t *sub2;
-        static const char * const list2[] = {
-          "align",
-          "animation",
-          "color",
-          "color_click",
-          "color_focus",
-          "font",
-          "length",
-          "pixmap",
-          "pixmap_focus",
-          "pixmap_format",
-          "print",
-          "static",
-          "step",
-          "timer",
-          "y"
-        };
 
         s->info.label_y = 0;
         s->info.label_printable = 1;
@@ -698,99 +846,109 @@ static void _skin_parse_2 (xitk_skin_config_t *skonfig, char *text, xitk_cfg_par
         s->info.label_animation_timer = xitk_get_cfg_num (skonfig->xitk, XITK_TIMER_LABEL_ANIM);
         s->info.label_alignment = ALIGN_CENTER;
 
-        for (sub2 = sub->first_child ? tree + sub->first_child : NULL; sub2; sub2 = sub2->next ? tree + sub2->next : NULL) {
-          const char *key2 = text + sub2->key, *val2 = text + sub2->value;
+        for (sub2 = tree + sub->first_child; sub2 != tree; sub2 = tree + sub2->next) {
+          const char *val2 = text + sub2->value;
 
-          n = _skin_string_index (list2, sizeof (list2) / sizeof (list2[0]), key2);
+          n = sub2->key;
           switch (n) {
-            case 0: /* align */
+	    case _K_align:
               s->info.label_alignment = skin_get_align_value (val2);
               break;
-            case 1: /* animation */
+	    case _K_animation:
               s->info.label_animation = xitk_get_bool_value (val2);
               break;
-            case 2: /* color */
-              s->info.label_color = xitk_get_color_name (val2);
+	    case _K_color:
+              s->info.label_color = sub2->value;
               break;
-            case 3: /* color_click */
-              s->info.label_color_click = xitk_get_color_name (val2);
+	    case _K_color_click:
+              s->info.label_color_click = sub2->value;
               break;
-            case 4: /* color_focus */
-              s->info.label_color_focus = xitk_get_color_name (val2);
+	    case _K_color_focus:
+              s->info.label_color_focus = sub2->value;
               break;
-            case 5: /* font */
+	    case _K_font:
               s->info.label_fontname = skonfig->sbuf + _skin_strdup (skonfig, val2);
               break;
-            case 6: /* length */
-              s->info.label_length = xitk_str2int32 (&val2);
+	    case _K_length:
+              s->info.label_length = sub2->value;
               break;
-            case 7: /* pixmap */
+	    case _K_pixmap:
               s->info.label_pixmap_font_name = skonfig->sbuf + _skin_strdup (skonfig, val2);
               if (s->info.label_pixmap_font_name[0])
                 _skin_load_img (skonfig, NULL, s->info.label_pixmap_font_name, s->info.label_pixmap_font_format);
               break;
-            case 8: /* pixmap_focus */
+	    case _K_pixmap_focus:
               s->info.label_pixmap_highlight_font_name = skonfig->sbuf + _skin_strdup (skonfig, val2);
               if (s->info.label_pixmap_highlight_font_name[0])
                 _skin_load_img (skonfig, NULL, s->info.label_pixmap_highlight_font_name, s->info.label_pixmap_font_format);
               break;
-            case 9: /* pixmap_format */
+	    case _K_pixmap_format:
               if (!s->info.label_pixmap_font_format) {
                 s->info.label_pixmap_font_format = skonfig->sbuf + _skin_strdup (skonfig, val2);
                 _skin_load_img (skonfig, NULL, s->info.label_pixmap_font_name, s->info.label_pixmap_font_format);
               }
               break;
-            case 10: /* print */
-              s->info.label_printable = xitk_get_bool_value (val2);
+	    case _K_print:
+              s->info.label_printable = sub2->value;
               break;
-            case 11: /* static */
-              s->info.label_staticity = xitk_get_bool_value (val2);
+	    case _K_static:
+              s->info.label_staticity = sub2->value;
               break;
-            case 12: /* step */
-              s->info.label_animation_step = xitk_str2int32 (&val2);
+	    case _K_step:
+              s->info.label_animation_step = sub2->value;
               break;
-            case 13: /* timer */
-              s->info.label_animation_timer = xitk_str2int32 (&val2);
+	    case _K_timer:
+              s->info.label_animation_timer = sub2->value;
               break;
-            case 14: /* y */
-              s->info.label_y = xitk_str2int32 (&val2);
+	    case _K_y:
+              s->info.label_y = sub2->value;
               break;
+            default: ;
           }
         }
       }
       break;
-    case 5: /* max_buttons */
-      s->info.max_buttons = xitk_str2int32 (&val);
+    case _K_max_buttons:
+      s->info.max_buttons = sub->value;
       break;
-    case 6: /* pixmap */
+    case _K_pixmap:
       s->info.pixmap_name = skonfig->sbuf + _skin_strdup (skonfig, val);
       break;
-    case 7: { /* slider */
+    case _K_slider:
+      {
         xitk_cfg_parse_t *sub2;
 
-        for (sub2 = sub->first_child ? tree + sub->first_child : NULL; sub2; sub2 = sub2->next ? tree + sub2->next : NULL) {
-          const char *key2 = text + sub2->key, *val2 = text + sub2->value;
+        for (sub2 = tree + sub->first_child; sub2 != tree; sub2 = tree + sub2->next) {
+          const char *val2 = text + sub2->value;
 
-          if (!strcmp (key2, "pixmap")) {
-            skonfig->celement->info.slider_pixmap_pad_name = skonfig->sbuf + _skin_strdup (skonfig, val2);
-          } else if (!strcmp (key2, "radius")) {
-            skonfig->celement->info.slider_radius = xitk_str2int32 (&val2);
-          } else if (!strcmp (key2, "type")) {
-            s->info.slider_type = skin_get_slider_type (val2);
+          n = sub2->key;
+          switch (n) {
+            case _K_pixmap:
+              skonfig->celement->info.slider_pixmap_pad_name = skonfig->sbuf + _skin_strdup (skonfig, val2);
+              break;
+            case _K_radius:
+              skonfig->celement->info.slider_radius = sub2->value;
+              break;
+            case _K_type:
+              s->info.slider_type = skin_get_slider_type (val2);
+              break;
+            default: ;
           }
         }
       }
       break;
-    case 8: /* visible */
-      s->info.visibility = xitk_get_bool_value (val);
+    case _K_visible:
+      s->info.visibility = sub->value;
       break;
+    default: ;
   }
 }
 
 static void _skin_parse_1 (xitk_skin_config_t *skonfig, char *text, xitk_cfg_parse_t *tree, xitk_cfg_parse_t *entry) {
-  const char *key = text + entry->key, *val = text + entry->value;
+  const char *val = text + entry->value;
 
   if (entry->first_child) {
+    const char *key = text + entry->key;
     xitk_skin_element_t *s = xitk_xmalloc (sizeof (*s));
 
     if (s) {
@@ -803,53 +961,41 @@ static void _skin_parse_1 (xitk_skin_config_t *skonfig, char *text, xitk_cfg_par
       s->info.visibility = s->info.enability = 1;
       xine_sarray_add (skonfig->elements, s);
 
-      for (sub = tree + entry->first_child; sub; sub = sub->next ? tree + sub->next : NULL) {
+      for (sub = tree + entry->first_child; sub != tree; sub = tree + sub->next) {
         _skin_parse_2 (skonfig, text, tree, sub);
       }
     }
   } else {
-    static const char * const list1[] = {
-      "animation",
-      "author",
-      "date",
-      "load_command",
-      "logo",
-      "name",
-      "unload_command",
-      "url",
-      "version"
-    };
-    int n = _skin_string_index (list1, sizeof (list1) / sizeof (list1[0]), key);
+    _skin_key_t n = entry->key;
     switch (n) {
-      case 0: /* animation */
+      case _K_animation:
         skonfig->animation = _skin_strdup (skonfig, val);
         break;
-      case 1: /* author */
+      case _K_author:
         skonfig->author = _skin_strdup (skonfig, val);
         break;
-      case 2: /* date */
+      case _K_date:
         skonfig->date = _skin_strdup (skonfig, val);
         break;
-      case 3: /* load_command */
+      case _K_load_command:
         skonfig->load_command = _expanded (skonfig, val);
         break;
-      case 4: /* logo */
+      case _K_logo:
         skonfig->logo = _expanded (skonfig, val);
         break;
-      case 5: /* name */
+      case _K_name:
         skonfig->name = _skin_strdup (skonfig, val);
         break;
-      case 6: /* unload_command */
+      case _K_unload_command:
         skonfig->unload_command = _expanded (skonfig, val);
         break;
-      case 7: /* url */
+      case _K_url:
         skonfig->url = _skin_strdup (skonfig, val);
         break;
-      case 8: /* version */
-        skonfig->version = xitk_str2int32 (&val);
+      case _K_version:
+        skonfig->version = entry->value;
         break;
-      default:
-        XITK_WARNING ("wrong section entry found: '%s'\n", key);
+      default: ;
     }
   }
 }
@@ -857,14 +1003,10 @@ static void _skin_parse_1 (xitk_skin_config_t *skonfig, char *text, xitk_cfg_par
 static void _skin_parse_0 (xitk_skin_config_t *skonfig, char *text, xitk_cfg_parse_t *tree) {
   xitk_cfg_parse_t *entry;
 
-  for (entry = tree->first_child ? tree + tree->first_child : NULL; entry;
-    entry = entry->next ? tree + entry->next : NULL) {
-    char *key = text + entry->key;
+  for (entry = tree + tree->first_child; entry != tree; entry = tree + entry->next) {
 
-    if (!strncmp (key, "skin.", 5)) {
-      entry->key += 5;
+    if (entry->key >= 0)
       _skin_parse_1 (skonfig, text, tree, entry);
-    }
   }
 }
 
@@ -899,6 +1041,40 @@ int xitk_skin_load_config(xitk_skin_config_t *skonfig, const char *path, const c
     xitk_cfg_unload (text);
     pthread_mutex_unlock (&skonfig->skin_mutex);
     return 0;
+  }
+
+  {
+    int i;
+
+    for (i = 1; i < tree[0].key; i++) {
+      if (tree[i].level == 1) {
+        if (memcmp (text + tree[i].key, "skin.", 5)) {
+          tree[i].key = -1;
+          continue;
+        }
+        tree[i].key += 5, tree[i].klen -= 5;
+        if (tree[i].first_child)
+          continue;
+      }
+      tree[i].key = _skin_key_index (text + tree[i].key, tree[i].klen);
+      switch (_skin_key_types[tree[i].key]) {
+        const char *v;
+
+        case _KT_int:
+          v = text + tree[i].value;
+          tree[i].value = xitk_str2int32 (&v);
+          break;
+        case _KT_bool:
+          v = text + tree[i].value;
+          tree[i].value = xitk_get_bool_value (v);
+          break;
+        case _KT_color:
+          v = text + tree[i].value;
+          tree[i].value = xitk_get_color_name (v);
+          break;
+        default: ;
+      }
+    }
   }
 
   _skin_parse_0 (skonfig, text, tree);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2021 the xine project
+ * Copyright (C) 2000-2022 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -1917,7 +1917,7 @@ char *xitk_filter_filename(const char *name) {
   if (!strncasecmp (name, "file:", 5)) {
     const uint8_t *p = (const uint8_t *)name + 5;
     uint8_t *ret, *q;
-    size_t l = strlen ((const char *)p);
+    size_t l = xitk_find_byte ((const char *)p, 0);
     ret = malloc (l + 2);
     if (!ret)
       return NULL;
@@ -2182,6 +2182,7 @@ xitk_cfg_parse_t *xitk_cfg_parse (char *contents, int flags) {
 
   box = tree;
   box->level = 0;
+  box->klen = 0;
   box->next = box->prev = box->parent = box->first_child = box->last_child = 0;
   box->key = box->value = -1;
   used = 1;
@@ -2232,9 +2233,10 @@ xitk_cfg_parse_t *xitk_cfg_parse (char *contents, int flags) {
         } else {
           uint8_t *key = p;
           item->key = p - start;
-          item = NULL;
           while (!((z = tab_cfg_parse[*p]) & 0xfd))
             p++;
+          item->klen = p - key;
+          item = NULL;
           if (!(flags & XITK_CFG_PARSE_CASE))
             _xitk_lower (key, p - key);
           *e = 0;
@@ -2316,6 +2318,7 @@ xitk_cfg_parse_t *xitk_cfg_parse (char *contents, int flags) {
         }
         item = tree + used;
         item->level = box->level + 1;
+        item->klen = 0;
         item->parent = box - tree;
         item->next = 0;
         item->prev = box->last_child;
@@ -2332,6 +2335,8 @@ xitk_cfg_parse_t *xitk_cfg_parse (char *contents, int flags) {
     }
   }
   *e = 0;
+
+  tree->key = used;
 
   if (flags & XITK_CFG_PARSE_DEBUG) {
     int i;
