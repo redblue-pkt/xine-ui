@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2021 the xine project
+ * Copyright (C) 2000-2022 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -343,7 +343,6 @@ struct xitk_x11_display_s {
   GC gc1, gc2;
 
   xine_sarray_t *ctrl_keysyms1;
-  uint8_t        ctrl_keysyms2[XITK_KEY_LASTCODE];
 
   XImage *testpix;
 
@@ -1276,14 +1275,59 @@ static uint32_t _xitk_x11_get_modifier (uint32_t state) {
   return res;
 }
 
+static const unsigned int ctrl_syms[XITK_KEY_LASTCODE] = {
+  0,
+  XK_Escape,
+  XK_Return,
+  XK_KP_Enter,
+  XK_ISO_Enter,
+  XK_Left,
+  XK_Right,
+  XK_Up,
+  XK_Down,
+  XK_Home,
+  XK_End,
+  XK_Page_Up,
+  XK_Page_Down,
+  XK_Tab,
+  XK_KP_Tab,
+  XK_ISO_Left_Tab,
+  XK_Insert,
+  XK_Delete,
+  XK_BackSpace,
+  XK_Print,
+  XK_Scroll_Lock,
+  XK_Pause,
+  XK_F1,
+  XK_F2,
+  XK_F3,
+  XK_F4,
+  XK_F5,
+  XK_F6,
+  XK_F7,
+  XK_F8,
+  XK_F9,
+  XK_F10,
+  XK_F11,
+  XK_F12,
+  XK_Prior,
+  XK_Next,
+  XK_Cancel,
+  XK_Menu,
+  XK_Help,
+  0xffffffff,
+  0xffffffff
+};
+
 static int _xitk_x11_ctrl_keysyms_cmp (void *a, void *b) {
-  const unsigned int d = (const unsigned int)(uintptr_t)a;
-  const unsigned int e = (const unsigned int)(uintptr_t)b;
-  return d < e ? -1 : d > e ? 1 : 0;
+  const unsigned int *d = (const unsigned int *)a;
+  const unsigned int *e = (const unsigned int *)b;
+  return *d < *e ? -1 : *d > *e ? 1 : 0;
 }
 
 static int _xitk_x11_keyevent_2_string (xitk_x11_display_t *d, XEvent *event, KeySym *ksym, char *buf, int bsize) {
   int i, len;
+  unsigned int v;
 
   *ksym = XK_VoidSymbol;
   d->d.lock (&d->d);
@@ -1291,10 +1335,11 @@ static int _xitk_x11_keyevent_2_string (xitk_x11_display_t *d, XEvent *event, Ke
   len = XLookupString (&event->xkey, buf, bsize - 1, ksym, NULL);
   d->d.unlock (&d->d);
 
-  i = xine_sarray_binary_search (d->ctrl_keysyms1, (void *)(uintptr_t)(*ksym));
+  v = *ksym;
+  i = xine_sarray_binary_search (d->ctrl_keysyms1, &v);
   if (i >= 0) {
     buf[0] = XITK_CTRL_KEY_PREFIX;
-    buf[1] = d->ctrl_keysyms2[i];
+    buf[1] = (unsigned int *)xine_sarray_get (d->ctrl_keysyms1, i) - ctrl_syms;
     len = 2;
   }
 
@@ -3182,49 +3227,6 @@ static int xitk_x11_change_vmode(xitk_be_display_t *_d, xitk_be_window_t *_w, in
 
 static xitk_be_display_t *xitk_x11_open_display (xitk_backend_t *_be, const char *name, int use_lock, int use_sync,
                                                  const char *prefered_visual, int install_colormap) {
-  static const unsigned int ctrl_syms[XITK_KEY_LASTCODE] = {
-    0,
-    XK_Escape,
-    XK_Return,
-    XK_KP_Enter,
-    XK_ISO_Enter,
-    XK_Left,
-    XK_Right,
-    XK_Up,
-    XK_Down,
-    XK_Home,
-    XK_End,
-    XK_Page_Up,
-    XK_Page_Down,
-    XK_Tab,
-    XK_KP_Tab,
-    XK_ISO_Left_Tab,
-    XK_Insert,
-    XK_Delete,
-    XK_BackSpace,
-    XK_Print,
-    XK_Scroll_Lock,
-    XK_Pause,
-    XK_F1,
-    XK_F2,
-    XK_F3,
-    XK_F4,
-    XK_F5,
-    XK_F6,
-    XK_F7,
-    XK_F8,
-    XK_F9,
-    XK_F10,
-    XK_F11,
-    XK_F12,
-    XK_Prior,
-    XK_Next,
-    XK_Cancel,
-    XK_Menu,
-    XK_Help,
-    0xffffffff,
-    0xffffffff
-  };
   xitk_x11_backend_t *be;
   xitk_x11_display_t *d;
   Display *display;
@@ -3306,13 +3308,8 @@ static xitk_be_display_t *xitk_x11_open_display (xitk_backend_t *_be, const char
   d->ctrl_keysyms1 = xine_sarray_new (XITK_KEY_LASTCODE, _xitk_x11_ctrl_keysyms_cmp);
   if (d->ctrl_keysyms1) {
     int i;
-    for (i = 0; i < XITK_KEY_LASTCODE; i++)
-      xine_sarray_add (d->ctrl_keysyms1, (void *)(uintptr_t)ctrl_syms[i]);
-    for (i = 0; i < XITK_KEY_LASTCODE; i++) {
-      int j = xine_sarray_binary_search (d->ctrl_keysyms1, (void *)(uintptr_t)ctrl_syms[i]);
-      if (j)
-        d->ctrl_keysyms2[j] = i;
-    }
+    for (i = 1; i < XITK_KEY_LASTCODE - 2; i++)
+      xine_sarray_add (d->ctrl_keysyms1, (void *)(ctrl_syms + i)); /** << will not be written to */
   }
 
   if (use_lock) {
