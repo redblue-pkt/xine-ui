@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2021 the xine project
+ * Copyright (C) 2000-2022 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -34,25 +34,26 @@
 typedef enum {
   XITK_KEY_ESCAPE = 1,
   XITK_KEY_RETURN,
-  XITK_KEY_NUMPAD_ENTER,
-  XITK_KEY_ISO_ENTER,
   XITK_KEY_LEFT,
   XITK_KEY_RIGHT,
   XITK_KEY_UP,
   XITK_KEY_DOWN,
   XITK_KEY_HOME,
   XITK_KEY_END,
-  XITK_KEY_PAGE_UP,
-  XITK_KEY_PAGE_DOWN,
+  XITK_KEY_PREV,
+  XITK_KEY_NEXT,
   XITK_KEY_TAB,
-  XITK_KEY_KP_TAB,
-  XITK_KEY_ISO_LEFT_TAB,
+  XITK_KEY_LEFT_TAB, /** << usually sent instead of shift + XITK_KEY_TAB. */
   XITK_KEY_INSERT,
   XITK_KEY_DELETE,
   XITK_KEY_BACKSPACE,
   XITK_KEY_PRINT,
   XITK_KEY_ROLL,
   XITK_KEY_PAUSE,
+  XITK_KEY_ABORT,
+  XITK_KEY_MENU,
+  XITK_KEY_HELP,
+
   XITK_KEY_F1,
   XITK_KEY_F2,
   XITK_KEY_F3,
@@ -65,11 +66,6 @@ typedef enum {
   XITK_KEY_F10,
   XITK_KEY_F11,
   XITK_KEY_F12,
-  XITK_KEY_PREV,
-  XITK_KEY_NEXT,
-  XITK_KEY_ABORT,
-  XITK_KEY_MENU,
-  XITK_KEY_HELP,
 
   XITK_MOUSE_WHEEL_UP,
   XITK_MOUSE_WHEEL_DOWN,
@@ -128,3 +124,4 @@ xitk_register_key_t xitk_be_register_event_handler (const char *name, xitk_windo
   void (*destructor) (void *data), void *destr_data);
 
 #endif
+

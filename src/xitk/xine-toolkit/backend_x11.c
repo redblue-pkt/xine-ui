@@ -1275,59 +1275,68 @@ static uint32_t _xitk_x11_get_modifier (uint32_t state) {
   return res;
 }
 
-static const unsigned int ctrl_syms[XITK_KEY_LASTCODE] = {
-  0,
-  XK_Escape,
-  XK_Return,
-  XK_KP_Enter,
-  XK_ISO_Enter,
-  XK_Left,
-  XK_Right,
-  XK_Up,
-  XK_Down,
-  XK_Home,
-  XK_End,
-  XK_Page_Up,
-  XK_Page_Down,
-  XK_Tab,
-  XK_KP_Tab,
-  XK_ISO_Left_Tab,
-  XK_Insert,
-  XK_Delete,
-  XK_BackSpace,
-  XK_Print,
-  XK_Scroll_Lock,
-  XK_Pause,
-  XK_F1,
-  XK_F2,
-  XK_F3,
-  XK_F4,
-  XK_F5,
-  XK_F6,
-  XK_F7,
-  XK_F8,
-  XK_F9,
-  XK_F10,
-  XK_F11,
-  XK_F12,
-  XK_Prior,
-  XK_Next,
-  XK_Cancel,
-  XK_Menu,
-  XK_Help,
-  0xffffffff,
-  0xffffffff
+#define _KSYM(xitk_sym,x11_sym) ((xitk_sym << 24) + (x11_sym & 0x00ffffff))
+static const uint32_t ctrl_syms[] = {
+  /* The XK_* we use here are all 16bit. We sort numerically just to speed up xine_sarray_add (). */
+  _KSYM (XITK_KEY_LEFT_TAB,  XK_ISO_Left_Tab),  /* 0xfe20 */
+  _KSYM (XITK_KEY_RETURN,    XK_ISO_Enter),     /* 0xfe34 */
+  _KSYM (XITK_KEY_BACKSPACE, XK_BackSpace),     /* 0xff08 */
+  _KSYM (XITK_KEY_TAB,       XK_Tab),           /* 0xff09 */
+  _KSYM (XITK_KEY_RETURN,    XK_Return),        /* 0xff0d */
+  _KSYM (XITK_KEY_PAUSE,     XK_Pause),         /* 0xff13 */
+  _KSYM (XITK_KEY_ROLL,      XK_Scroll_Lock),   /* 0xff14 */
+  _KSYM (XITK_KEY_ESCAPE,    XK_Escape),        /* 0xff1b */
+  _KSYM (XITK_KEY_HOME,      XK_Home),          /* 0xff50 */
+  _KSYM (XITK_KEY_LEFT,      XK_Left),          /* 0xff51 */
+  _KSYM (XITK_KEY_UP,        XK_Up),            /* 0xff52 */
+  _KSYM (XITK_KEY_RIGHT,     XK_Right),         /* 0xff53 */
+  _KSYM (XITK_KEY_DOWN,      XK_Down),          /* 0xff54 */
+  _KSYM (XITK_KEY_PREV,      XK_Prior),         /* 0xff55 */
+  _KSYM (XITK_KEY_NEXT,      XK_Next),          /* 0xff56 */
+  _KSYM (XITK_KEY_END,       XK_End),           /* 0xff57 */
+  _KSYM (XITK_KEY_PRINT,     XK_Print),         /* 0xff61 */
+  _KSYM (XITK_KEY_INSERT,    XK_Insert),        /* 0xff63 */
+  _KSYM (XITK_KEY_MENU,      XK_Menu),          /* 0xff67 */
+  _KSYM (XITK_KEY_ABORT,     XK_Cancel),        /* 0xff69 */
+  _KSYM (XITK_KEY_HELP,      XK_Help),          /* 0xff6a */
+  _KSYM (XITK_KEY_TAB,       XK_KP_Tab),        /* 0xff89 */
+  _KSYM (XITK_KEY_RETURN,    XK_KP_Enter),      /* 0xff8d */
+  _KSYM (XITK_KEY_F1,        XK_KP_F1),         /* 0xff91 */
+  _KSYM (XITK_KEY_F2,        XK_KP_F2),         /* 0xff92 */
+  _KSYM (XITK_KEY_F3,        XK_KP_F3),         /* 0xff93 */
+  _KSYM (XITK_KEY_F4,        XK_KP_F4),         /* 0xff94 */
+  _KSYM (XITK_KEY_HOME,      XK_KP_Home),       /* 0xff95 */
+  _KSYM (XITK_KEY_LEFT,      XK_KP_Left),       /* 0xff96 */
+  _KSYM (XITK_KEY_UP,        XK_KP_Up),         /* 0xff97 */
+  _KSYM (XITK_KEY_RIGHT,     XK_KP_Right),      /* 0xff98 */
+  _KSYM (XITK_KEY_DOWN,      XK_KP_Down),       /* 0xff99 */
+  _KSYM (XITK_KEY_PREV,      XK_KP_Prior),      /* 0xff9a */
+  _KSYM (XITK_KEY_NEXT,      XK_KP_Next),       /* 0xff9b */
+  _KSYM (XITK_KEY_END,       XK_KP_End),        /* 0xff9c */
+  _KSYM (XITK_KEY_INSERT,    XK_KP_Insert),     /* 0xff9e */
+  _KSYM (XITK_KEY_DELETE,    XK_KP_Delete),     /* 0xff9f */
+  _KSYM (XITK_KEY_F1,        XK_F1),            /* 0xffbe */
+  _KSYM (XITK_KEY_F2,        XK_F2),            /* 0xffbf */
+  _KSYM (XITK_KEY_F3,        XK_F3),            /* 0xffc0 */
+  _KSYM (XITK_KEY_F4,        XK_F4),            /* 0xffc1 */
+  _KSYM (XITK_KEY_F5,        XK_F5),            /* 0xffc2 */
+  _KSYM (XITK_KEY_F6,        XK_F6),            /* 0xffc3 */
+  _KSYM (XITK_KEY_F7,        XK_F7),            /* 0xffc4 */
+  _KSYM (XITK_KEY_F8,        XK_F8),            /* 0xffc5 */
+  _KSYM (XITK_KEY_F9,        XK_F9),            /* 0xffc6 */
+  _KSYM (XITK_KEY_F10,       XK_F10),           /* 0xffc7 */
+  _KSYM (XITK_KEY_F11,       XK_F11),           /* 0xffc8 */
+  _KSYM (XITK_KEY_F12,       XK_F12),           /* 0xffc9 */
+  _KSYM (XITK_KEY_DELETE,    XK_Delete)         /* 0xffff */
 };
 
 static int _xitk_x11_ctrl_keysyms_cmp (void *a, void *b) {
-  const unsigned int *d = (const unsigned int *)a;
-  const unsigned int *e = (const unsigned int *)b;
-  return *d < *e ? -1 : *d > *e ? 1 : 0;
+  uint32_t d = (uintptr_t)a, e = (uintptr_t)b;
+  return (int)(d & 0x00ffffff) - (int)(e & 0x00ffffff);
 }
 
 static int _xitk_x11_keyevent_2_string (xitk_x11_display_t *d, XEvent *event, KeySym *ksym, char *buf, int bsize) {
-  int i, len;
-  unsigned int v;
+  int len;
 
   *ksym = XK_VoidSymbol;
   d->d.lock (&d->d);
@@ -1335,12 +1344,14 @@ static int _xitk_x11_keyevent_2_string (xitk_x11_display_t *d, XEvent *event, Ke
   len = XLookupString (&event->xkey, buf, bsize - 1, ksym, NULL);
   d->d.unlock (&d->d);
 
-  v = *ksym;
-  i = xine_sarray_binary_search (d->ctrl_keysyms1, &v);
-  if (i >= 0) {
-    buf[0] = XITK_CTRL_KEY_PREFIX;
-    buf[1] = (unsigned int *)xine_sarray_get (d->ctrl_keysyms1, i) - ctrl_syms;
-    len = 2;
+  if (!((*ksym) & 0xff000000)) {
+    int i = xine_sarray_binary_search (d->ctrl_keysyms1, (void *)(uintptr_t)*ksym);
+
+    if (i >= 0) {
+      buf[0] = XITK_CTRL_KEY_PREFIX;
+      buf[1] = (uintptr_t)xine_sarray_get (d->ctrl_keysyms1, i) >> 24;
+      len = 2;
+    }
   }
 
   if (len < 0)
@@ -3307,9 +3318,9 @@ static xitk_be_display_t *xitk_x11_open_display (xitk_backend_t *_be, const char
 
   d->ctrl_keysyms1 = xine_sarray_new (XITK_KEY_LASTCODE, _xitk_x11_ctrl_keysyms_cmp);
   if (d->ctrl_keysyms1) {
-    int i;
-    for (i = 1; i < XITK_KEY_LASTCODE - 2; i++)
-      xine_sarray_add (d->ctrl_keysyms1, (void *)(ctrl_syms + i)); /** << will not be written to */
+    uint32_t u;
+    for (u = 0; u < sizeof (ctrl_syms) / sizeof (ctrl_syms[0]); u++)
+      xine_sarray_add (d->ctrl_keysyms1, (void *)(uintptr_t)ctrl_syms[u]);
   }
 
   if (use_lock) {
@@ -3417,4 +3428,3 @@ xitk_backend_t *xitk_backend_new (xitk_t *xitk, int verbosity) {
 
   return &be->be;
 }
-
