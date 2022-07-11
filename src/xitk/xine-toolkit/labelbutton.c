@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2021 the xine project
+ * Copyright (C) 2000-2022 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -254,8 +254,6 @@ static int _labelbutton_input (_lbutton_private_t *wp, const widget_event_t *eve
     static const char k[] = {
       XITK_CTRL_KEY_PREFIX, XITK_KEY_RIGHT,
       XITK_CTRL_KEY_PREFIX, XITK_KEY_RETURN,
-      XITK_CTRL_KEY_PREFIX, XITK_KEY_NUMPAD_ENTER,
-      XITK_CTRL_KEY_PREFIX, XITK_KEY_ISO_ENTER,
       ' ', 0
     };
     int i, n = sizeof (k) / sizeof (k[0]);

@@ -953,8 +953,6 @@ static int _inputtext_key (_inputtext_private_t *wp, const char *s, int modifier
         _inputtext_move_eol (wp);
         return 1;
       case XITK_KEY_RETURN:
-      case XITK_KEY_NUMPAD_ENTER:
-      case XITK_KEY_ISO_ENTER:
         _inputtext_exec_return (wp);
         return 1;
       case XITK_KEY_ESCAPE:

@@ -1277,6 +1277,13 @@ static void xitk_handle_event (__xitk_t *xitk, xitk_be_event_t *event) {
 
   handled = 0;
   switch (event->type) {
+    static const uint8_t keyflags[XITK_KEY_LASTCODE + 1] = {
+      [XITK_KEY_ESCAPE] = 1,
+      [XITK_KEY_RETURN] = 1,
+      [XITK_KEY_TAB] = 2,
+      [XITK_KEY_LEFT_TAB] = 4,
+      [XITK_KEY_MENU] = 8
+    };
 
     case XITK_EV_CLIP_READY:
       if (xwin && xitk->clipboard.widget_in) {
@@ -1300,36 +1307,40 @@ static void xitk_handle_event (__xitk_t *xitk, xitk_be_event_t *event) {
 
     case XITK_EV_KEY_UP:
       gettimeofday (&xitk->keypress, 0);
-      if (fx && fx->wl.widget_focused)
-        handled = xitk_widget_key_event (fx->wl.widget_focused, event->utf8, event->qual, 1);
+      if (fx) {
+        xitk_widget_t *w = fx->wl.widget_focused;
+
+        if (w) {
+          handled = xitk_widget_key_event (w, event->utf8, event->qual, 1);
+          /* this may have changed focus or deleted w. */
+          if (w == fx->wl.widget_focused) {
+            const uint8_t *kstr = (const uint8_t *)event->utf8;
+            uint8_t flags = (kstr[0] == XITK_CTRL_KEY_PREFIX) ? keyflags[kstr[1]] : 0;
+            /* convenience HACK: leaving inputtext with ESCAPE or ENTER shall
+             * set focus to next widget. using XITK_EV_KEY_UP to avoid various glitches. */
+            if ((flags & 1) && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
+              handled = 1;
+              xitk_set_focus_to_next_widget (&fx->wl, event->qual & MODIFIER_SHIFT, event->qual);
+            }
+          }
+        }
+      }
       break;
 
     case XITK_EV_KEY_DOWN:
       if (fx) {
-        static const uint8_t t[XITK_KEY_LASTCODE + 1] = {
-          [XITK_KEY_ESCAPE] = 32,
-          [XITK_KEY_TAB] = 1,
-          [XITK_KEY_KP_TAB] = 1,
-          [XITK_KEY_ISO_LEFT_TAB] = 1,
-          [XITK_KEY_RETURN] = 2,
-          [XITK_KEY_NUMPAD_ENTER] = 2,
-          [XITK_KEY_ISO_ENTER] = 2,
-          [XITK_KEY_UP] = 8,
-          [XITK_KEY_DOWN] = 16,
-          [XITK_KEY_PREV] = 8,
-          [XITK_KEY_NEXT] = 16,
-          [XITK_KEY_LASTCODE] = 4
-        };
-        uint8_t       *kbuf = (uint8_t *)event->utf8;
+        const uint8_t *kstr = (const uint8_t *)event->utf8;
         int            modifier = event->qual;
+        uint8_t        flags;
         xitk_widget_t *w;
 
         xitk_tips_hide_tips (xitk->x.tips);
 
         w = fx->wl.widget_focused;
 
-        /* hint possible menu location */
-        if ((event->utf8[0] == XITK_CTRL_KEY_PREFIX) && (event->utf8[1] == XITK_KEY_MENU) && fx->wl.xwin->bewin) {
+        flags = (kstr[0] == XITK_CTRL_KEY_PREFIX) ? keyflags[kstr[1]] : 0;
+        if ((flags & 8) && fx->wl.xwin->bewin) {
+          /* hint possible menu location */
           xitk_tagitem_t tags[] = {{XITK_TAG_X, 0}, {XITK_TAG_Y, 0}, {XITK_TAG_END, 0}};
           fx->wl.xwin->bewin->get_props (fx->wl.xwin->bewin, tags);
           event->w = tags[0].value;
@@ -1347,23 +1358,19 @@ static void xitk_handle_event (__xitk_t *xitk, xitk_be_event_t *event) {
         /* this may have changed focus or deleted w. */
         w = fx->wl.widget_focused;
 
-        if (!handled) {
-          if (kbuf[0] == ' ')
-            kbuf[0] = XITK_CTRL_KEY_PREFIX, kbuf[1] = XITK_KEY_LASTCODE;
-          if (kbuf[0] == XITK_CTRL_KEY_PREFIX) {
-            if ((t[kbuf[1]] == 1) || (w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT) && (t[kbuf[1]] & 34))) {
-              handled = 1;
-              xitk_set_focus_to_next_widget (&fx->wl, (modifier & MODIFIER_SHIFT), modifier);
-            }
-          }
+        if (!handled && (flags & (2 | 4))) {
+          handled = 1;
+          /* TJ. I have seen keyboards with separate left tab key.
+           * My keyboards have not. However, when I press shift + tab,
+           * I get MODIFIER_SHIFT + XITK_KEY_LEFT_TAB. */
+          if (flags & 4) /* XITK_KEY_LEFT_TAB */
+            modifier |= MODIFIER_SHIFT;
+          xitk_set_focus_to_next_widget (&fx->wl, (modifier & MODIFIER_SHIFT), modifier);
+          w = fx->wl.widget_focused;
         }
 
-        if (!handled) {
-          if (xitk->menu) {
-            if (!(fx->wl.widget_focused && (fx->wl.widget_focused->type & WIDGET_GROUP_MENU)))
-              xitk_set_current_menu (&xitk->x, NULL);
-          }
-        }
+        if (!handled && xitk->menu && !(w && (w->type & WIDGET_GROUP_MENU)))
+          xitk_set_current_menu (&xitk->x, NULL);
       }
       break;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2021 the xine project
+ * Copyright (C) 2000-2022 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -176,9 +176,7 @@ static int event_sender_event (void *data, const xitk_be_event_t *e) {
             case XITK_KEY_DOWN:  xine_event.type = XINE_EVENT_INPUT_DOWN; break;
             case XITK_KEY_LEFT:  xine_event.type = XINE_EVENT_INPUT_LEFT; break;
             case XITK_KEY_RIGHT: xine_event.type = XINE_EVENT_INPUT_RIGHT; break;
-            case XITK_KEY_RETURN:
-            case XITK_KEY_NUMPAD_ENTER:
-            case XITK_KEY_ISO_ENTER: xine_event.type = XINE_EVENT_INPUT_SELECT; break;
+            case XITK_KEY_RETURN: xine_event.type = XINE_EVENT_INPUT_SELECT; break;
             case XITK_KEY_ESCAPE:
               event_sender_exit (NULL, es, 0);
               return 1;

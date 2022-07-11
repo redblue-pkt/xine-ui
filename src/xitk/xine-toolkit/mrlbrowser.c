@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2021 the xine project
+ * Copyright (C) 2000-2022 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -900,8 +900,6 @@ static int mrlbrowser_event (void *data, const xitk_be_event_t *e) {
         case XITK_CTRL_KEY_PREFIX:
           switch (e->utf8[1]) {
             case XITK_KEY_RETURN:
-            case XITK_KEY_NUMPAD_ENTER:
-            case XITK_KEY_ISO_ENTER:
               {
                 int selected;
                 if ((selected = xitk_browser_get_current_selected (wp->mrlb_list)) >= 0)
@@ -1155,3 +1153,4 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_t *xitk, xitk_skin_config_t *skonfig,
 
   return &wp->w;
 }
+
