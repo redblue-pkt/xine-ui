@@ -65,6 +65,11 @@
 
 #include "xitk_x11.h"
 
+/* TJ. if i got <X11/keysym.h> right, this will always be true. */
+#if XK_KP_Next == 0xff9b
+# define _STATIC_TABLE 1
+#endif
+
 #define _XITK_X11_BE_MAGIC      (('x' << 24) | ('1' << 16) | ('1' << 8) | 'b')
 #define _XITK_X11_FONT_MAGIC    (('x' << 24) | ('1' << 16) | ('1' << 8) | 'f')
 #define _XITK_X11_IMAGE_MAGIC   (('x' << 24) | ('1' << 16) | ('1' << 8) | 'i')
@@ -341,9 +346,9 @@ struct xitk_x11_display_s {
   xitk_x11_cursors_t *cursors;
 
   GC gc1, gc2;
-
+#ifndef _STATIC_TABLE
   xine_sarray_t *ctrl_keysyms1;
-
+#endif
   XImage *testpix;
 
 #ifdef HAVE_XTESTEXTENSION
@@ -415,10 +420,10 @@ static void _xitk_x11_display_delete (xitk_x11_display_t *d) {
   pthread_mutex_lock (&be->mutex);
   xitk_dnode_remove (&d->d.node);
   pthread_mutex_unlock (&be->mutex);
-
+#ifndef _STATIC_TABLE
   xine_sarray_delete (d->ctrl_keysyms1);
   d->ctrl_keysyms1 = NULL;
-
+#endif
   if (d->testpix) {
     XDestroyImage (d->testpix);
     d->testpix = NULL;
@@ -1275,8 +1280,14 @@ static uint32_t _xitk_x11_get_modifier (uint32_t state) {
   return res;
 }
 
-#define _KSYM(xitk_sym,x11_sym) ((xitk_sym << 24) + (x11_sym & 0x00ffffff))
-static const uint32_t ctrl_syms[] = {
+#ifdef _STATIC_TABLE
+# define _KSYM(xitk_sym,x11_sym) [x11_sym & 0x1ff] = xitk_sym
+static const uint8_t ctrl_syms[512] =
+#else
+# define _KSYM(xitk_sym,x11_sym) ((xitk_sym << 24) + (x11_sym & 0x00ffffff))
+static const uint32_t ctrl_syms[] =
+#endif
+{
   /* The XK_* we use here are all 16bit. We sort numerically just to speed up xine_sarray_add (). */
   _KSYM (XITK_KEY_LEFT_TAB,  XK_ISO_Left_Tab),  /* 0xfe20 */
   _KSYM (XITK_KEY_RETURN,    XK_ISO_Enter),     /* 0xfe34 */
@@ -1330,10 +1341,12 @@ static const uint32_t ctrl_syms[] = {
   _KSYM (XITK_KEY_DELETE,    XK_Delete)         /* 0xffff */
 };
 
+#ifndef _STATIC_TABLE
 static int _xitk_x11_ctrl_keysyms_cmp (void *a, void *b) {
   uint32_t d = (uintptr_t)a, e = (uintptr_t)b;
   return (int)(d & 0x00ffffff) - (int)(e & 0x00ffffff);
 }
+#endif
 
 static int _xitk_x11_keyevent_2_string (xitk_x11_display_t *d, XEvent *event, KeySym *ksym, char *buf, int bsize) {
   int len;
@@ -1344,6 +1357,17 @@ static int _xitk_x11_keyevent_2_string (xitk_x11_display_t *d, XEvent *event, Ke
   len = XLookupString (&event->xkey, buf, bsize - 1, ksym, NULL);
   d->d.unlock (&d->d);
 
+#ifdef _STATIC_TABLE
+  if (((*ksym) & 0xfffffe00) == 0x0000fe00) {
+    uint8_t s = ctrl_syms[(*ksym) & 0x1ff];
+
+    if (s) {
+      buf[0] = XITK_CTRL_KEY_PREFIX;
+      buf[1] = s;
+      len = 2;
+    }
+  }
+#else
   if (!((*ksym) & 0xff000000)) {
     int i = xine_sarray_binary_search (d->ctrl_keysyms1, (void *)(uintptr_t)*ksym);
 
@@ -1353,7 +1377,7 @@ static int _xitk_x11_keyevent_2_string (xitk_x11_display_t *d, XEvent *event, Ke
       len = 2;
     }
   }
-
+#endif
   if (len < 0)
     len = 0;
   buf[len] = 0;
@@ -3315,14 +3339,14 @@ static xitk_be_display_t *xitk_x11_open_display (xitk_backend_t *_be, const char
   d->d.id = (uintptr_t)d->display;
   d->refs = 1;
   pthread_mutex_init (&d->mutex, NULL);
-
-  d->ctrl_keysyms1 = xine_sarray_new (XITK_KEY_LASTCODE, _xitk_x11_ctrl_keysyms_cmp);
+#ifndef _STATIC_TABLE
+  d->ctrl_keysyms1 = xine_sarray_new (sizeof (ctrl_syms) / sizeof (ctrl_syms[0]), _xitk_x11_ctrl_keysyms_cmp);
   if (d->ctrl_keysyms1) {
     uint32_t u;
     for (u = 0; u < sizeof (ctrl_syms) / sizeof (ctrl_syms[0]); u++)
       xine_sarray_add (d->ctrl_keysyms1, (void *)(uintptr_t)ctrl_syms[u]);
   }
-
+#endif
   if (use_lock) {
     d->d.lock   = xitk_x11_display_lock;
     d->d.unlock = xitk_x11_display_unlock;
