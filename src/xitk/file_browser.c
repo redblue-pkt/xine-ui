@@ -161,12 +161,17 @@ static void _fb_list_add (fb_list_t *list, const char *str, uint32_t term) {
     list->have = nhave;
   }
   slen = strlen (str);
-  if (list->bufused + slen + 2 > list->bufsize) {
+  /* keep start and end pads */
+  if (list->bufused + slen + 8 > list->bufsize) {
     uint32_t nsize = list->bufsize + 8192, u;
     char **a, *nb = realloc (list->buf, nsize);
     if (!nb)
       return;
-    for (a = list->array, u = list->bufused; u; a++, u--)
+    if (!list->buf) {
+      memset (nb, 0, 4);
+      list->bufused = 4;
+    }
+    for (a = list->array, u = list->used; u; a++, u--)
       *a = nb + (*a - list->buf);
     list->buf = nb;
     list->bufsize = nsize;
@@ -243,9 +248,6 @@ struct filebrowser_s {
 
   int                             show_hidden_files;
 
-  char                            current_dir[XINE_PATH_MAX + 1];
-  char                            filename[XINE_NAME_MAX + 1];
-
   fb_list_t                       dir_list;
   int                             directories_sel;
 
@@ -261,8 +263,41 @@ struct filebrowser_s {
 
   xitk_register_key_t             widget_key;
   xitk_register_key_t             dialog;
+
+  uint32_t                        saved_file_len;
+  /* offsets into path */
+  uint32_t                        dirstart, dirstop, filestart, filestop;
+  char                            path[2048], trypath[2048];
+  char                            saved_file[768];
 };
 
+static const char *_fb_file_get (filebrowser_t *fb, const char *name) {
+  uint32_t have, l;
+
+  if (!fb->saved_file_len) {
+    have = sizeof (fb->saved_file);
+    l = fb->filestop - fb->filestart + 1;
+    if (l > have)
+      l = have;
+    fb->saved_file_len = l;
+    memcpy (fb->saved_file, fb->path + fb->filestart, l);
+  }
+
+  have = sizeof (fb->path) - fb->filestart;
+  l = strlen (name) + 1;
+  if (l > have)
+    l = have;
+  memcpy (fb->path + fb->filestart, name, l);
+
+  return fb->path + fb->dirstart;
+}
+
+static void _fb_file_unget (filebrowser_t *fb) {
+  if (!fb->saved_file_len)
+    return;
+  memcpy (fb->path + fb->filestart, fb->saved_file, fb->saved_file_len);
+  fb->saved_file_len = 0;
+}
 
 typedef struct {
   xitk_window_t            *xwin;
@@ -348,8 +383,8 @@ static int fne_event (void *data, const xitk_be_event_t *e) {
   return gui_handle_be_event (fne->fb->gui, e);
 }
 
-static void fb_create_input_window(char *title, char *text,
-				   xitk_string_callback_t cb, filebrowser_t *fb) {
+static void fb_create_input_window (filebrowser_t *fb, xitk_string_callback_t cb,
+  const char *title, char *text, size_t maxlen) {
   filename_editor_t          *fne;
   int                         x, y, w;
   int                         width = WINDOW_WIDTH;
@@ -381,7 +416,7 @@ static void fb_create_input_window(char *title, char *text,
 
   inp.skin_element_name = NULL;
   inp.text              = text;
-  inp.max_length        = XITK_PATH_MAX + XITK_NAME_MAX + 1;
+  inp.max_length        = maxlen;
   inp.callback          = NULL;
   inp.userdata          = (void *)fne;
   fne->input = xitk_noskin_inputtext_create (fne->widget_list, &inp,
@@ -470,74 +505,70 @@ static int is_file_match_to_filter(filebrowser_t *fb, char *file) {
 }
 
 static void fb_update_origin(filebrowser_t *fb) {
-  char   buf[XITK_PATH_MAX + XITK_NAME_MAX + 2];
-
-  if(strcmp(fb->current_dir, "/"))
-    snprintf(buf, sizeof(buf), "%s/%s", fb->current_dir, fb->filename);
-  else
-    snprintf(buf, sizeof(buf), "/%s", fb->filename);
-
-  xitk_inputtext_change_text(fb->w[_W_origin], buf);
+  xitk_inputtext_change_text (fb->w[_W_origin], fb->path + fb->dirstart);
 }
 
 static void fb_extract_path_and_file(filebrowser_t *fb, const char *filepathname) {
-  if(filepathname && *filepathname) {
-    char *dirname = NULL;
-    char *filename = NULL;
-    char  _filepathname[XITK_PATH_MAX + XITK_NAME_MAX + 2];
-    char *p;
+  uint32_t l, have;
+  char *d;
 
-    if((*filepathname == '~') && (*(filepathname + 1) == '/' || *(filepathname + 1) == '\0')) {
-      const char *homedir = xine_get_homedir();
+  if (!filepathname)
+    return;
+  if (!filepathname[0])
+    return;
 
-      snprintf(_filepathname, sizeof(_filepathname), "%s%s", homedir, (filepathname + 1));
-    }
-    else {
-      if((*filepathname == '\\') && (*(filepathname + 1) == '~'))
-	filepathname++;
-      if(*filepathname == '/')
-	strlcpy(_filepathname, filepathname, sizeof(_filepathname));
-      else
-	snprintf(_filepathname, sizeof(_filepathname), "%s/%s", fb->current_dir, filepathname);
-    }
+  have = sizeof (fb->path) - fb->dirstart;
+  d = fb->path + fb->dirstart;
+  /* "\~..." -> "~..." */
+  if ((filepathname[0] == '\\') && (filepathname[1] == '~'))
+    filepathname++;
+  /* "~/..." -> "/home/user" "/..." */
+  if ((filepathname[0] == '~') && ((filepathname[1] == '/') || !filepathname[1])) {
+    const char *homedir = xine_get_homedir ();
 
-    p = _filepathname + strlen(_filepathname) - 1;
-    while((p > _filepathname) && (*p == '/'))	/* Remove trailing '/' from path name */
-      *p-- = '\0';
-
-    if(is_a_dir(_filepathname)) {		/* Whole name is a dir name */
-      dirname = _filepathname;
-    }
-    else {
-      filename = strrchr(_filepathname, '/');
-
-      if(!filename) {				/* Whole name treated as file name */
-	filename = _filepathname;
-      }
-      else {					/* Split into dir and file part */
-	*filename++ = '\0';
-
-	if(*_filepathname == '\0')
-	  dirname = "/";			/* Dir part was "/", restore it */
-	else
-	  dirname = _filepathname;
-
-	p = dirname + strlen(dirname) - 1;
-	while((p > dirname) && (*p == '/'))	/* Remove trailing '/' from dir name */
-	  *p-- = '\0';
-
-	if(!is_a_dir(dirname))			/* Invalid path, don't change anything */
-	  return;
-      }
-    }
-
-    if(dirname)
-      strlcpy(fb->current_dir, dirname, sizeof(fb->current_dir));
-
-    if(filename)
-      strlcpy(fb->filename, filename, sizeof(fb->filename));
-    else
-      *fb->filename = '\0';
+    filepathname++;
+    l = strlcpy (d, homedir, have);
+    if (l > have - 1)
+      l = have - 1;
+    d += l;
+    have -= l;
+  } else
+  /* XXX: "/some/dir/filename.flv" "newfile.flv" -> "/some/dir/newfile.flv" */
+  if (filepathname[0] != '/') {
+    have = sizeof (fb->path) - fb->filestart;
+    d = fb->path + fb->filestart;
+    l = strlcpy (d, filepathname, have);
+    if (l > have - 1)
+      l = have - 1;
+    fb->filestop = fb->filestart + l;
+    return;
+  }
+  /* get everything */
+  l = strlcpy (fb->path + fb->dirstart, filepathname, have);
+  if (l > have - 1)
+    l = have - 1;
+  d += l;
+  /* "...////" -> "..." */
+  fb->path[fb->dirstart -1] = 0;
+  while (d[-1] == '/')
+    d--;
+  /* find last / */
+  fb->path[fb->dirstart -1] = '/';
+  while (d[-1] != '/')
+    d--;
+  if (d <= fb->path + fb->dirstart) {
+    /* "justafilename.flv" */
+    fb->dirstop = fb->filestart = fb->dirstart;
+    fb->filestop = fb->dirstart + l;
+  } else if (d == fb->path + fb->dirstart + 1) {
+    /* "/filename.flv" */
+    fb->dirstop = fb->filestart = fb->dirstart + 1;
+    fb->filestop = fb->dirstart + 1 + l;
+  } else {
+    /* "...somedir/filename.flv" */
+    fb->dirstop = d - fb->path - 1;
+    fb->filestart = d - fb->path;
+    fb->filestop = fb->dirstart + l;
   }
 }
 
@@ -637,9 +668,9 @@ static void sort_files (filebrowser_t *fb) {
 }
 
 static void fb_getdir(filebrowser_t *fb) {
-  char                  fullfilename[XINE_PATH_MAX + XINE_NAME_MAX + 2];
-  struct dirent        *pdirent;
-  DIR                  *pdir;
+  char           temp;
+  struct dirent *pdirent;
+  DIR           *pdir;
 
   _fb_set_cursor(fb, WAIT_CURS);
 
@@ -647,36 +678,30 @@ static void fb_getdir(filebrowser_t *fb) {
   _fb_list_clear (&fb->dir_list);
 
   /* Following code relies on the fact that fb->current_dir has no trailing '/' */
-  if((pdir = opendir(fb->current_dir)) == NULL) {
-    char *p = strrchr(fb->current_dir, '/');
-
+  temp = fb->path[fb->dirstop];
+  fb->path[fb->dirstop] = 0;
+  if ((pdir = opendir (fb->path + fb->dirstart)) == NULL) {
     gui_msg (fb->gui, XUI_MSG_ERROR, _("Unable to open directory '%s': %s."),
-	       (p && *(p + 1)) ? p + 1 : fb->current_dir, strerror(errno));
-
-    /* One step back if dir has a subdir component */
-    if(p && *(p + 1)) {
-      if(p == fb->current_dir) /* we are in the root dir */
-	*(p + 1) = '\0';
-      else
-	*p = '\0';
-
-      fb_update_origin(fb);
-      fb_getdir(fb);
-    }
+      fb->path + fb->dirstart, strerror (errno));
+    fb->path[fb->dirstop] = temp;
+    /* give user an exit */
+    _fb_list_add (&fb->dir_list, "..", '/');
+    _fb_set_cursor (fb, NORMAL_CURS);
     return;
   }
+  fb->path[fb->dirstop] = temp;
 
   while ((pdirent = readdir (pdir)) != NULL) {
     fb_list_t *list;
+    const char *fullname;
     uint32_t term;
-
-    snprintf(fullfilename, sizeof(fullfilename), "%s/%s", fb->current_dir, pdirent->d_name);
 
     /* if user don't want to see hidden files, ignore them */
     if ((pdirent->d_name[0] == '.') && pdirent->d_name[1] && (pdirent->d_name[1] != '.') && !fb->show_hidden_files)
       continue;
 
-    if (is_a_dir (fullfilename)) {
+    fullname = _fb_file_get (fb, pdirent->d_name);
+    if (is_a_dir (fullname)) {
       list = &fb->dir_list;
       term = '/';
     } else {
@@ -687,6 +712,7 @@ static void fb_getdir(filebrowser_t *fb) {
     }
     _fb_list_add (list, pdirent->d_name, term);
   }
+  _fb_file_unget (fb);
 
   closedir(pdir);
 
@@ -712,7 +738,11 @@ static void fb_select(xitk_widget_t *w, void *data, int selected, int modifier) 
   if (selected < 0)
     return;
   if(w == fb->w[_W_files_browser]) {
-    strlcpy (fb->filename, fb->file_list.array[selected], sizeof (fb->filename));
+    uint32_t have = sizeof (fb->path) - fb->filestart;
+    uint32_t l = strlcpy (fb->path + fb->filestart, fb->file_list.array[selected], have);
+    if (l > have - 1)
+      l = have - 1;
+    fb->filestop = fb->filestart + l;
     fb_update_origin(fb);
   }
 }
@@ -723,9 +753,7 @@ static void fb_callback_button_cb (xitk_widget_t *w, void *data, int state) {
 
   (void)state;
   if (b->need_a_file) {
-    if (!fb->filename)
-      return;
-    if (!fb->filename[0])
+    if (!fb->path[fb->filestart])
       return;
   }
   if (b->callback)
@@ -736,57 +764,61 @@ static void fb_callback_button_cb (xitk_widget_t *w, void *data, int state) {
 
 static void fb_dbl_select(xitk_widget_t *w, void *data, int selected, int modifier) {
   filebrowser_t *fb = (filebrowser_t *) data;
+  uint32_t l = strlen (fb->dir_list.array[selected]);
 
   (void)modifier;
-  if(w == fb->w[_W_directories_browser]) {
-    char buf[XITK_PATH_MAX + XITK_NAME_MAX + 2];
-
-    /* Want to re-read current dir */
-    if (!strcasecmp (fb->dir_list.array[selected], ".")) {
-      /* NOOP */
-    }
-    else if (!strcasecmp (fb->dir_list.array[selected], "..")) {
-      char *p;
-
-      strlcpy(buf, fb->current_dir, sizeof(buf));
-      if(strlen(buf) > 1) { /* not '/' directory */
-
-	p = &buf[strlen(buf)-1];
-	while(*p && *p != '/') {
-	  *p = '\0';
-	  p--;
-	}
-
-	/* Remove last '/' if current_dir isn't root */
-	if((strlen(buf) > 1) && *p == '/')
-	  *p = '\0';
-
-	strlcpy(fb->current_dir, buf, sizeof(fb->current_dir));
+  if (w == fb->w[_W_directories_browser]) {
+    if (!memcmp (fb->dir_list.array[selected], "./", 3)) {
+      /* Want to re-read current dir */
+      ;
+    } else if (!memcmp (fb->dir_list.array[selected], "../", 4)) {
+      char *d, *f;
+      /* level up */
+      fb->path[fb->dirstart - 1] = '/';
+      d = fb->path + fb->dirstop;
+      while (d[-1] != '/')
+        d--;
+      fb->dirstop = d - fb->path;
+      if (fb->dirstop < fb->dirstart + 2) {
+        /* all dirs gone or leading / reached */
+        ;
+      } else {
+        fb->dirstop--;
       }
-    }
-    else {
-
-      /* not '/' directory */
-      if(strcasecmp(fb->current_dir, "/")) {
-        snprintf (buf, sizeof (buf), "%s/%s", fb->current_dir, fb->dir_list.array[selected]);
+      f = fb->path + fb->filestart;
+      if (f > d) {
+        memmove (d, f, fb->filestop - fb->filestart + 1);
+        fb->filestart -= f - d;
+        fb->filestop -= f - d;
       }
-      else {
-        snprintf (buf, sizeof (buf), "/%s", fb->dir_list.array[selected]);
+    } else if (fb->filestop + l < sizeof (fb->path)) {
+      char *d = fb->path + fb->dirstop, *f = fb->path + fb->filestart;
+      /* level down */
+      fb->path[fb->dirstart - 1] = '/';
+      if (d[-1] == '/') {
+        /* "file" -> "add/file" or "/" -> "/add/file" */
+        ;
+      } else {
+        /* "...have/file" -> "...have/add/file" */
+        d++;
       }
-
-      if(is_a_dir(buf))
-	strlcpy(fb->current_dir, buf, sizeof(fb->current_dir));
-
+      memmove (d + l, f, fb->filestop - fb->filestart + 1);
+      memcpy (d, fb->dir_list.array[selected], l);
+      d += l;
+      fb->dirstop = d - fb->path - 1;
+      l = d - f;
+      fb->filestart += l;
+      fb->filestop += l;
     }
-
     fb_update_origin(fb);
     fb_getdir(fb);
+  } else if (w == fb->w[_W_files_browser]) {
+    if (fb->filestop + l < sizeof (fb->path)) {
+      memcpy (fb->path + fb->filestart, fb->file_list.array[selected], l + 1);
+      fb->filestop = fb->filestart + l;
+      fb_callback_button_cb (fb->w[_W_cb_button0], (void *)data, 0);
+    }
   }
-  else if(w == fb->w[_W_files_browser]) {
-    strlcpy (fb->filename, fb->file_list.array[selected], sizeof (fb->filename));
-    fb_callback_button_cb (fb->w[_W_cb_button0], (void *)data, 0);
-  }
-
 }
 
 static void fb_change_origin(xitk_widget_t *w, void *data, const char *currenttext) {
@@ -888,17 +920,16 @@ static void _fb_delete_file_done (void *data, int state) {
   filebrowser_t *fb = data;
 
   if (state == 2) {
-    char buf[XITK_PATH_MAX + XITK_NAME_MAX + 2];
     int sel = xitk_browser_get_current_selected (fb->w[_W_files_browser]);
+    const char *fullname = _fb_file_get (fb, fb->file_list.array[sel]);
 
-    snprintf (buf, sizeof(buf), "%s%s%s",
-      fb->current_dir, ((fb->current_dir[0] && strcmp(fb->current_dir, "/")) ? "/" : ""),
-      fb->file_list.array[sel]);
-
-    if ((unlink (buf)) == -1)
-      gui_msg (fb->gui, XUI_MSG_ERROR, _("Unable to delete file '%s': %s."), buf, strerror (errno));
-    else
+    if ((unlink (fullname)) == -1) {
+      gui_msg (fb->gui, XUI_MSG_ERROR, _("Unable to delete file '%s': %s."), fullname, strerror (errno));
+      _fb_file_unget (fb);
+    } else {
+      _fb_file_unget (fb);
       fb_getdir (fb);
+    }
   }
   fb_reactivate (fb);
 }
@@ -910,36 +941,32 @@ static void fb_delete_file (xitk_widget_t *w, void *data, int state) {
   (void)w;
   (void)state;
   if ((sel = xitk_browser_get_current_selected (fb->w[_W_files_browser])) >= 0) {
-    char buf[256 + XITK_PATH_MAX + XITK_NAME_MAX + 2];
-
-    snprintf(buf, sizeof(buf), _("Do you really want to delete the file '%s%s%s' ?"),
-	     fb->current_dir, ((fb->current_dir[0] && strcmp(fb->current_dir, "/")) ? "/" : ""),
-	     fb->file_list.array[sel]);
+    const char *fullname = _fb_file_get (fb, fb->file_list.array[sel]);
 
     fb_deactivate(fb);
     fb->dialog = xitk_window_dialog_3 (fb->gui->xitk,
       fb->xwin,
       get_layer_above_video (fb->gui), 400, _("Confirm deletion ?"), _fb_delete_file_done, fb,
-      NULL, XITK_LABEL_YES, XITK_LABEL_NO, NULL, 0, ALIGN_DEFAULT, "%s", buf);
+      NULL, XITK_LABEL_YES, XITK_LABEL_NO, NULL, 0, ALIGN_DEFAULT, "%s", fullname);
+    _fb_file_unget (fb);
   }
 }
 
 static void fb_rename_file_cb(xitk_widget_t *w, void *data, const char *newname) {
   filebrowser_t *fb = (filebrowser_t *) data;
-  char buf[XITK_PATH_MAX + XITK_NAME_MAX + 2];
   int sel = xitk_browser_get_current_selected(fb->w[_W_files_browser]);
+  const char *fullname = _fb_file_get (fb, fb->file_list.array[sel]);
 
   (void)w;
-  snprintf(buf, sizeof(buf), "%s%s%s",
-	   fb->current_dir, ((fb->current_dir[0] && strcmp(fb->current_dir, "/")) ? "/" : ""),
-	   fb->file_list.array[sel]);
-
-  if((rename(buf, newname)) == -1)
-    gui_msg (fb->gui, XUI_MSG_ERROR, _("Unable to rename file '%s' to '%s': %s."), buf, newname, strerror(errno));
-  else
+  if ((rename (fullname, newname)) == -1) {
+    gui_msg (fb->gui, XUI_MSG_ERROR, _("Unable to rename file '%s' to '%s': %s."), fullname, newname, strerror (errno));
+    _fb_file_unget (fb);
+  } else {
+    _fb_file_unget (fb);
     fb_getdir(fb);
-
+  }
 }
+
 static void fb_rename_file (xitk_widget_t *w, void *data, int state) {
   filebrowser_t *fb = (filebrowser_t *) data;
   int            sel;
@@ -947,14 +974,12 @@ static void fb_rename_file (xitk_widget_t *w, void *data, int state) {
   (void)w;
   (void)state;
   if((sel = xitk_browser_get_current_selected(fb->w[_W_files_browser])) >= 0) {
-    char buf[XITK_PATH_MAX + XITK_NAME_MAX + 2];
+    const char *fullname = _fb_file_get (fb, fb->file_list.array[sel]);
 
-    snprintf(buf, sizeof(buf), "%s%s%s",
-	     fb->current_dir, ((fb->current_dir[0] && strcmp(fb->current_dir, "/")) ? "/" : ""),
-	     fb->file_list.array[sel]);
-
+    strcpy (fb->trypath, fullname);
+    _fb_file_unget (fb);
     fb_deactivate(fb);
-    fb_create_input_window(_("Rename file"), buf, fb_rename_file_cb, fb);
+    fb_create_input_window (fb, fb_rename_file_cb, _("Rename file"), fb->trypath, sizeof (fb->trypath));
   }
 }
 
@@ -967,17 +992,18 @@ static void fb_create_directory_cb(xitk_widget_t *w, void *data, const char *new
   else
     fb_getdir(fb);
 }
+
 static void fb_create_directory(xitk_widget_t *w, void *data, int state) {
   filebrowser_t *fb = (filebrowser_t *) data;
-  char           buf[XITK_PATH_MAX + XITK_NAME_MAX + 2];
+  uint32_t       l = fb->filestart - fb->dirstart;
 
   (void)w;
   (void)state;
-  snprintf(buf, sizeof(buf), "%s%s",
-	   fb->current_dir, ((fb->current_dir[0] && strcmp(fb->current_dir, "/")) ? "/" : ""));
 
+  memcpy (fb->trypath, fb->path + fb->dirstart, l);
+  fb->trypath[l] = 0;
   fb_deactivate(fb);
-  fb_create_input_window(_("Create a new directory"), buf, fb_create_directory_cb, fb);
+  fb_create_input_window (fb, fb_create_directory_cb, _("Create a new directory"), fb->trypath, sizeof (fb->trypath));
 }
 
 static void fb_select_file_filter(xitk_widget_t *w, void *data, int selected) {
@@ -1028,30 +1054,24 @@ void filebrowser_end(filebrowser_t *fb) {
 }
 
 char *filebrowser_get_current_dir(filebrowser_t *fb) {
-  char *current_dir = NULL;
+  char temp, *res;
 
-  if(fb)
-    current_dir = strdup(fb->current_dir);
+  if (!fb)
+    return NULL;
 
-  return current_dir;
+  temp = fb->path[fb->dirstop];
+  fb->path[fb->dirstop] = 0;
+  res = strdup (fb->path + fb->dirstart);
+  fb->path[fb->dirstop] = temp;
+  return res;
 }
 
 char *filebrowser_get_current_filename(filebrowser_t *fb) {
-  char *filename = NULL;
-
-  if(fb && strlen(fb->filename))
-    filename = strdup(fb->filename);
-
-  return filename;
+  return fb && fb->path[fb->filestart] ? strdup (fb->path + fb->filestart) : NULL;
 }
 
 char *filebrowser_get_full_filename(filebrowser_t *fb) {
-  char *fullfilename = NULL;
-
-  if(fb)
-    fullfilename = strdup(xitk_inputtext_get_text(fb->w[_W_origin]));
-
-  return fullfilename;
+  return fb ? strdup (fb->path + fb->dirstart) : NULL;
 }
 
 char **filebrowser_get_all_files(filebrowser_t *fb) {
@@ -1094,6 +1114,9 @@ filebrowser_t *create_filebrowser (gGui_t *gui, const char *window_title, const 
 
   _fb_list_init (&fb->dir_list);
   _fb_list_init (&fb->file_list);
+
+  fb->dirstart = fb->dirstop = fb->filestart = fb->filestop = 4;
+  fb->path[4] = 0;
 
   if (cbb1) {
     fb->cbb[0].label = (cbb1->label && cbb1->label[0]) ? strdup (cbb1->label) : NULL;
@@ -1142,8 +1165,13 @@ filebrowser_t *create_filebrowser (gGui_t *gui, const char *window_title, const 
   fb->hidden_data                = hidden_data;
   fb->show_hidden_files          = hidden_cb ? hidden_cb (hidden_data, 0, 0) : 1;
 
-  strlcpy(fb->current_dir, xine_get_homedir(), sizeof(fb->current_dir));
-  memset(&fb->filename, 0, sizeof(fb->filename));
+  {
+    uint32_t have = sizeof (fb->path) - fb->dirstart;
+    uint32_t l = strlcpy (fb->path + fb->dirstart, xine_get_homedir (), have);
+    if (l > have - 1)
+      l = have - 1;
+    fb->dirstop = fb->filestart = fb->filestop = fb->dirstart + l;
+  }
   fb_extract_path_and_file(fb, filepathname);
 
   fb->file_filters = (const char **) malloc(sizeof(filebrowser_filter_t) * ((sizeof(__fb_filters) / sizeof(__fb_filters[0])) + 1));
