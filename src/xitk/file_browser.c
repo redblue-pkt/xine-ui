@@ -127,6 +127,76 @@ static const filebrowser_filter_t __fb_filters[] = {
 };
 
 typedef struct {
+  uint32_t have, used, bufsize, bufused;
+  char **array, *buf;
+} fb_list_t;
+
+static void _fb_list_init (fb_list_t *list) {
+  list->have = list->used = list->bufsize = list->bufused = 0;
+  list->array = NULL;
+  list->buf = NULL;
+}
+
+static void _fb_list_deinit (fb_list_t *list) {
+  list->have = list->used = list->bufsize = list->bufused = 0;
+  SAFE_FREE (list->array);
+  SAFE_FREE (list->buf);
+}
+
+static void _fb_list_clear (fb_list_t *list) {
+  list->used = list->bufused = 0;
+}
+
+static void _fb_list_add (fb_list_t *list, const char *str, uint32_t term) {
+  size_t slen;
+  char *p;
+  if (!str)
+    return;
+  if (list->used + 2 > list->have) {
+    uint32_t nhave = list->have + 128;
+    char **na = realloc (list->array, nhave * sizeof (list->array[0]));
+    if (!na)
+      return;
+    list->array = na;
+    list->have = nhave;
+  }
+  slen = strlen (str);
+  if (list->bufused + slen + 2 > list->bufsize) {
+    uint32_t nsize = list->bufsize + 8192, u;
+    char **a, *nb = realloc (list->buf, nsize);
+    if (!nb)
+      return;
+    for (a = list->array, u = list->bufused; u; a++, u--)
+      *a = nb + (*a - list->buf);
+    list->buf = nb;
+    list->bufsize = nsize;
+  }
+  p = list->buf + list->bufused;
+  list->array[list->used++] = p;
+  list->array[list->used] = NULL;
+  if (!term) {
+    slen += 1;
+    memcpy (p, str, slen);
+  } else {
+    memcpy (p, str, slen);
+    p[slen++] = term;
+    p[slen++] = 0;
+  }
+  list->bufused += slen;
+}
+
+static void fb_list_reverse (fb_list_t *list) {
+  char **a, **b;
+  if (list->used < 2)
+    return;
+  for (a = list->array, b = list->array + list->used - 1; a < b; a++, b--) {
+    char *temp = *a;
+    *a = *b;
+    *b = temp;
+  }
+}
+
+typedef struct {
   char                  *name;
 } fileinfo_t;
 
@@ -176,14 +246,10 @@ struct filebrowser_s {
   char                            current_dir[XINE_PATH_MAX + 1];
   char                            filename[XINE_NAME_MAX + 1];
 
-  fileinfo_t                     *dir_files;
-  char                          **directories;
-  int                             directories_num;
+  fb_list_t                       dir_list;
   int                             directories_sel;
 
-  fileinfo_t                     *norm_files;
-  char                          **files;
-  int                             files_num;
+  fb_list_t                       file_list;
 
   int                             running;
   int                             visible;
@@ -544,103 +610,41 @@ static int my_strverscmp(const char *s1, const char *s2) {
 /*
  * Wrapper to my_strverscmp() for qsort() calls, which sort mrl_t type array.
  */
-static int _sortfiles_default(const fileinfo_t *s1, const fileinfo_t *s2) {
-  return(my_strverscmp(s1->name, s2->name));
-}
-static int _sortfiles_reverse(const fileinfo_t *s1, const fileinfo_t *s2) {
-  return(my_strverscmp(s2->name, s1->name));
-}
-
-static void sort_files(filebrowser_t *fb) {
-  int  (*func) () = NULL;
-
-  if(fb->files) {
-    int i = 0;
-
-    while(fb->files[i]) {
-      SAFE_FREE(fb->files[i]);
-      i++;
-    }
-  }
-
-  if(fb->files_num) {
-    int i;
-
-    if(fb->files_sort_direction == REVERSE_SORT)
-      func = _sortfiles_reverse;
-    else /*if(fb->w[_W_files_sort]_direction == DEFAULT_SORT)*/
-      func = _sortfiles_default;
-
-    qsort(fb->norm_files, fb->files_num, sizeof(fileinfo_t), func);
-
-    fb->files = (char **) realloc(fb->files, sizeof(char *) * (fb->files_num + 2));
-
-    for(i = 0; i < fb->files_num; i++)
-      fb->files[i] = strdup(fb->norm_files[i].name);
-
-    fb->files[i] = NULL;
-  }
-
-  xitk_browser_update_list(fb->w[_W_files_browser], (const char *const *)fb->files, NULL, fb->files_num, 0);
+static int _sortfiles_default (const void *a, const void *b) {
+  const char * const *d = (const char * const *)a;
+  const char * const *e = (const char * const *)b;
+  return my_strverscmp (*d, *e);
 }
 
-static void sort_directories(filebrowser_t *fb) {
-  int  (*func) () = NULL;
+static void fb_list_sort (fb_list_t *list, uint32_t reverse) {
+  if (list->used < 2)
+    return;
+  qsort (list->array, list->used, sizeof (list->array[0]), _sortfiles_default);
+  if (reverse == REVERSE_SORT)
+    fb_list_reverse (list);
+}
 
-  if(fb->directories) {
-    int i = 0;
+static void sort_directories (filebrowser_t *fb) {
+  fb_list_sort (&fb->dir_list, fb->directories_sort_direction);
+  xitk_browser_update_list (fb->w[_W_directories_browser],
+    (const char *const *)fb->dir_list.array, NULL, fb->dir_list.used, 0);
+}
 
-    while(fb->directories[i]) {
-      SAFE_FREE(fb->directories[i]);
-      i++;
-    }
-  }
-
-  if(fb->directories_num) {
-    int i;
-
-    if(fb->directories_sort_direction == REVERSE_SORT)
-      func = _sortfiles_reverse;
-    else /*if(fb->w[_W_directories_sort]_direction == DEFAULT_SORT)*/
-      func = _sortfiles_default;
-
-    qsort(fb->dir_files, fb->directories_num, sizeof(fileinfo_t), func);
-
-    fb->directories = (char **) realloc(fb->directories, sizeof(char *) * (fb->directories_num + 2));
-    for(i = 0; i < fb->directories_num; i++) {
-      fb->directories[i] = xitk_asprintf("%s%c", fb->dir_files[i].name, '/');
-    }
-
-    fb->directories[i] = NULL;
-  }
-
-  xitk_browser_update_list(fb->w[_W_directories_browser],
-			   (const char *const *)fb->directories, NULL, fb->directories_num, 0);
+static void sort_files (filebrowser_t *fb) {
+  fb_list_sort (&fb->file_list, fb->files_sort_direction);
+  xitk_browser_update_list (fb->w[_W_files_browser],
+    (const char *const *)fb->file_list.array, NULL, fb->file_list.used, 0);
 }
 
 static void fb_getdir(filebrowser_t *fb) {
   char                  fullfilename[XINE_PATH_MAX + XINE_NAME_MAX + 2];
   struct dirent        *pdirent;
-  int                   num_dir_files   = 0;
-  int                   num_norm_files  = 0;
   DIR                  *pdir;
-  int                   num_files       = -1;
 
   _fb_set_cursor(fb, WAIT_CURS);
 
-  if(fb->norm_files) {
-    while(fb->files_num) {
-      free(fb->norm_files[fb->files_num - 1].name);
-      fb->files_num--;
-    }
-  }
-
-  if(fb->dir_files) {
-    while(fb->directories_num) {
-      free(fb->dir_files[fb->directories_num - 1].name);
-      fb->directories_num--;
-    }
-  }
+  _fb_list_clear (&fb->file_list);
+  _fb_list_clear (&fb->dir_list);
 
   /* Following code relies on the fact that fb->current_dir has no trailing '/' */
   if((pdir = opendir(fb->current_dir)) == NULL) {
@@ -662,44 +666,26 @@ static void fb_getdir(filebrowser_t *fb) {
     return;
   }
 
-  while((pdirent = readdir(pdir)) != NULL) {
+  while ((pdirent = readdir (pdir)) != NULL) {
+    fb_list_t *list;
+    uint32_t term;
 
     snprintf(fullfilename, sizeof(fullfilename), "%s/%s", fb->current_dir, pdirent->d_name);
 
-    if(is_a_dir(fullfilename)) {
+    /* if user don't want to see hidden files, ignore them */
+    if ((pdirent->d_name[0] == '.') && pdirent->d_name[1] && (pdirent->d_name[1] != '.') && !fb->show_hidden_files)
+      continue;
 
-      /* if user don't want to see hidden files, ignore them */
-      if(fb->show_hidden_files == 0 &&
-	 ((strlen(pdirent->d_name) > 1)
-	  && (pdirent->d_name[0] == '.' &&  pdirent->d_name[1] != '.'))) {
-	;
-      }
-      else {
-	fb->dir_files[num_dir_files].name = strdup(pdirent->d_name);
-	num_dir_files++;
-      }
-
-    } /* Hmmmm, an hidden file ? */
-    else if((strlen(pdirent->d_name) > 1)
-	    && (pdirent->d_name[0] == '.' &&  pdirent->d_name[1] != '.')) {
-
-      /* if user don't want to see hidden files, ignore them */
-      if(fb->show_hidden_files) {
-	if(is_file_match_to_filter(fb, pdirent->d_name)) {
-	  fb->norm_files[num_norm_files].name = strdup(pdirent->d_name);
-	  num_norm_files++;
-	}
-      }
-
-    } /* So a *normal* one. */
-    else {
-      if(is_file_match_to_filter(fb, pdirent->d_name)) {
-	fb->norm_files[num_norm_files].name = strdup(pdirent->d_name);
-	num_norm_files++;
-      }
+    if (is_a_dir (fullfilename)) {
+      list = &fb->dir_list;
+      term = '/';
+    } else {
+      if (!is_file_match_to_filter (fb, pdirent->d_name))
+        continue;
+      list = &fb->file_list;
+      term = 0;
     }
-
-    num_files++;
+    _fb_list_add (list, pdirent->d_name, term);
   }
 
   closedir(pdir);
@@ -707,8 +693,6 @@ static void fb_getdir(filebrowser_t *fb) {
   /*
    * Sort arrays
    */
-  fb->directories_num = num_dir_files;
-  fb->files_num = num_norm_files;
   sort_directories(fb);
   sort_files(fb);
   _fb_set_cursor(fb, NORMAL_CURS);
@@ -728,7 +712,7 @@ static void fb_select(xitk_widget_t *w, void *data, int selected, int modifier) 
   if (selected < 0)
     return;
   if(w == fb->w[_W_files_browser]) {
-    strlcpy(fb->filename, fb->norm_files[selected].name, sizeof(fb->filename));
+    strlcpy (fb->filename, fb->file_list.array[selected], sizeof (fb->filename));
     fb_update_origin(fb);
   }
 }
@@ -758,10 +742,10 @@ static void fb_dbl_select(xitk_widget_t *w, void *data, int selected, int modifi
     char buf[XITK_PATH_MAX + XITK_NAME_MAX + 2];
 
     /* Want to re-read current dir */
-    if(!strcasecmp(fb->dir_files[selected].name, ".")) {
+    if (!strcasecmp (fb->dir_list.array[selected], ".")) {
       /* NOOP */
     }
-    else if(!strcasecmp(fb->dir_files[selected].name, "..")) {
+    else if (!strcasecmp (fb->dir_list.array[selected], "..")) {
       char *p;
 
       strlcpy(buf, fb->current_dir, sizeof(buf));
@@ -784,10 +768,10 @@ static void fb_dbl_select(xitk_widget_t *w, void *data, int selected, int modifi
 
       /* not '/' directory */
       if(strcasecmp(fb->current_dir, "/")) {
-	snprintf(buf, sizeof(buf), "%s/%s", fb->current_dir, fb->dir_files[selected].name);
+        snprintf (buf, sizeof (buf), "%s/%s", fb->current_dir, fb->dir_list.array[selected]);
       }
       else {
-	snprintf(buf, sizeof(buf), "/%s", fb->dir_files[selected].name);
+        snprintf (buf, sizeof (buf), "/%s", fb->dir_list.array[selected]);
       }
 
       if(is_a_dir(buf))
@@ -799,7 +783,7 @@ static void fb_dbl_select(xitk_widget_t *w, void *data, int selected, int modifi
     fb_getdir(fb);
   }
   else if(w == fb->w[_W_files_browser]) {
-    strlcpy(fb->filename, fb->norm_files[selected].name, sizeof(fb->filename));
+    strlcpy (fb->filename, fb->file_list.array[selected], sizeof (fb->filename));
     fb_callback_button_cb (fb->w[_W_cb_button0], (void *)data, 0);
   }
 
@@ -833,7 +817,9 @@ static void fb_sort(xitk_widget_t *w, void *data) {
 
     xitk_widgets_state (fb->w + _W_directories_sort, 1, XITK_WIDGET_STATE_VISIBLE, ~0u);
 
-    sort_directories(fb);
+    fb_list_reverse (&fb->dir_list);
+    xitk_browser_update_list (fb->w[_W_directories_browser],
+      (const char * const *)fb->dir_list.array, NULL, fb->dir_list.used, 0);
   }
   else if(w == fb->w[_W_files_sort]) {
     xitk_image_t *fsimage = xitk_get_widget_foreground_skin(fb->w[_W_files_sort]);
@@ -850,7 +836,9 @@ static void fb_sort(xitk_widget_t *w, void *data) {
 
     xitk_widgets_state (fb->w + _W_files_sort, 1, XITK_WIDGET_STATE_VISIBLE, ~0u);
 
-    sort_files(fb);
+    fb_list_reverse (&fb->file_list);
+    xitk_browser_update_list (fb->w[_W_files_browser],
+      (const char * const *)fb->file_list.array, NULL, fb->file_list.used, 0);
   }
 }
 
@@ -859,8 +847,6 @@ static void fb_exit(xitk_widget_t *w, void *data) {
 
   (void)w;
   if(fb) {
-    int i;
-
     fb->running = 0;
     fb->visible = 0;
 
@@ -873,42 +859,6 @@ static void fb_exit(xitk_widget_t *w, void *data) {
     fb->xwin = NULL;
     /* xitk_dlist_init (&fb->widget_list->list); */
 
-    if(fb->norm_files) {
-      while(fb->files_num) {
-	free(fb->norm_files[fb->files_num - 1].name);
-	fb->files_num--;
-      }
-    }
-    SAFE_FREE(fb->norm_files);
-
-    if(fb->dir_files) {
-      while(fb->directories_num) {
-	free(fb->dir_files[fb->directories_num - 1].name);
-	fb->directories_num--;
-      }
-    }
-    SAFE_FREE(fb->dir_files);
-
-    if(fb->files) {
-      i = 0;
-
-      while(fb->files[i]) {
-	free(fb->files[i]);
-	i++;
-      }
-      free(fb->files);
-    }
-
-    if(fb->directories) {
-      i = 0;
-
-      while(fb->directories[i]) {
-	free(fb->directories[i]);
-	i++;
-      }
-      free(fb->directories);
-    }
-
     free(fb->file_filters);
 
     SAFE_FREE(fb->cbb[0].label);
@@ -916,6 +866,9 @@ static void fb_exit(xitk_widget_t *w, void *data) {
 
     xitk_image_free_image (&fb->sort_skin_up);
     xitk_image_free_image (&fb->sort_skin_down);
+
+    _fb_list_deinit (&fb->file_list);
+    _fb_list_deinit (&fb->dir_list);
 
     free(fb);
     fb = NULL;
@@ -940,7 +893,7 @@ static void _fb_delete_file_done (void *data, int state) {
 
     snprintf (buf, sizeof(buf), "%s%s%s",
       fb->current_dir, ((fb->current_dir[0] && strcmp(fb->current_dir, "/")) ? "/" : ""),
-      fb->norm_files[sel].name);
+      fb->file_list.array[sel]);
 
     if ((unlink (buf)) == -1)
       gui_msg (fb->gui, XUI_MSG_ERROR, _("Unable to delete file '%s': %s."), buf, strerror (errno));
@@ -961,7 +914,7 @@ static void fb_delete_file (xitk_widget_t *w, void *data, int state) {
 
     snprintf(buf, sizeof(buf), _("Do you really want to delete the file '%s%s%s' ?"),
 	     fb->current_dir, ((fb->current_dir[0] && strcmp(fb->current_dir, "/")) ? "/" : ""),
-	     fb->norm_files[sel].name);
+	     fb->file_list.array[sel]);
 
     fb_deactivate(fb);
     fb->dialog = xitk_window_dialog_3 (fb->gui->xitk,
@@ -979,7 +932,7 @@ static void fb_rename_file_cb(xitk_widget_t *w, void *data, const char *newname)
   (void)w;
   snprintf(buf, sizeof(buf), "%s%s%s",
 	   fb->current_dir, ((fb->current_dir[0] && strcmp(fb->current_dir, "/")) ? "/" : ""),
-	   fb->norm_files[sel].name);
+	   fb->file_list.array[sel]);
 
   if((rename(buf, newname)) == -1)
     gui_msg (fb->gui, XUI_MSG_ERROR, _("Unable to rename file '%s' to '%s': %s."), buf, newname, strerror(errno));
@@ -998,7 +951,7 @@ static void fb_rename_file (xitk_widget_t *w, void *data, int state) {
 
     snprintf(buf, sizeof(buf), "%s%s%s",
 	     fb->current_dir, ((fb->current_dir[0] && strcmp(fb->current_dir, "/")) ? "/" : ""),
-	     fb->norm_files[sel].name);
+	     fb->file_list.array[sel]);
 
     fb_deactivate(fb);
     fb_create_input_window(_("Rename file"), buf, fb_rename_file_cb, fb);
@@ -1104,12 +1057,12 @@ char *filebrowser_get_full_filename(filebrowser_t *fb) {
 char **filebrowser_get_all_files(filebrowser_t *fb) {
   char **files = NULL;
 
-  if(fb && fb->files_num) {
-    int i;
-    files = (char **) calloc((fb->files_num + 2), sizeof(char *));
+  if (fb && fb->file_list.used) {
+    uint32_t i;
+    files = calloc ((fb->file_list.used + 2), sizeof (files[0]));
 
-    for(i = 0; i < fb->files_num; i++)
-      files[i] = strdup(fb->norm_files[i].name);
+    for (i = 0; i < fb->file_list.used; i++)
+      files[i] = strdup (fb->file_list.array[i]);
     files[i] = NULL;
   }
 
@@ -1138,6 +1091,9 @@ filebrowser_t *create_filebrowser (gGui_t *gui, const char *window_title, const 
     return NULL;
 
   fb->gui = gui;
+
+  _fb_list_init (&fb->dir_list);
+  _fb_list_init (&fb->file_list);
 
   if (cbb1) {
     fb->cbb[0].label = (cbb1->label && cbb1->label[0]) ? strdup (cbb1->label) : NULL;
@@ -1180,10 +1136,6 @@ filebrowser_t *create_filebrowser (gGui_t *gui, const char *window_title, const 
   xitk_window_set_window_class(fb->xwin, NULL, "xine");
   xitk_window_set_window_icon (fb->xwin, fb->gui->icon);
 
-  fb->directories                = NULL;
-  fb->directories_num            = 0;
-  fb->files                      = NULL;
-  fb->files_num                  = 0;
   fb->directories_sort_direction = DEFAULT_SORT;
   fb->files_sort_direction       = DEFAULT_SORT;
   fb->hidden_cb                  = hidden_cb;
@@ -1193,12 +1145,6 @@ filebrowser_t *create_filebrowser (gGui_t *gui, const char *window_title, const 
   strlcpy(fb->current_dir, xine_get_homedir(), sizeof(fb->current_dir));
   memset(&fb->filename, 0, sizeof(fb->filename));
   fb_extract_path_and_file(fb, filepathname);
-
-  fb->norm_files = (fileinfo_t *) calloc(MAXFILES, sizeof(fileinfo_t));
-  fb->dir_files = (fileinfo_t *) calloc(MAXFILES, sizeof(fileinfo_t));
-
-  fb->files = (char **) calloc(2, sizeof(char *));
-  fb->directories = (char **) calloc(2, sizeof(char *));
 
   fb->file_filters = (const char **) malloc(sizeof(filebrowser_filter_t) * ((sizeof(__fb_filters) / sizeof(__fb_filters[0])) + 1));
 
@@ -1242,8 +1188,8 @@ filebrowser_t *create_filebrowser (gGui_t *gui, const char *window_title, const 
   br.arrow_dn.skin_element_name    = NULL;
   br.browser.skin_element_name     = NULL;
   br.browser.max_displayed_entries = MAX_DISP_ENTRIES;
-  br.browser.num_entries           = fb->directories_num;
-  br.browser.entries               = (const char *const *)fb->directories;
+  br.browser.num_entries           = fb->dir_list.used;
+  br.browser.entries               = (const char *const *)fb->dir_list.array;
   br.callback                      = fb_select;
   br.dbl_click_callback            = fb_dbl_select;
   br.userdata                      = (void *)fb;
@@ -1271,8 +1217,8 @@ filebrowser_t *create_filebrowser (gGui_t *gui, const char *window_title, const 
   br.arrow_dn.skin_element_name    = NULL;
   br.browser.skin_element_name     = NULL;
   br.browser.max_displayed_entries = MAX_DISP_ENTRIES;
-  br.browser.num_entries           = fb->files_num;
-  br.browser.entries               = (const char *const *)fb->files;
+  br.browser.num_entries           = fb->file_list.used;
+  br.browser.entries               = (const char * const *)fb->file_list.array;
   br.callback                      = fb_select;
   br.dbl_click_callback            = fb_dbl_select;
   br.userdata                      = (void *)fb;
