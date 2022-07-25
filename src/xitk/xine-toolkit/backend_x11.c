@@ -89,6 +89,7 @@ struct xitk_x11_backend_s {
 };
 
 typedef enum {
+#define XITK_A_FALSE_START XITK_A_UTF8
   XITK_A_UTF8 = 0,
   XITK_A__WIN_LAYER,
   XITK_A_WM_NORMAL_HINTS,
@@ -133,10 +134,49 @@ typedef enum {
   XITK_A__NET_WM_STATE_BELOW,
   XITK_A__NET_WM_STATE_STAYS_ON_TOP,
   XITK_A__NET_WM_STATE_DEMANDS_ATTENTION,
+  XITK_A__NET_WM_WINDOW_OPACITY_LOCKED,
+  /* clipboard */
+  XITK_A__XITK_CLIP,
+#define XITK_A_FALSE_STOP XITK_A_null
+#define XITK_A_TRUE_START XITK_A_null
+  XITK_A_null,
+  XITK_A_atom,
+  XITK_A_timestamp,
+  XITK_A_integer,
+  XITK_A_c_string,
+  XITK_A_string,
+  XITK_A_utf8_string,
+  XITK_A_text,
+  XITK_A_filename,
+  XITK_A_net_address,
+  XITK_A_window,
+  XITK_A_clipboard,
+  XITK_A_length,
+  XITK_A_targets,
+  XITK_A_multiple,
+  /* /clipboard */
+  /* window manager detection */
+  XITK_A_XFWM_FLAGS,
+  XITK_A__WINDOWMAKER_WM_PROTOCOLS,
+  XITK_A__SAWMILL_TIMESTAMP,
+  XITK_A_ENLIGHTENMENT_COMMS,
+  XITK_A__METACITY_RESTART_MESSAGE,
+  XITK_A__AS_STYLE,
+  XITK_A__ICEWM_WINOPTHINT,
+  XITK_A__BLACKBOX_HINTS,
+  XITK_A_LARSWM_EXIT,
+  XITK_A_KWIN_RUNNING,
+  XITK_A__DT_SM_WINDOW_INFO,
+  XITK_A_DTWM_IS_RUNNING,
+  XITK_A__WIN_SUPPORTING_WM_CHECK,
+  XITK_A__NET_SUPPORTING_WM_CHECK,
+  XITK_A__NET_WORKAREA,
+  XITK_A__WIN_WM_NAME,
+#define XITK_A_TRUE_STOP XITK_A_LAST
   XITK_A_LAST
 } xitk_x11_atoms_t;
 
-static const char * const _xitk_x11_atom_names[XITK_A_LAST] = {
+static const char _xitk_x11_atom_names[XITK_A_LAST][32] = {
   [XITK_A_UTF8]             = "UTF8_STRING",
   [XITK_A__WIN_LAYER]       = "_WIN_LAYER",
   [XITK_A_WM_NORMAL_HINTS]  = "WM_NORMAL_HINTS",
@@ -185,27 +225,42 @@ static const char * const _xitk_x11_atom_names[XITK_A_LAST] = {
   [XITK_A__NET_WM_STATE_BELOW]         = "_NET_WM_STATE_BELOW",
   [XITK_A__NET_WM_STATE_STAYS_ON_TOP]  = "_NET_WM_STATE_STAYS_ON_TOP",
   [XITK_A__NET_WM_STATE_DEMANDS_ATTENTION] = "_NET_WM_STATE_DEMANDS_ATTENTION",
-};
+  [XITK_A__NET_WM_WINDOW_OPACITY_LOCKED] = "_NET_WM_WINDOW_OPACITY_LOCKED",
 
-typedef enum {
-  XITK_A_null = 0,
-  XITK_A_atom,
-  XITK_A_timestamp,
-  XITK_A_integer,
-  XITK_A_c_string,
-  XITK_A_string,
-  XITK_A_utf8_string,
-  XITK_A_text,
-  XITK_A_filename,
-  XITK_A_net_address,
-  XITK_A_window,
-  XITK_A_clipboard,
-  XITK_A_length,
-  XITK_A_targets,
-  XITK_A_multiple,
-  XITK_A__NET_SUPPORTING_WM_CHECK,
-  XITK_A_clip_end
-} xitk_x11_clip_atom_t;
+  [XITK_A__XITK_CLIP]  = "_XITK_CLIP",
+  [XITK_A_null]        = "NULL",
+  [XITK_A_atom]        = "ATOM",
+  [XITK_A_timestamp]   = "TIMESTAMP",
+  [XITK_A_integer]     = "INTEGER",
+  [XITK_A_c_string]    = "C_STRING",
+  [XITK_A_string]      = "STRING",
+  [XITK_A_utf8_string] = "UTF8_STRING",
+  [XITK_A_text]        = "TEXT",
+  [XITK_A_filename]    = "FILENAME",
+  [XITK_A_net_address] = "NET_ADDRESS",
+  [XITK_A_window]      = "WINDOW",
+  [XITK_A_clipboard]   = "CLIPBOARD",
+  [XITK_A_length]      = "LENGTH",
+  [XITK_A_targets]     = "TARGETS",
+  [XITK_A_multiple]    = "MULTIPLE",
+
+  [XITK_A_XFWM_FLAGS]                  = "XFWM_FLAGS",
+  [XITK_A__WINDOWMAKER_WM_PROTOCOLS]   = "_WINDOWMAKER_WM_PROTOCOLS",
+  [XITK_A__SAWMILL_TIMESTAMP]          = "_SAWMILL_TIMESTAMP",
+  [XITK_A_ENLIGHTENMENT_COMMS]         = "ENLIGHTENMENT_COMMS",
+  [XITK_A__METACITY_RESTART_MESSAGE]   = "_METACITY_RESTART_MESSAGE",
+  [XITK_A__AS_STYLE]                   = "_AS_STYLE",
+  [XITK_A__ICEWM_WINOPTHINT]           = "_ICEWM_WINOPTHINT",
+  [XITK_A__BLACKBOX_HINTS]             = "_BLACKBOX_HINTS",
+  [XITK_A_LARSWM_EXIT]                 = "LARSWM_EXIT",
+  [XITK_A_KWIN_RUNNING]                = "KWIN_RUNNING",
+  [XITK_A__DT_SM_WINDOW_INFO]          = "_DT_SM_WINDOW_INFO",
+  [XITK_A_DTWM_IS_RUNNING]             = "DTWM_IS_RUNNING",
+  [XITK_A__WIN_SUPPORTING_WM_CHECK]    = "_WIN_SUPPORTING_WM_CHECK",
+  [XITK_A__NET_SUPPORTING_WM_CHECK]    = "_NET_SUPPORTING_WM_CHECK",
+  [XITK_A__NET_WORKAREA]               = "_NET_WORKAREA",
+  [XITK_A__WIN_WM_NAME]                = "_WIN_WM_NAME"
+};
 
 typedef enum {
   XITK_X11_WT_BUFSIZE = 0,
@@ -338,9 +393,8 @@ struct xitk_x11_display_s {
     char   *text;
     int     text_len;
     Window  window_in, window_out;
-    Atom    req, prop, target, dummy;
+    Atom    req, prop, target;
     Time    own_time;
-    Atom    atoms[XITK_A_clip_end];
   } clipboard;
 
   xitk_x11_cursors_t *cursors;
@@ -966,69 +1020,46 @@ static void _xitk_x11_clipboard_unregister_window (xitk_x11_display_t *d, Window
 }
 
 static void _xitk_x11_clipboard_init (xitk_x11_display_t *d) {
-  static const char * const atom_names[XITK_A_clip_end] = {
-    [XITK_A_null]        = "NULL",
-    [XITK_A_atom]        = "ATOM",
-    [XITK_A_timestamp]   = "TIMESTAMP",
-    [XITK_A_integer]     = "INTEGER",
-    [XITK_A_c_string]    = "C_STRING",
-    [XITK_A_string]      = "STRING",
-    [XITK_A_utf8_string] = "UTF8_STRING",
-    [XITK_A_text]        = "TEXT",
-    [XITK_A_filename]    = "FILENAME",
-    [XITK_A_net_address] = "NET_ADDRESS",
-    [XITK_A_window]      = "WINDOW",
-    [XITK_A_clipboard]   = "CLIPBOARD",
-    [XITK_A_length]      = "LENGTH",
-    [XITK_A_targets]     = "TARGETS",
-    [XITK_A_multiple]    = "MULTIPLE",
-    [XITK_A__NET_SUPPORTING_WM_CHECK] = "_NET_SUPPORTING_WM_CHECK"
-  };
-
   d->clipboard.text = NULL;
   d->clipboard.text_len = 0;
   d->clipboard.window_in = None;
   d->clipboard.window_out = None;
   d->clipboard.own_time = CurrentTime;
 
-  d->d.lock (&d->d);
-  XInternAtoms (d->display, (char **)atom_names, XITK_A_clip_end, True, d->clipboard.atoms);
-  d->clipboard.dummy = XInternAtom (d->display, "_XITK_CLIP", False);
-  d->d.unlock (&d->d);
   if (d->be->be.verbosity >= 2)
     printf ("xitk.x11.clipboard: "
       "null=%d atom=%d timestamp=%d integer=%d c_string=%d string=%d utf8_string=%d text=%d "
-      "filename=%d net_address=%d window=%d clipboard=%d length=%d targets=%d multiple=%d dummy=%d.\n",
-      (int)d->clipboard.atoms[XITK_A_null],
-      (int)d->clipboard.atoms[XITK_A_atom],
-      (int)d->clipboard.atoms[XITK_A_timestamp],
-      (int)d->clipboard.atoms[XITK_A_integer],
-      (int)d->clipboard.atoms[XITK_A_c_string],
-      (int)d->clipboard.atoms[XITK_A_string],
-      (int)d->clipboard.atoms[XITK_A_utf8_string],
-      (int)d->clipboard.atoms[XITK_A_text],
-      (int)d->clipboard.atoms[XITK_A_filename],
-      (int)d->clipboard.atoms[XITK_A_net_address],
-      (int)d->clipboard.atoms[XITK_A_window],
-      (int)d->clipboard.atoms[XITK_A_clipboard],
-      (int)d->clipboard.atoms[XITK_A_length],
-      (int)d->clipboard.atoms[XITK_A_targets],
-      (int)d->clipboard.atoms[XITK_A_multiple],
-      (int)d->clipboard.dummy);
+      "filename=%d net_address=%d window=%d clipboard=%d length=%d targets=%d multiple=%d _xitk_clip=%d.\n",
+      (int)d->atoms[XITK_A_null],
+      (int)d->atoms[XITK_A_atom],
+      (int)d->atoms[XITK_A_timestamp],
+      (int)d->atoms[XITK_A_integer],
+      (int)d->atoms[XITK_A_c_string],
+      (int)d->atoms[XITK_A_string],
+      (int)d->atoms[XITK_A_utf8_string],
+      (int)d->atoms[XITK_A_text],
+      (int)d->atoms[XITK_A_filename],
+      (int)d->atoms[XITK_A_net_address],
+      (int)d->atoms[XITK_A_window],
+      (int)d->atoms[XITK_A_clipboard],
+      (int)d->atoms[XITK_A_length],
+      (int)d->atoms[XITK_A_targets],
+      (int)d->atoms[XITK_A_multiple],
+      (int)d->atoms[XITK_A__XITK_CLIP]);
 }
 
 static int _xitk_x11_clipboard_event (xitk_x11_display_t *d, XEvent *event) {
   if (event->xproperty.window == None)
     return 0;
   if (event->type == PropertyNotify) {
-    if (event->xproperty.atom == d->clipboard.dummy) {
+    if (event->xproperty.atom == d->atoms[XITK_A__XITK_CLIP]) {
       if (event->xproperty.window == d->clipboard.window_out) {
         /* set #2. */
         if (d->be->be.verbosity >= 2)
           printf ("xitk.x11.clipboard: set #2: own clipboard @ time=%ld.\n", (long int)event->xproperty.time);
         d->clipboard.own_time = event->xproperty.time;
         d->d.lock (&d->d);
-        XSetSelectionOwner (d->display, d->clipboard.atoms[XITK_A_clipboard],
+        XSetSelectionOwner (d->display, d->atoms[XITK_A_clipboard],
           d->clipboard.window_out, d->clipboard.own_time);
         d->d.unlock (&d->d);
       } else if (event->xproperty.window == d->clipboard.window_in) {
@@ -1044,18 +1075,18 @@ static int _xitk_x11_clipboard_event (xitk_x11_display_t *d, XEvent *event) {
 
             d->d.lock (&d->d);
             XGetWindowProperty (d->display, d->clipboard.window_in,
-              d->clipboard.dummy, 0, 0, False, d->clipboard.atoms[XITK_A_utf8_string],
+              d->atoms[XITK_A__XITK_CLIP], 0, 0, False, d->atoms[XITK_A_utf8_string],
               &actual_type, &actual_format, &nitems, &bytes_after, &prop);
             XFree (prop);
-            if ((actual_type != d->clipboard.atoms[XITK_A_utf8_string]) || (actual_format != 8))
+            if ((actual_type != d->atoms[XITK_A_utf8_string]) || (actual_format != 8))
               break;
             d->clipboard.text = malloc ((bytes_after + 1 + 3) & ~3);
             if (!d->clipboard.text)
               break;
             d->clipboard.text_len = bytes_after;
             XGetWindowProperty (d->display, d->clipboard.window_in,
-              d->clipboard.dummy, 0, (d->clipboard.text_len + 3) >> 2,
-              True, d->clipboard.atoms[XITK_A_utf8_string],
+              d->atoms[XITK_A__XITK_CLIP], 0, (d->clipboard.text_len + 3) >> 2,
+              True, d->atoms[XITK_A_utf8_string],
               &actual_type, &actual_format, &nitems, &bytes_after, &prop);
             if (!prop)
               break;
@@ -1074,7 +1105,7 @@ static int _xitk_x11_clipboard_event (xitk_x11_display_t *d, XEvent *event) {
     }
   } else if (event->type == SelectionClear) {
     if ((event->xselectionclear.window == d->clipboard.window_out)
-     && (event->xselectionclear.selection == d->clipboard.atoms[XITK_A_clipboard])) {
+     && (event->xselectionclear.selection == d->atoms[XITK_A_clipboard])) {
       if (d->be->be.verbosity >= 2)
         printf ("xitk.x11.clipboard: lost.\n");
       d->clipboard.window_out = None;
@@ -1083,7 +1114,7 @@ static int _xitk_x11_clipboard_event (xitk_x11_display_t *d, XEvent *event) {
   } else if (event->type == SelectionNotify) {
   } else if (event->type == SelectionRequest) {
     if ((event->xselectionrequest.owner == d->clipboard.window_out)
-     && (event->xselectionrequest.selection == d->clipboard.atoms[XITK_A_clipboard])) {
+     && (event->xselectionrequest.selection == d->atoms[XITK_A_clipboard])) {
       if (d->be->be.verbosity >= 2) {
         char tname[64], pname[64];
         _xitk_x11_get_atom_name (d, tname, sizeof (tname), event->xselectionrequest.target);
@@ -1096,33 +1127,33 @@ static int _xitk_x11_clipboard_event (xitk_x11_display_t *d, XEvent *event) {
       d->clipboard.req    = event->xselectionrequest.requestor;
       d->clipboard.target = event->xselectionrequest.target;
       d->clipboard.prop   = event->xselectionrequest.property;
-      if (d->clipboard.target == d->clipboard.atoms[XITK_A_targets]) {
+      if (d->clipboard.target == d->atoms[XITK_A_targets]) {
         int r;
         Atom atoms[] = {
-          d->clipboard.atoms[XITK_A_string], d->clipboard.atoms[XITK_A_utf8_string],
-          d->clipboard.atoms[XITK_A_length], d->clipboard.atoms[XITK_A_timestamp]
+          d->atoms[XITK_A_string], d->atoms[XITK_A_utf8_string],
+          d->atoms[XITK_A_length], d->atoms[XITK_A_timestamp]
         };
         if (d->be->be.verbosity >= 2)
           printf ("xitk.x11.clipboard: serve #2: reporting %d (STRING) %d (UTF8_STRING) %d (LENGTH) %d (TIMESTAMP).\n",
-            (int)d->clipboard.atoms[XITK_A_string], (int)d->clipboard.atoms[XITK_A_utf8_string],
-            (int)d->clipboard.atoms[XITK_A_length], (int)d->clipboard.atoms[XITK_A_timestamp]);
+            (int)d->atoms[XITK_A_string], (int)d->atoms[XITK_A_utf8_string],
+            (int)d->atoms[XITK_A_length], (int)d->atoms[XITK_A_timestamp]);
         d->d.lock (&d->d);
         r = XChangeProperty (d->display, d->clipboard.req, d->clipboard.prop,
-          d->clipboard.atoms[XITK_A_atom], 32, PropModeReplace,
+          d->atoms[XITK_A_atom], 32, PropModeReplace,
           (const unsigned char *)atoms, sizeof (atoms) / sizeof (atoms[0]));
         d->d.unlock (&d->d);
         if (r) {
           if (d->be->be.verbosity >= 2)
             printf ("xitk.x11.clipboard: serve #2: reporting OK.\n");
         }
-      } else if ((d->clipboard.target == d->clipboard.atoms[XITK_A_string])
-        || (d->clipboard.target == d->clipboard.atoms[XITK_A_utf8_string])) {
+      } else if ((d->clipboard.target == d->atoms[XITK_A_string])
+        || (d->clipboard.target == d->atoms[XITK_A_utf8_string])) {
         int r;
         if (d->be->be.verbosity >= 2)
           printf ("xitk.x11.clipboard: serve #3: sending %d bytes.\n", d->clipboard.text_len + 1);
         d->d.lock (&d->d);
         r = XChangeProperty (d->display, d->clipboard.req, d->clipboard.prop,
-          d->clipboard.atoms[XITK_A_utf8_string], 8, PropModeReplace,
+          d->atoms[XITK_A_utf8_string], 8, PropModeReplace,
           (const unsigned char *)d->clipboard.text, d->clipboard.text_len + 1);
         d->d.unlock (&d->d);
         if (r) {
@@ -1176,7 +1207,7 @@ static int xitk_x11_window_set_utf8 (xitk_be_window_t *_win, const char *text, i
   d->d.lock (&d->d);
   /* set #1: HACK: get current server time. */
   XChangeProperty (d->display, xw,
-    d->clipboard.dummy, d->clipboard.atoms[XITK_A_utf8_string], 8, PropModeAppend, NULL, 0);
+    d->atoms[XITK_A__XITK_CLIP], d->atoms[XITK_A_utf8_string], 8, PropModeAppend, NULL, 0);
   d->d.unlock (&d->d);
 
   return text_len;
@@ -1205,8 +1236,8 @@ static int xitk_x11_window_get_utf8 (xitk_be_window_t *_win, char **text, int ma
       if (d->be->be.verbosity >= 2)
         printf ("xitk.x11.clipboard: get #1.\n");
       d->d.lock (&d->d);
-      XConvertSelection (d->display, d->clipboard.atoms[XITK_A_clipboard],
-        d->clipboard.atoms[XITK_A_utf8_string], d->clipboard.dummy, win->w.id, CurrentTime);
+      XConvertSelection (d->display, d->atoms[XITK_A_clipboard],
+        d->atoms[XITK_A_utf8_string], d->atoms[XITK_A__XITK_CLIP], win->w.id, CurrentTime);
       d->d.unlock (&d->d);
       return -1;
     }
@@ -1388,7 +1419,7 @@ static int _xitk_x11_keyevent_2_string (xitk_x11_display_t *d, XEvent *event, Ke
 static void _xitk_x11_window_debug_flags (const char *s1, const char *s2, uint32_t flags) {
   static const struct {
     uint32_t flag;
-    const char *s;
+    const char s[20];
   } winf[] = {
     {XITK_WINF_VISIBLE,            " visible"},
     {XITK_WINF_ICONIFIED,          " iconified"},
@@ -1628,13 +1659,12 @@ static void _xitk_x11_window_flags (xitk_x11_window_t *win, uint32_t mask_and_va
        * At the time of writing (2006-06-29), only xfwm4 SVN understands this.
        * Ref. http://bugzilla.xfce.org/show_bug.cgi?id=1958
        */
-      Atom opacity_lock = XInternAtom (d->display, "_NET_WM_WINDOW_OPACITY_LOCKED", False);
       unsigned int val = (newflags & XITK_WINF_LOCK_OPACITY) ? 0xffffffff : 0;
 
       /* This shouldn't happen, but was reported in bug #1573056 */
-      if (opacity_lock != None)
-        XChangeProperty (d->display, win->w.id, opacity_lock, XA_CARDINAL, 32, PropModeReplace,
-                         (unsigned char *)&val, 1);
+      if (d->atoms[XITK_A__NET_WM_WINDOW_OPACITY_LOCKED] != None)
+        XChangeProperty (d->display, win->w.id, d->atoms[XITK_A__NET_WM_WINDOW_OPACITY_LOCKED],
+          XA_CARDINAL, 32, PropModeReplace, (unsigned char *)&val, 1);
     }
 
     XSync (d->display, False);
@@ -3160,7 +3190,7 @@ static long int xitk_x11_reset_screen_saver(xitk_be_display_t *_d, long int time
   if (XScreenSaverQueryExtension (d->display, &dummy, &dummy)) {
     XScreenSaverInfo *ssaverinfo = XScreenSaverAllocInfo();
     long int ssaver_idle;
-    XScreenSaverQueryInfo (d->display, (DefaultRootWindow (d->display)), ssaverinfo);
+    XScreenSaverQueryInfo (d->display, d->imlibdata->x.root, ssaverinfo);
     ssaver_idle = ssaverinfo->idle / 1000;
     XFree(ssaverinfo);
     if (ssaver_idle < timeout) {
@@ -3255,6 +3285,195 @@ static int xitk_x11_change_vmode(xitk_be_display_t *_d, xitk_be_window_t *_w, in
 }
 #endif
 
+
+/* Extract WM Name */
+static unsigned char *_xitk_x11_get_wm_name (Display *display, Window win, Atom atom, Atom type_utf8) {
+  unsigned char   *prop_return = NULL;
+  unsigned long    nitems_return, bytes_after_return;
+  Atom             type_return;
+  int              format_return;
+
+  if (atom == None)
+    return NULL;
+
+  if ((XGetWindowProperty (display, win, atom, 0, 4, False, XA_STRING,
+    &type_return, &format_return, &nitems_return, &bytes_after_return, &prop_return)) != Success)
+    return NULL;
+
+  do {
+    if (type_return == None)
+      break;
+    if (type_return == XA_STRING)
+      return prop_return;
+    if (type_return == type_utf8) {
+      if (prop_return) {
+        XFree (prop_return);
+        prop_return = NULL;
+      }
+      if ((XGetWindowProperty (display, win, atom, 0, 4, False, type_utf8,
+        &type_return, &format_return, &nitems_return, &bytes_after_return, &prop_return)) != Success)
+        break;
+    }
+    if (format_return == 8)
+      return prop_return;
+  } while (0);
+  if (prop_return)
+    XFree (prop_return);
+  return NULL;
+}
+
+static int _xitk_x11_error_handler (Display *display, XErrorEvent *xevent) {
+  char buffer[2048];
+
+  XGetErrorText (display, xevent->error_code, buffer, sizeof (buffer) - 1);
+  XITK_WARNING ("X error received: '%s'\n", buffer);
+  return 0;
+}
+
+static uint32_t _xitk_x11_check_wm (xitk_x11_display_t *d, int verbose) {
+  uint32_t  type = WM_TYPE_UNKNOWN;
+  unsigned char *wm_name = NULL;
+  int (*old_error_handler) (Display *, XErrorEvent *);
+
+  if (d->atoms[XITK_A_XFWM_FLAGS] != None)
+    type |= WM_TYPE_XFCE;
+  else if (d->atoms[XITK_A__WINDOWMAKER_WM_PROTOCOLS] != None)
+    type |= WM_TYPE_WINDOWMAKER;
+  else if (d->atoms[XITK_A__SAWMILL_TIMESTAMP] != None)
+    type |= WM_TYPE_SAWFISH;
+  else if (d->atoms[XITK_A_ENLIGHTENMENT_COMMS] != None)
+    type |= WM_TYPE_E;
+  else if (d->atoms[XITK_A__METACITY_RESTART_MESSAGE] != None)
+    type |= WM_TYPE_METACITY;
+  else if (d->atoms[XITK_A__AS_STYLE] != None)
+    type |= WM_TYPE_AFTERSTEP;
+  else if (d->atoms[XITK_A__ICEWM_WINOPTHINT] != None)
+    type |= WM_TYPE_ICE;
+  else if (d->atoms[XITK_A__BLACKBOX_HINTS] != None)
+    type |= WM_TYPE_BLACKBOX;
+  else if (d->atoms[XITK_A_LARSWM_EXIT] != None)
+    type |= WM_TYPE_LARSWM;
+  else if ((d->atoms[XITK_A_KWIN_RUNNING] != None) && (d->atoms[XITK_A__DT_SM_WINDOW_INFO] != None))
+    type |= WM_TYPE_KWIN;
+  else if (d->atoms[XITK_A_DTWM_IS_RUNNING] != None)
+    type |= WM_TYPE_DTWM;
+
+  old_error_handler = XSetErrorHandler (_xitk_x11_error_handler);
+  XSync (d->display, False);
+
+  if (d->atoms[XITK_A__WIN_SUPPORTING_WM_CHECK] != None) {
+    unsigned char   *prop_return = NULL;
+    unsigned long    nitems_return;
+    unsigned long    bytes_after_return;
+    Atom             type_return;
+    int              format_return;
+    Status           status;
+
+    /* Check for Gnome Compliant WM */
+    if ((XGetWindowProperty (d->display, d->imlibdata->x.root,
+      d->atoms[XITK_A__WIN_SUPPORTING_WM_CHECK], 0, 1, False, XA_CARDINAL,
+      &type_return, &format_return, &nitems_return, &bytes_after_return, &prop_return)) == Success) {
+
+      if ((type_return != None) && (type_return == XA_CARDINAL) &&
+        ((format_return == 32) && (nitems_return == 1) && (bytes_after_return == 0))) {
+        unsigned char *prop_return2 = NULL;
+        Window         win_id;
+
+        win_id = *(unsigned long *)prop_return;
+        status = XGetWindowProperty (d->display, win_id, d->atoms[XITK_A__WIN_SUPPORTING_WM_CHECK], 0, 1,
+          False, XA_CARDINAL, &type_return, &format_return, &nitems_return, &bytes_after_return, &prop_return2);
+        if ((status == Success) && (type_return != None) && (type_return == XA_CARDINAL)) {
+          if ((format_return == 32) && (nitems_return == 1)
+              && (bytes_after_return == 0) && (win_id == *(unsigned long *)prop_return2)) {
+            type |= WM_TYPE_GNOME_COMP;
+          }
+        }
+        if (prop_return2)
+          XFree (prop_return2);
+        if (!(wm_name = _xitk_x11_get_wm_name (d->display, win_id, d->atoms[XITK_A__NET_WM_NAME], d->atoms[XITK_A_utf8_string]))) {
+          /* Enlightenment is Gnome compliant, but don't set the _NET_WM_NAME atom property */
+          wm_name = _xitk_x11_get_wm_name (d->display, d->imlibdata->x.root, d->atoms[XITK_A__WIN_WM_NAME], d->atoms[XITK_A_utf8_string]);
+        }
+      }
+
+      if (prop_return)
+        XFree (prop_return);
+    }
+  }
+
+  /* Check for Extended Window Manager Hints (EWMH) Compliant */
+  if ((d->atoms[XITK_A__NET_SUPPORTING_WM_CHECK] != None) && (d->atoms[XITK_A__NET_WORKAREA] != None)) {
+    unsigned char   *prop_return = NULL;
+    unsigned long    nitems_return;
+    unsigned long    bytes_after_return;
+    Atom             type_return;
+    int              format_return;
+    Status           status;
+
+    if ((XGetWindowProperty (d->display, d->imlibdata->x.root, d->atoms[XITK_A__NET_SUPPORTING_WM_CHECK], 0, 1, False, XA_WINDOW,
+                             &type_return, &format_return, &nitems_return,
+                             &bytes_after_return, &prop_return)) == Success) {
+
+      if ((type_return != None) && (type_return == XA_WINDOW) &&
+          (format_return == 32) && (nitems_return == 1) && (bytes_after_return == 0)) {
+        unsigned char   *prop_return2 = NULL;
+        Window           win_id;
+
+        win_id = *(unsigned long *)prop_return;
+        status = XGetWindowProperty (d->display, win_id, d->atoms[XITK_A__NET_SUPPORTING_WM_CHECK], 0, 1,
+          False, XA_WINDOW, &type_return, &format_return, &nitems_return, &bytes_after_return, &prop_return2);
+        if ((status == Success) && (type_return != None) && (type_return == XA_WINDOW) &&
+          (format_return == 32) && (nitems_return == 1) && (bytes_after_return == 0)) {
+          if (win_id == *(unsigned long *)prop_return) {
+            if (wm_name)
+              XFree (wm_name);
+            wm_name = _xitk_x11_get_wm_name (d->display, win_id, d->atoms[XITK_A__NET_WM_NAME], d->atoms[XITK_A_utf8_string]);
+            type |= WM_TYPE_EWMH_COMP;
+          }
+        }
+        if (prop_return2)
+          XFree(prop_return2);
+      }
+      if (prop_return)
+        XFree(prop_return);
+    }
+  }
+
+  XSetErrorHandler (old_error_handler);
+  XSync (d->display, False);
+
+  if (verbose) {
+    static const char names[][16] = {
+        [WM_TYPE_UNKNOWN]     = "Unknown",
+        [WM_TYPE_KWIN]        = "KWIN",
+        [WM_TYPE_E]           = "Enlightenment",
+        [WM_TYPE_ICE]         = "Ice",
+        [WM_TYPE_WINDOWMAKER] = "WindowMaker",
+        [WM_TYPE_MOTIF]       = "Motif(like?)",
+        [WM_TYPE_XFCE]        = "XFce",
+        [WM_TYPE_SAWFISH]     = "Sawfish",
+        [WM_TYPE_METACITY]    = "Metacity",
+        [WM_TYPE_AFTERSTEP]   = "Afterstep",
+        [WM_TYPE_BLACKBOX]    = "Blackbox",
+        [WM_TYPE_LARSWM]      = "LarsWM",
+        [WM_TYPE_DTWM]        = "dtwm"
+    };
+    uint32_t t = type & WM_TYPE_COMP_MASK;
+    const char *name = (t < sizeof (names) / sizeof (names[0])) ? names[t] : NULL;
+
+    if (!name)
+      name = names[WM_TYPE_UNKNOWN];
+    printf ("[ WM type: %s%s%s {%s} ]-\n",
+      (type & WM_TYPE_GNOME_COMP) ? "(GnomeCompliant) " : "",
+      (type & WM_TYPE_EWMH_COMP) ? "(EWMH) " : "",
+      name, wm_name ? (char *)wm_name : "");
+  }
+
+  if (wm_name)
+    XFree (wm_name);
+
+  return type;
+}
 
 /*
  *
@@ -3357,13 +3576,22 @@ static xitk_be_display_t *xitk_x11_open_display (xitk_backend_t *_be, const char
 
   _init_imlib(d, prefered_visual, install_colormap);
 
-  _xitk_x11_clipboard_init (d);
+  {
+    char *names[XITK_A_LAST];
+    uint32_t u;
+    for (u = 0; u < XITK_A_LAST; u++)
+      names[u] = (char *)_xitk_x11_atom_names[u];
+    d->d.lock (&d->d);
+    XInternAtoms (d->display, names + XITK_A_FALSE_START,
+      XITK_A_FALSE_STOP - XITK_A_FALSE_START, False, d->atoms + XITK_A_FALSE_START);
+    XInternAtoms (d->display, names + XITK_A_TRUE_START,
+      XITK_A_TRUE_STOP - XITK_A_TRUE_START, True, d->atoms + XITK_A_TRUE_START);
+    d->wm_type = _xitk_x11_check_wm (d, d->be->be.verbosity >= 2);
+    d->d.wm_type = d->wm_type;
+    d->d.unlock (&d->d);
+  }
 
-  d->d.lock (&d->d);
-  XInternAtoms (d->display, (char **)_xitk_x11_atom_names, XITK_A_LAST, False, d->atoms);
-  d->wm_type = xitk_x11_check_wm(d->display, d->be->be.verbosity >= 2);
-  d->d.wm_type = d->wm_type;
-  d->d.unlock (&d->d);
+  _xitk_x11_clipboard_init (d);
 
   d->d.close = xitk_x11_display_close;
   d->d.next_event = xitk_x11_next_event;

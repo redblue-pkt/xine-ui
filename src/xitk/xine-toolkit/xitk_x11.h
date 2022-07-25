@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2021 the xine project
+ * Copyright (C) 2000-2022 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -66,14 +66,6 @@ void xitk_x11_xrm_parse(const char *xrm_class_name,
                         char **prefered_visual, int *install_colormap);
 
 int xitk_x11_parse_geometry(const char *geomstr, int *x, int *y, int *w, int *h);
-
-/*
- *
- */
-
-void xitk_x11_set_ewmh_fullscreen(Display *display, Window window, int enable);
-
-uint32_t xitk_x11_check_wm (Display *display, int verbose);
 
 /*
  *
