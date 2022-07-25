@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2021 the xine project
+ * Copyright (C) 2000-2022 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -723,22 +723,24 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y) {
   }
 
   /* Mediamark */
-  if(xine_get_status(gui->stream) != XINE_STATUS_STOP) {
-    char *str = xitk_asprintf ("%s/%s", _("Playback"), _("Add Mediamark"));
-    if (str) {
-      xitk_menu_entry_t   menu_entry;
-      memset (&menu_entry, 0, sizeof (xitk_menu_entry_t));
-      menu_entry.type      = XITK_MENU_ENTRY_SEPARATOR;
-      menu_entry.menu      = _("Playback/SEP");
-      xitk_menu_add_entry (w, &menu_entry);
-      menu_entry.menu = str;
-      menu_entry.type      = XITK_MENU_ENTRY_PLAIN;
-      menu_entry.shortcut  = "AddMediamark";
-      menu_entry.user_id   = _MENU_GUI_ACTION_BASE + ACTID_ADDMEDIAMARK;
-      _menu_set_shortcuts (gui, &tbuf, &menu_entry, 1);
-      xitk_menu_add_entry (w, &menu_entry);
-      free (str);
-    }
+  if (xine_get_status (gui->stream) != XINE_STATUS_STOP) {
+    xitk_menu_entry_t menu_entry;
+    char buf[1024], *p = buf, *e = buf + sizeof (buf);
+    p += strlcpy (p, _("Playback"), e - p);
+    if (p >= e)
+      p = e - 1;
+    *p++ = '/';
+    /* p += */ strlcpy (p, _("Add Mediamark"), e - p);
+    memset (&menu_entry, 0, sizeof (menu_entry));
+    menu_entry.type      = XITK_MENU_ENTRY_SEPARATOR;
+    menu_entry.menu      = _("Playback/SEP");
+    xitk_menu_add_entry (w, &menu_entry);
+    menu_entry.menu      = buf;
+    menu_entry.type      = XITK_MENU_ENTRY_PLAIN;
+    menu_entry.shortcut  = "AddMediamark";
+    menu_entry.user_id   = _MENU_GUI_ACTION_BASE + ACTID_ADDMEDIAMARK;
+    _menu_set_shortcuts (gui, &tbuf, &menu_entry, 1);
+    xitk_menu_add_entry (w, &menu_entry);
   }
 
   xitk_menu_show_menu(w);
