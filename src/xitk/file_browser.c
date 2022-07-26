@@ -126,6 +126,16 @@ static const filebrowser_filter_t __fb_filters[] = {
   { NULL, NULL                                                                     }
 };
 
+static char *_fb_strldup (const char *s, uint32_t l) {
+  char *res = malloc (l + 1);
+  if (!res)
+    return NULL;
+  if (l)
+    memcpy (res, s, l);
+  res[l] = 0;
+  return res;
+}
+
 typedef struct {
   uint32_t have, used, bufsize, bufused;
   char **array, *buf;
@@ -510,7 +520,7 @@ static void fb_update_origin(filebrowser_t *fb) {
 
 static void fb_extract_path_and_file(filebrowser_t *fb, const char *filepathname) {
   uint32_t l, have;
-  char *d;
+  char *d, temp;
 
   if (!filepathname)
     return;
@@ -549,26 +559,36 @@ static void fb_extract_path_and_file(filebrowser_t *fb, const char *filepathname
     l = have - 1;
   d += l;
   /* "...////" -> "..." */
-  fb->path[fb->dirstart -1] = 0;
+  fb->path[fb->dirstart - 1] = 0;
+  temp = fb->path[fb->dirstart];
+  fb->path[fb->dirstart] = 0;
   while (d[-1] == '/')
     d--;
-  /* find last / */
-  fb->path[fb->dirstart -1] = '/';
-  while (d[-1] != '/')
-    d--;
-  if (d <= fb->path + fb->dirstart) {
-    /* "justafilename.flv" */
-    fb->dirstop = fb->filestart = fb->dirstart;
-    fb->filestop = fb->dirstart + l;
-  } else if (d == fb->path + fb->dirstart + 1) {
-    /* "/filename.flv" */
-    fb->dirstop = fb->filestart = fb->dirstart + 1;
-    fb->filestop = fb->dirstart + 1 + l;
+  fb->path[fb->dirstart] = temp;
+  *d = 0;
+  /* file part? */
+  if (is_a_dir (fb->path + fb->dirstart)) {
+    /* known a dir */
+    fb->dirstop = d - fb->path;
+    if (d[-1] != '/') {
+      *d++ = '/';
+      *d = 0;
+    }
+    fb->filestart = fb->filestop = d - fb->path;
   } else {
-    /* "...somedir/filename.flv" */
-    fb->dirstop = d - fb->path - 1;
-    fb->filestart = d - fb->path;
-    fb->filestop = fb->dirstart + l;
+    fb->filestop = d - fb->path;
+    /* find last / */
+    fb->path[fb->dirstart -1] = '/';
+    while (d[-1] != '/')
+      d--;
+    fb->dirstop = fb->filestart = d - fb->path;
+    if (fb->dirstop < fb->dirstart + 2) {
+      /* "justafilename.flv" or "/filename.flv" */
+      ;
+    } else {
+      /* "...somedir/filename.flv" */
+      fb->dirstop--;
+    }
   }
 }
 
@@ -1054,24 +1074,15 @@ void filebrowser_end(filebrowser_t *fb) {
 }
 
 char *filebrowser_get_current_dir(filebrowser_t *fb) {
-  char temp, *res;
-
-  if (!fb)
-    return NULL;
-
-  temp = fb->path[fb->dirstop];
-  fb->path[fb->dirstop] = 0;
-  res = strdup (fb->path + fb->dirstart);
-  fb->path[fb->dirstop] = temp;
-  return res;
+  return fb ? _fb_strldup (fb->path + fb->dirstart, fb->dirstop - fb->dirstart) : NULL;
 }
 
 char *filebrowser_get_current_filename(filebrowser_t *fb) {
-  return fb && fb->path[fb->filestart] ? strdup (fb->path + fb->filestart) : NULL;
+  return fb ? _fb_strldup (fb->path + fb->filestart, fb->filestop - fb->filestart) : NULL;
 }
 
 char *filebrowser_get_full_filename(filebrowser_t *fb) {
-  return fb ? strdup (fb->path + fb->dirstart) : NULL;
+  return fb ? _fb_strldup (fb->path + fb->dirstart, fb->filestop- fb->dirstart) : NULL;
 }
 
 char **filebrowser_get_all_files(filebrowser_t *fb) {
@@ -1079,7 +1090,7 @@ char **filebrowser_get_all_files(filebrowser_t *fb) {
 
   if (fb && fb->file_list.used) {
     uint32_t i;
-    files = calloc ((fb->file_list.used + 2), sizeof (files[0]));
+    files = malloc ((fb->file_list.used + 2) * sizeof (files[0]));
 
     for (i = 0; i < fb->file_list.used; i++)
       files[i] = strdup (fb->file_list.array[i]);
@@ -1216,11 +1227,12 @@ filebrowser_t *create_filebrowser (gGui_t *gui, const char *window_title, const 
   br.arrow_dn.skin_element_name    = NULL;
   br.browser.skin_element_name     = NULL;
   br.browser.max_displayed_entries = MAX_DISP_ENTRIES;
+  br.userdata                      = (void *)fb;
+
   br.browser.num_entries           = fb->dir_list.used;
   br.browser.entries               = (const char *const *)fb->dir_list.array;
   br.callback                      = fb_select;
   br.dbl_click_callback            = fb_dbl_select;
-  br.userdata                      = (void *)fb;
   fb->w[_W_directories_browser] = xitk_noskin_browser_create (fb->widget_list, &br,
     x + 2, y + 2, w - 4 - 12, 20, 12, fontname);
   xitk_add_widget (fb->widget_list, fb->w[_W_directories_browser], XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
@@ -1240,16 +1252,10 @@ filebrowser_t *create_filebrowser (gGui_t *gui, const char *window_title, const 
   x = WINDOW_WIDTH - (w + 15);
   y += 15;
 
-  br.arrow_up.skin_element_name    = NULL;
-  br.slider.skin_element_name      = NULL;
-  br.arrow_dn.skin_element_name    = NULL;
-  br.browser.skin_element_name     = NULL;
-  br.browser.max_displayed_entries = MAX_DISP_ENTRIES;
   br.browser.num_entries           = fb->file_list.used;
   br.browser.entries               = (const char * const *)fb->file_list.array;
   br.callback                      = fb_select;
   br.dbl_click_callback            = fb_dbl_select;
-  br.userdata                      = (void *)fb;
   fb->w[_W_files_browser] = xitk_noskin_browser_create (fb->widget_list, &br,
     x + 2, y + 2, w - 4 - 12, 20, 12, fontname);
   xitk_add_widget (fb->widget_list, fb->w[_W_files_browser], XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
@@ -1396,38 +1402,29 @@ filebrowser_t *create_filebrowser (gGui_t *gui, const char *window_title, const 
   w = (WINDOW_WIDTH - (4 * 15)) / 3;
 
   lb.button_type       = CLICK_BUTTON;
-  lb.label             = _("Rename");
   lb.align             = ALIGN_CENTER;
-  lb.callback          = fb_rename_file;
   lb.state_callback    = NULL;
   lb.userdata          = (void *)fb;
   lb.skin_element_name = NULL;
+
+  lb.label             = _("Rename");
+  lb.callback          = fb_rename_file;
   fb->w[_W_rename] = xitk_noskin_labelbutton_create (fb->widget_list,
     &lb, x, y, w, 23, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_INV, btnfontname);
   xitk_add_widget (fb->widget_list, fb->w[_W_rename], XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
   x = (WINDOW_WIDTH - w) / 2;
 
-  lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Delete");
-  lb.align             = ALIGN_CENTER;
   lb.callback          = fb_delete_file;
-  lb.state_callback    = NULL;
-  lb.userdata          = (void *)fb;
-  lb.skin_element_name = NULL;
   fb->w[_W_delete] = xitk_noskin_labelbutton_create (fb->widget_list,
     &lb, x, y, w, 23, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_INV, btnfontname);
   xitk_add_widget (fb->widget_list, fb->w[_W_delete], XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
   x = WINDOW_WIDTH - (w + 15);
 
-  lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Create a directory");
-  lb.align             = ALIGN_CENTER;
   lb.callback          = fb_create_directory;
-  lb.state_callback    = NULL;
-  lb.userdata          = (void *)fb;
-  lb.skin_element_name = NULL;
   fb->w[_W_create] = xitk_noskin_labelbutton_create (fb->widget_list,
     &lb, x, y, w, 23, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_INV, btnfontname);
   xitk_add_widget (fb->widget_list, fb->w[_W_create], XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
@@ -1439,13 +1436,8 @@ filebrowser_t *create_filebrowser (gGui_t *gui, const char *window_title, const 
   if(fb->cbb[0].label) {
     x = 15;
 
-    lb.button_type       = CLICK_BUTTON;
     lb.label             = fb->cbb[0].label;
-    lb.align             = ALIGN_CENTER;
     lb.callback          = fb_callback_button_cb;
-    lb.state_callback    = NULL;
-    lb.userdata          = (void *)fb;
-    lb.skin_element_name = NULL;
     fb->w[_W_cb_button0] = xitk_noskin_labelbutton_create (fb->widget_list,
       &lb, x, y, w, 23, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_INV, btnfontname);
     xitk_add_widget (fb->widget_list, fb->w[_W_cb_button0], XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
@@ -1453,13 +1445,8 @@ filebrowser_t *create_filebrowser (gGui_t *gui, const char *window_title, const 
     if(fb->cbb[1].label) {
       x = (WINDOW_WIDTH - w) / 2;
 
-      lb.button_type       = CLICK_BUTTON;
       lb.label             = fb->cbb[1].label;
-      lb.align             = ALIGN_CENTER;
       lb.callback          = fb_callback_button_cb;
-      lb.state_callback    = NULL;
-      lb.userdata          = (void *)fb;
-      lb.skin_element_name = NULL;
       fb->w[_W_cb_button1] = xitk_noskin_labelbutton_create (fb->widget_list,
         &lb, x, y, w, 23, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_INV, btnfontname);
       xitk_add_widget (fb->widget_list, fb->w[_W_cb_button1], XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
@@ -1468,13 +1455,8 @@ filebrowser_t *create_filebrowser (gGui_t *gui, const char *window_title, const 
 
   x = WINDOW_WIDTH - (w + 15);
 
-  lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Close");
-  lb.align             = ALIGN_CENTER;
   lb.callback          = _fb_exit;
-  lb.state_callback    = NULL;
-  lb.userdata          = (void *)fb;
-  lb.skin_element_name = NULL;
   fb->w[_W_close] =  xitk_noskin_labelbutton_create (fb->widget_list,
     &lb, x, y, w, 23, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_INV, btnfontname);
   xitk_add_widget (fb->widget_list, fb->w[_W_close], XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
@@ -1502,3 +1484,4 @@ filebrowser_t *create_filebrowser (gGui_t *gui, const char *window_title, const 
 
   return fb;
 }
+
