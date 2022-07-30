@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2021 the xine project
+ * Copyright (C) 2000-2022 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -60,8 +60,13 @@ int gui_xine_open_and_play (gGui_t *gui, char *mrl, char *sub, int start_pos,
 void gui_dndcallback (void *gui, const char *filename);
 void gui_step_mrl (gGui_t *gui, int by);
 void gui_nextprev_mrl (xitk_widget_t *w, void *gui_nextprev);
-void gui_set_current_mmk (gGui_t *gui, mediamark_t *mmk);
-void gui_set_current_mmk_by_index (gGui_t *gui, int idx);
+void gui_set_current_mmk (gGui_t *gui, const mediamark_t *mmk);
+
+/** returns the real index used. */
+#define GUI_MMK_NONE -1
+#define GUI_MMK_CURRENT -2
+int gui_set_current_mmk_by_index (gGui_t *gui, int idx);
+
 void gui_add_mediamark (gGui_t *gui);
 void gui_file_selector (gGui_t *gui);
 

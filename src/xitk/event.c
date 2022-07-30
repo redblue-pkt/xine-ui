@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2021 the xine project
+ * Copyright (C) 2000-2022 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -1157,7 +1157,7 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
   case ACTID_PLAYLIST_OPEN:
     if (sarg) {
         mediamark_load_mediamarks (gui, sarg);
-        gui_set_current_mmk (gui, mediamark_get_current_mmk (gui));
+        gui_set_current_mmk_by_index (gui, GUI_MMK_CURRENT);
         playlist_update_playlist (gui);
         if ((!is_playback_widgets_enabled (gui->panel)) && gui->playlist.num)
           enable_playback_controls (gui->panel, 1);
@@ -1218,14 +1218,14 @@ int gui_playlist_play (gGui_t *gui, int idx) {
     return 0;
   gui_set_current_mmk_by_index (gui, idx);
 
-  pthread_mutex_lock(&gui->mmk_mutex);
+  gui_playlist_lock (gui);
   if (!gui_xine_open_and_play (gui, gui->mmk.mrl, gui->mmk.sub, 0,
     gui->mmk.start, gui->mmk.av_offset, gui->mmk.spu_offset,
     !mediamark_have_alternates (&(gui->mmk))) &&
      (!mediamark_have_alternates(&(gui->mmk)) ||
         !gui_open_and_play_alternates (gui, &(gui->mmk), gui->mmk.sub)))
     ret = 0;
-  pthread_mutex_unlock(&gui->mmk_mutex);
+  gui_playlist_unlock (gui);
   return ret;
 }
 
@@ -1248,7 +1248,7 @@ void gui_playlist_start_next (gGui_t *gui) {
   }
 
   if (is_playback_widgets_enabled (gui->panel) && (!gui->playlist.num)) {
-    gui_set_current_mmk (gui, NULL);
+    gui_set_current_mmk_by_index (gui, GUI_MMK_NONE);
     enable_playback_controls (gui->panel, 0);
     gui_display_logo (gui);
     return;
@@ -1672,7 +1672,7 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
   gui->kbindings = kbindings_init_kbinding (gui, gui->keymap_file);
   gui->kbindings_enabled = !!gui->kbindings;
 
-  gui_set_current_mmk (gui, mediamark_get_current_mmk (gui));
+  gui_set_current_mmk_by_index (gui, GUI_MMK_CURRENT);
 
   panel_init (gui);
   gui->event_reject = 0;
@@ -1759,7 +1759,7 @@ void gui_run(gGui_t *gui, char **session_opts) {
 				     autoplay_mrls[j], NULL, 0, -1, 0, 0);
 
 	    gui->playlist.cur = 0;
-            gui_set_current_mmk (gui, mediamark_get_current_mmk (gui));
+            gui_set_current_mmk_by_index (gui, GUI_MMK_CURRENT);
 	  }
 	}
       }
@@ -1832,7 +1832,7 @@ void gui_run(gGui_t *gui, char **session_opts) {
 
     /* User load a playlist on startup */
     if(actions_on_start(gui->actions_on_start, ACTID_PLAYLIST)) {
-      gui_set_current_mmk (gui, mediamark_get_current_mmk (gui));
+      gui_set_current_mmk_by_index (gui, GUI_MMK_CURRENT);
 
       if(gui->playlist.num) {
 	gui->playlist.cur = 0;

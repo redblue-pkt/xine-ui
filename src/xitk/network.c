@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2021 the xine project
+ * Copyright (C) 2000-2022 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -1644,19 +1644,19 @@ static void handle_xine_error(gGui_t *gui, client_info_t *client_info) {
     break;
 
   case XINE_ERROR_NO_INPUT_PLUGIN:
-    pthread_mutex_lock (&gui->mmk_mutex);
+    gui_playlist_lock (gui);
     p += snprintf (p, e - p,
       "xine engine error:\n"
       "There is no available input plugin available to handle '%s'.\n\n", gui->mmk.mrl);
-    pthread_mutex_unlock (&gui->mmk_mutex);
+    gui_playlist_unlock (gui);
     break;
 
   case XINE_ERROR_NO_DEMUX_PLUGIN:
-    pthread_mutex_lock (&gui->mmk_mutex);
+    gui_playlist_lock (gui);
     p += snprintf (p, e - p,
       "xine engine error:\n"
       "There is no available demuxer plugin to handle '%s'.\n\n", gui->mmk.mrl);
-    pthread_mutex_unlock (&gui->mmk_mutex);
+    gui_playlist_unlock (gui);
     break;
 
   default:
@@ -1907,11 +1907,11 @@ static void do_mrl(const commands_t *cmd, client_info_t *client_info) {
 	xine_stop (gui->stream);
 	gui->playlist.cur--;
 	if ((gui->playlist.cur >= 0) && (gui->playlist.cur < gui->playlist.num)) {
-          gui_set_current_mmk (gui, mediamark_get_current_mmk (gui));
-          pthread_mutex_lock (&gui->mmk_mutex);
+          gui_set_current_mmk_by_index (gui, GUI_MMK_CURRENT);
+          gui_playlist_lock (gui);
           (void)gui_xine_open_and_play (gui, gui->mmk.mrl, gui->mmk.sub, 0,
 					gui->mmk.start, gui->mmk.av_offset, gui->mmk.spu_offset, 1);
-          pthread_mutex_unlock (&gui->mmk_mutex);
+          gui_playlist_unlock (gui);
 
 	}
 	else {
@@ -1939,7 +1939,7 @@ static void do_mrl(const commands_t *cmd, client_info_t *client_info) {
 	  xine_stop(gui->stream);
 	  gui->ignore_next = 0;
 	}
-        pthread_mutex_lock (&gui->mmk_mutex);
+        gui_playlist_lock (gui);
         gui_set_current_mmk (gui, gui->playlist.mmk[gui->playlist.num - 1]);
 	if(!(xine_open(gui->stream, gui->mmk.mrl)
 	     && xine_play (gui->stream, 0, gui->mmk.start))) {
@@ -1948,7 +1948,7 @@ static void do_mrl(const commands_t *cmd, client_info_t *client_info) {
 	}
 	else
 	  gui->logo_mode = 0;
-        pthread_mutex_unlock (&gui->mmk_mutex);
+        gui_playlist_unlock (gui);
       }
     }
   }
@@ -1971,13 +1971,13 @@ static void do_playlist(const commands_t *cmd, client_info_t *client_info) {
 
 	if(gui->playlist.num) {
           char buf[_BUFSIZ], *p, *e = buf + sizeof (buf) - 4;
-          pthread_mutex_lock (&gui->mmk_mutex);
+          gui_playlist_lock (gui);
 	  for(i = 0; i < gui->playlist.num; i++) {
             p = buf;
             p += snprintf (p, e - p, "%2s %5d %s\n\n", (i == gui->playlist.cur) ? "*>" : "", i, gui->playlist.mmk[i]->mrl);
             _sock_write (client_info->socket, buf, p - buf);
 	  }
-          pthread_mutex_unlock (&gui->mmk_mutex);
+          gui_playlist_unlock (gui);
 	}
 	else
           _sock_write (client_info->socket, "empty playlist.\n", 16);
@@ -2006,7 +2006,7 @@ static void do_playlist(const commands_t *cmd, client_info_t *client_info) {
 	    }
 
 	    gui->playlist.cur = entry;
-            gui_set_current_mmk (gui, mediamark_get_current_mmk (gui));
+            gui_set_current_mmk_by_index (gui, GUI_MMK_CURRENT);
             gui_play (NULL, gui);
 	  }
 	}
@@ -2030,7 +2030,7 @@ static void do_playlist(const commands_t *cmd, client_info_t *client_info) {
 
 	if((j >= 0) && (j <= gui->playlist.num)) {
 	  gui->playlist.cur = j;
-          gui_set_current_mmk (gui, mediamark_get_current_mmk (gui));
+          gui_set_current_mmk_by_index (gui, GUI_MMK_CURRENT);
 
 	  if(xine_get_status(gui->stream) != XINE_STATUS_STOP) {
 	    gui->ignore_next = 1;
@@ -2063,17 +2063,17 @@ static void do_playlist(const commands_t *cmd, client_info_t *client_info) {
 	    if((gui->playlist.cur == j) && ((xine_get_status(gui->stream) != XINE_STATUS_STOP)))
               gui_stop (NULL, gui);
 
-            pthread_mutex_lock (&gui->mmk_mutex);
+            gui_playlist_lock (gui);
             mediamark_delete_entry (gui, j);
 	    gui->playlist.cur = 0;
-            pthread_mutex_unlock (&gui->mmk_mutex);
+            gui_playlist_unlock (gui);
 	  }
 	}
 
         playlist_update_playlist (gui);
 
 	if(gui->playlist.num)
-          gui_set_current_mmk (gui, mediamark_get_current_mmk (gui));
+          gui_set_current_mmk_by_index (gui, GUI_MMK_CURRENT);
 	else {
 
           if (is_playback_widgets_enabled (gui->panel))
@@ -2082,7 +2082,7 @@ static void do_playlist(const commands_t *cmd, client_info_t *client_info) {
 	  if(xine_get_status(gui->stream) != XINE_STATUS_STOP)
             gui_stop (NULL, gui);
 
-          gui_set_current_mmk (gui, NULL);
+          gui_set_current_mmk_by_index (gui, GUI_MMK_NONE);
 	}
       }
     }
@@ -2094,14 +2094,14 @@ static void do_play(const commands_t *cmd, client_info_t *client_info) {
 
   (void)cmd;
   if (xine_get_status (gui->stream) != XINE_STATUS_PLAY) {
-    pthread_mutex_lock (&gui->mmk_mutex);
+    gui_playlist_lock (gui);
     if(!(xine_open(gui->stream, gui->mmk.mrl) && xine_play (gui->stream, 0, gui->mmk.start))) {
       handle_xine_error(gui, client_info);
       gui_display_logo (gui);
     }
     else
       gui->logo_mode = 0;
-    pthread_mutex_unlock (&gui->mmk_mutex);
+    gui_playlist_unlock (gui);
   }
   else {
     xine_set_param(gui->stream, XINE_PARAM_SPEED, XINE_SPEED_NORMAL);
@@ -2658,10 +2658,10 @@ static void do_snap(const commands_t *cmd, client_info_t *client_info) {
   gGui_t *gui = client_info->gui;
 
   (void)cmd;
-  pthread_mutex_lock (&gui->mmk_mutex);
+  gui_playlist_lock (gui);
   create_snapshot (gui, gui->mmk.mrl,
 		  network_messenger, network_messenger, (void *)(intptr_t)client_info->socket);
-  pthread_mutex_unlock (&gui->mmk_mutex);
+  gui_playlist_unlock (gui);
 }
 
 /*

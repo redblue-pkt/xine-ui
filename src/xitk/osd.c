@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2021 the xine project
+ * Copyright (C) 2000-2022 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -332,9 +332,9 @@ void osd_stream_infos (gGui_t *gui) {
 
     y = x = 0;
 
-    pthread_mutex_lock (&gui->mmk_mutex);
+    gui_playlist_lock (gui);
     strlcpy (buffer, (gui->is_display_mrl) ? gui->mmk.mrl : gui->mmk.ident, sizeof (buffer));
-    pthread_mutex_unlock (&gui->mmk_mutex);
+    gui_playlist_unlock (gui);
     xine_osd_get_text_size (gui->osd.sinfo.osd[0], buffer, &osdw, &h);
     p = buffer;
     while(osdw > (wwidth - 40)) {

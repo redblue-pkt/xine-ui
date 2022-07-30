@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2021 the xine project
+ * Copyright (C) 2000-2022 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -27,7 +27,6 @@
 void playlist_editor (gGui_t *gui);
 void playlist_change_skins (gGui_t *gui, int synth);
 void playlist_get_input_focus (gGui_t *gui);
-void playlist_raise_window (gGui_t *gui);
 int playlist_is_visible (gGui_t *gui);
 void playlist_toggle_visibility (gGui_t *gui);
 void playlist_play_current (gGui_t *gui);

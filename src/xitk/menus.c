@@ -241,7 +241,7 @@ static void _menu_action (xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
                 mediamark_append_entry (gui, autoplay_mrls[j], autoplay_mrls[j], NULL, 0, -1, 0, 0);
               gui->playlist.cur = gui->playlist.num ? 0 : -1;
               if (gui->playlist.cur == 0)
-                gui_set_current_mmk (gui, mediamark_get_current_mmk (gui));
+                gui_set_current_mmk_by_index (gui, GUI_MMK_CURRENT);
               /* If we're in newbie mode, start playback immediately
                * (even ignoring if we're currently playing something */
               if (gui->smart_mode) {
@@ -697,7 +697,7 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y) {
     int                 i, first_entry = 0;
     const char *const menus_str = _("Menus");
 
-    pthread_mutex_lock (&gui->mmk_mutex);
+    gui_playlist_lock (gui);
     if (gui->mmk.mrl) {
       if (!strncmp(gui->mmk.mrl, "bd:/", 4)) {
         first_entry = 14;
@@ -707,7 +707,7 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y) {
         first_entry = 7;
       }
     }
-    pthread_mutex_unlock (&gui->mmk_mutex);
+    gui_playlist_unlock (gui);
 
     memset (&menu_entry, 0, sizeof (xitk_menu_entry_t));
     menu_entry.type = XITK_MENU_ENTRY_PLAIN;

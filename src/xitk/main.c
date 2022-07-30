@@ -1,4 +1,4 @@
-/** Copyright (C) 2000-2021 the xine project
+/** Copyright (C) 2000-2022 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -892,7 +892,7 @@ static void event_listener (void *user_data, const xine_event_t *event) {
     if(event->stream == gui->stream) {
       xine_ui_data_t *uevent = (xine_ui_data_t *) event->data;
 
-      pthread_mutex_lock (&gui->mmk_mutex);
+      gui_playlist_lock (gui);
       if(strcmp(gui->mmk.ident, uevent->str)) {
 
 	free(gui->mmk.ident);
@@ -904,13 +904,13 @@ static void event_listener (void *user_data, const xine_event_t *event) {
 	  gui->playlist.mmk[gui->playlist.cur]->ident = strdup(uevent->str);
 	}
 	gui->mmk.ident = strdup(uevent->str);
-        pthread_mutex_unlock (&gui->mmk_mutex);
+        gui_playlist_unlock (gui);
 
         video_window_set_mrl (gui->vwin, uevent->str);
         playlist_mrlident_toggle (gui);
         panel_update_mrl_display (gui->panel);
       } else {
-        pthread_mutex_unlock (&gui->mmk_mutex);
+        gui_playlist_unlock (gui);
       }
     }
     break;
@@ -986,9 +986,9 @@ static void event_listener (void *user_data, const xine_event_t *event) {
           flags = _MSG_WITH_ARGS;
           {
             int i;
-            pthread_mutex_lock (&gui->mmk_mutex);
+            gui_playlist_lock (gui);
             i = strncasecmp (gui->mmk.mrl, "dvd:/", 5);
-            pthread_mutex_unlock (&gui->mmk_mutex);
+            gui_playlist_unlock (gui);
             if (!i)
               s2 = _("\nYour DVD is probably crypted. According to your country laws, you can or can't "
                      "install/use libdvdcss to be able to read this disc, which you bought.");
@@ -1129,20 +1129,19 @@ static void event_listener (void *user_data, const xine_event_t *event) {
 	printf("XINE_EVENT_MRL_REFERENCE got mrl [%s] (alternative=%d)\n",
                ref->mrl, ref->alternative);
 
+      gui_playlist_lock (gui);
       if(ref->alternative == 0) {
         gui->playlist.ref_append++;
         mediamark_insert_entry(gui->playlist.ref_append, ref->mrl, ref->mrl, NULL, 0, -1, 0, 0);
       } else {
-        pthread_mutex_lock (&gui->mmk_mutex);
 	mediamark_t *mmk = mediamark_get_mmk_by_index(gui->playlist.ref_append);
 
 	if(mmk) {
 	  mediamark_append_alternate_mrl(mmk, ref->mrl);
 	  mediamark_set_got_alternate(mmk);
 	}
-        pthread_mutex_unlock (&gui->mmk_mutex);
-
       }
+      gui_playlist_unlock (gui);
 
     }
     break;
@@ -1167,6 +1166,7 @@ typedef struct {
 	printf("XINE_EVENT_MRL_REFERENCE_EXT got mrl [%s] (alternative=%d)\n",
                ref->mrl, ref->alternative);
 
+      gui_playlist_lock (gui);
       if(ref->alternative == 0) {
         gui->playlist.ref_append++;
         /* FIXME: duration handled correctly? */
@@ -1176,15 +1176,14 @@ typedef struct {
                                0, 0);
       } else {
         /* FIXME: title? start? duration? */
-        pthread_mutex_lock (&gui->mmk_mutex);
         mediamark_t *mmk = mediamark_get_mmk_by_index (gui, gui->playlist.ref_append);
 
 	if(mmk) {
 	  mediamark_append_alternate_mrl(mmk, ref->mrl);
 	  mediamark_set_got_alternate(mmk);
 	}
-        pthread_mutex_unlock (&gui->mmk_mutex);
       }
+      gui_playlist_unlock (gui);
     }
     break;
 
@@ -1565,12 +1564,12 @@ int main(int argc, char *argv[]) {
       if((!actions_on_start(gui->actions_on_start, ACTID_PLAYLIST) && (aos < MAX_ACTIONS_ON_START)))
 	gui->actions_on_start[aos++] = ACTID_PLAYLIST;
 
-      pthread_mutex_lock (&gui->mmk_mutex);
+      gui_playlist_lock (gui);
       if(!gui->playlist.mmk)
         mediamark_load_mediamarks (gui, optarg);
       else
         mediamark_concat_mediamarks (gui, optarg);
-      pthread_mutex_unlock (&gui->mmk_mutex);
+      gui_playlist_unlock (gui);
 
       /* don't load original playlist when loading this one */
       no_old_playlist = 1;

@@ -321,7 +321,7 @@ static void autoplay_cb (void *data) {
     oxine->mode = OXINE_MODE_NORMAL;
 
     gui->playlist.cur = 0;
-    gui_set_current_mmk (gui, mediamark_get_current_mmk (gui));
+    gui_set_current_mmk_by_index (gui, GUI_MMK_CURRENT);
 
     gui_xine_open_and_play (gui, gui->mmk.mrl, gui->mmk.sub, 0,
                            gui->mmk.start, gui->mmk.av_offset, gui->mmk.spu_offset, 0);
