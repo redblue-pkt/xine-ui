@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2021 the xine project
+ * Copyright (C) 2000-2022 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -48,14 +48,21 @@ typedef struct {
   alternate_t              *alternates;
 } mediamark_t;
 
+typedef enum {
+  MMK_VAL_IDENT = 0,
+  MMK_VAL_MRL,
+  MMK_VAL_SUB
+} mmk_val_t;
 
-int mediamark_have_alternates(mediamark_t *mmk);
+int mediamark_set_str_val (mediamark_t **mmk, const char *value, mmk_val_t what);
+
+#define mediamark_have_alternates(_mmk) ((_mmk)->alternates != NULL)
 void mediamark_free_alternates(mediamark_t *mmk);
 char *mediamark_get_first_alternate_mrl(mediamark_t *mmk);
 char *mediamark_get_next_alternate_mrl(mediamark_t *mmk);
 char *mediamark_get_current_alternate_mrl(mediamark_t *mmk);
 void mediamark_append_alternate_mrl(mediamark_t *mmk, const char *mrl);
-void mediamark_duplicate_alternates(mediamark_t *s_mmk, mediamark_t *d_mmk);
+void mediamark_duplicate_alternates (const mediamark_t *s_mmk, mediamark_t *d_mmk);
 int mediamark_got_alternate(mediamark_t *mmk);
 void mediamark_set_got_alternate(mediamark_t *mmk);
 void mediamark_unset_got_alternate(mediamark_t *mmk);
@@ -63,12 +70,11 @@ void mediamark_unset_got_alternate(mediamark_t *mmk);
 int mediamark_free_mmk(mediamark_t **mmk);
 int mediamark_store_mmk(mediamark_t **mmk, const char *mrl, const char *ident, const char *sub, int start, int end, int av_offset, int spu_offset);
 mediamark_t *mediamark_clone_mmk(mediamark_t *mmk);
-void mediamark_insert_entry (gGui_t *gui, int index, const char *mrl, const char *ident,
-  const char *sub, int start, int end, int av_offset, int spu_offset);
-void mediamark_append_entry (gGui_t *gui, const char *mrl, const char *ident,
+#define mediamark_append_entry(_gui,_mrl,_ident,_sub,_start,_end,_av_offset,_spu_offset) \
+  mediamark_insert_entry (_gui, -1, _mrl, _ident, _sub, _start, _end, _av_offset, _spu_offset)
+int mediamark_insert_entry (gGui_t *gui, int index, const char *mrl, const char *ident,
   const char *sub, int start, int end, int av_offset, int spu_offset);
 void mediamark_free_mediamarks (gGui_t *gui);
-void mediamark_replace_entry(mediamark_t **mmk, const char *mrl, const char *ident, const char *sub, int start, int end, int av_offset, int spu_offset);
 void mediamark_delete_entry (gGui_t *gui, int offset);
 void mediamark_reset_played_state (gGui_t *gui);
 int mediamark_all_played (gGui_t *gui);

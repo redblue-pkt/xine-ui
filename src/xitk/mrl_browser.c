@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2021 the xine project
+ * Copyright (C) 2000-2022 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -360,7 +360,7 @@ static void mrl_add_noautoplay(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
 
     if ((!num) && ((xine_get_status (mrlb->gui->stream) == XINE_STATUS_STOP) || mrlb->gui->logo_mode)) {
       mrlb->gui->playlist.cur = mrlb->gui->playlist.num - 1;
-      gui_set_current_mmk (mrlb->gui, mediamark_get_current_mmk (mrlb->gui));
+      gui_set_current_mmk_by_index (mrlb->gui, GUI_MMK_CURRENT);
     }
 
     playlist_update_playlist (mrlb->gui);
@@ -410,7 +410,7 @@ static void mrl_play(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
 
     if(mrl_look_like_playlist(_mrl)) {
       if (mediamark_concat_mediamarks (mrlb->gui, _mrl)) {
-        gui_set_current_mmk (mrlb->gui, mediamark_get_current_mmk (mrlb->gui));
+        gui_set_current_mmk_by_index (mrlb->gui, GUI_MMK_CURRENT);
         _mrl = (char *) mediamark_get_current_mrl (mrlb->gui);
         playlist_update_playlist (mrlb->gui);
       }

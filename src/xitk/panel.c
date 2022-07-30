@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2021 the xine project
+ * Copyright (C) 2000-2022 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -564,16 +564,16 @@ static void *slider_loop (void *data) {
                 panel->gui->mmk.ident = strdup (panel->sl.istr.s);
                 free (panel->gui->playlist.mmk[panel->gui->playlist.cur]->ident);
                 panel->gui->playlist.mmk[panel->gui->playlist.cur]->ident = strdup (panel->sl.istr.s);
-                pthread_mutex_unlock (&panel->gui->mmk_mutex);
+                gui_playlist_unlock (panel->gui);
                 video_window_set_mrl (panel->gui->vwin, panel->sl.istr.s);
                 playlist_mrlident_toggle (panel->gui);
                 panel_update_mrl_display (panel);
               } else {
-                pthread_mutex_unlock (&panel->gui->mmk_mutex);
+                gui_playlist_unlock (panel->gui);
               }
             } else {
               video_window_set_mrl (panel->gui->vwin, panel->gui->mmk.mrl);
-              pthread_mutex_unlock (&panel->gui->mmk_mutex);
+              gui_playlist_unlock (panel->gui);
             }
           }
         }
@@ -885,9 +885,9 @@ static void panel_spu_lang_list(xitk_widget_t *w, void *data) {
  */
 void panel_update_mrl_display (xui_panel_t *panel) {
   if (panel) {
-    pthread_mutex_lock (&panel->gui->mmk_mutex);
+    gui_playlist_lock (panel->gui);
     panel_set_title (panel, (panel->gui->is_display_mrl) ? panel->gui->mmk.mrl : panel->gui->mmk.ident);
-    pthread_mutex_unlock (&panel->gui->mmk_mutex);
+    gui_playlist_unlock (panel->gui);
   }
 }
 
@@ -949,9 +949,9 @@ void panel_snapshot (xitk_widget_t *w, void *data) {
   xui_panel_t *panel = data;
 
   (void)w;
-  pthread_mutex_lock (&panel->gui->mmk_mutex);
+  gui_playlist_lock (panel->gui);
   create_snapshot (panel->gui, panel->gui->mmk.mrl, panel_snapshot_error, panel_snapshot_info, panel->gui);
-  pthread_mutex_unlock (&panel->gui->mmk_mutex);
+  gui_playlist_unlock (panel->gui);
 }
 
 /*

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2021 the xine project
+ * Copyright (C) 2000-2022 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -126,7 +126,7 @@ static void _playlist_create_playlists (xui_playlist_t *pl) {
 
   _playlist_free_playlists (pl);
 
-  pthread_mutex_lock (&pl->gui->mmk_mutex);
+  gui_playlist_lock (pl->gui);
   if (pl->gui->playlist.mmk && pl->gui->playlist.num) {
 
     pl->playlist_mrls = (char **)calloc ((pl->gui->playlist.num + 1), sizeof (char *));
@@ -141,7 +141,7 @@ static void _playlist_create_playlists (xui_playlist_t *pl) {
     pl->playlist_idents[i] = NULL;
     pl->playlist_len = pl->gui->playlist.num;
   }
-  pthread_mutex_unlock (&pl->gui->mmk_mutex);
+  gui_playlist_unlock (pl->gui);
 }
 
 /*
@@ -157,9 +157,9 @@ static void _playlist_handle_selection(xitk_widget_t *w, void *data, int selecte
 
   if (pl->playlist_mrls[selected] != NULL) {
     xitk_inputtext_change_text (pl->w[_W_winput], pl->playlist_mrls[selected]);
-    pthread_mutex_lock (&pl->gui->mmk_mutex);
+    gui_playlist_lock (pl->gui);
     mmk_editor_set_mmk (pl->gui, &pl->gui->playlist.mmk[selected]);
-    pthread_mutex_unlock (&pl->gui->mmk_mutex);
+    gui_playlist_unlock (pl->gui);
   }
 }
 
@@ -185,13 +185,13 @@ void playlist_play_current (gGui_t *gui) {
     return;
 
   j = xitk_browser_get_current_selected (pl->w[_W_playlist]);
-  pthread_mutex_lock (&gui->mmk_mutex);
+  gui_playlist_lock (gui);
   if ((j >= 0) && (gui->playlist.mmk[j]->mrl != NULL)) {
     gui->playlist.cur = j;
     _playlist_xine_play (pl);
     xitk_browser_release_all_buttons (pl->w[_W_playlist]);
   }
-  pthread_mutex_unlock (&gui->mmk_mutex);
+  gui_playlist_unlock (gui);
 }
 static void _playlist_play_current (xitk_widget_t *w, void *data) {
   gGui_t *gui = data;
@@ -207,13 +207,13 @@ static void _playlist_play_on_dbl_click(xitk_widget_t *w, void *data, int select
 
   (void)w;
   (void)modifier;
-  pthread_mutex_lock (&pl->gui->mmk_mutex);
+  gui_playlist_lock (pl->gui);
   if (pl->gui->playlist.mmk[selected]->mrl != NULL) {
     pl->gui->playlist.cur = selected;
     _playlist_xine_play (pl);
     xitk_browser_release_all_buttons (pl->w[_W_playlist]);
   }
-  pthread_mutex_unlock (&pl->gui->mmk_mutex);
+  gui_playlist_unlock (pl->gui);
 }
 
 /*
@@ -229,14 +229,14 @@ void playlist_delete_entry (gGui_t *gui, int j) {
     if ((gui->playlist.cur == j) && (xine_get_status (gui->stream) != XINE_STATUS_STOP))
       gui_stop (NULL, gui);
 
-    pthread_mutex_lock (&gui->mmk_mutex);
+    gui_playlist_lock (gui);
     mediamark_delete_entry (gui, j);
-    pthread_mutex_unlock (&gui->mmk_mutex);
+    gui_playlist_unlock (gui);
 
     playlist_update_playlist (gui);
 
     if (gui->playlist.num) {
-      gui_set_current_mmk (gui, mediamark_get_current_mmk (gui));
+      gui_set_current_mmk_by_index (gui, GUI_MMK_CURRENT);
       gui->playlist.cur = 0;
     }
     else {
@@ -249,7 +249,7 @@ void playlist_delete_entry (gGui_t *gui, int j) {
       if (xine_get_status (gui->stream) != XINE_STATUS_STOP)
         gui_stop (NULL, gui);
 
-      gui_set_current_mmk (gui, NULL);
+      gui_set_current_mmk_by_index (gui, GUI_MMK_NONE);
       if (pl)
         xitk_inputtext_change_text (pl->w[_W_winput], NULL);
     }
@@ -304,7 +304,7 @@ void playlist_delete_all (gGui_t *gui) {
       xitk_inputtext_change_text (pl->w[_W_winput], NULL);
     xitk_browser_release_all_buttons (pl->w[_W_playlist]);
   }
-  gui_set_current_mmk (gui, NULL);
+  gui_set_current_mmk_by_index (gui, GUI_MMK_NONE);
   enable_playback_controls (gui->panel, 0);
 }
 static void _playlist_delete_all (xitk_widget_t *w, void *data) {
@@ -330,7 +330,7 @@ static void _playlist_move_current_updown (xui_playlist_t *pl, int dir) {
     int          max_vis_len = xitk_browser_get_num_entries (pl->w[_W_playlist]);
 
     if ((dir == -1) && (j > 0)) {
-      pthread_mutex_lock (&pl->gui->mmk_mutex);
+      gui_playlist_lock (pl->gui);
       mmk = pl->gui->playlist.mmk[j - 1];
 
       if (j == pl->gui->playlist.cur)
@@ -339,10 +339,10 @@ static void _playlist_move_current_updown (xui_playlist_t *pl, int dir) {
       pl->gui->playlist.mmk[j - 1] = pl->gui->playlist.mmk[j];
       pl->gui->playlist.mmk[j] = mmk;
       j--;
-      pthread_mutex_unlock (&pl->gui->mmk_mutex);
+      gui_playlist_unlock (pl->gui);
     }
     else if ((dir == 1) && (j < (pl->gui->playlist.num - 1))) {
-      pthread_mutex_lock (&pl->gui->mmk_mutex);
+      gui_playlist_lock (pl->gui);
       mmk = pl->gui->playlist.mmk[j + 1];
 
       if (j == pl->gui->playlist.cur)
@@ -351,7 +351,7 @@ static void _playlist_move_current_updown (xui_playlist_t *pl, int dir) {
       pl->gui->playlist.mmk[j + 1] = pl->gui->playlist.mmk[j];
       pl->gui->playlist.mmk[j] = mmk;
       j++;
-      pthread_mutex_unlock (&pl->gui->mmk_mutex);
+      gui_playlist_unlock (pl->gui);
     }
 
     _playlist_create_playlists (pl);
@@ -404,7 +404,7 @@ static void _playlist_load_callback (filebrowser_t *fb, void *data) {
 
   if ((file = filebrowser_get_full_filename(fb)) != NULL) {
     mediamark_load_mediamarks (gui, file);
-    gui_set_current_mmk (gui, mediamark_get_current_mmk (gui));
+    gui_set_current_mmk_by_index (gui, GUI_MMK_CURRENT);
     playlist_update_playlist (gui);
 
     if ((xine_get_status (gui->stream) == XINE_STATUS_PLAY))
@@ -601,7 +601,7 @@ static int playlist_event (void *data, const xitk_be_event_t *e) {
 static void _playlist_apply_cb(void *data) {
   gGui_t *gui = data;
   playlist_mrlident_toggle (gui);
-  gui_set_current_mmk (gui, mediamark_get_current_mmk (gui));
+  gui_set_current_mmk_by_index (gui, GUI_MMK_CURRENT);
 }
 
 void playlist_get_input_focus (gGui_t *gui) {
@@ -618,15 +618,15 @@ void playlist_mmk_editor (gGui_t *gui) {
     int sel = xitk_browser_get_current_selected (pl->w[_W_playlist]);
 
     if(sel >= 0) {
-      pthread_mutex_lock (&pl->gui->mmk_mutex);
+      gui_playlist_lock (pl->gui);
       mmk_edit_mediamark (pl->gui, &pl->gui->playlist.mmk[sel], _playlist_apply_cb, gui);
-      pthread_mutex_unlock (&pl->gui->mmk_mutex);
+      gui_playlist_unlock (pl->gui);
     }
   }
 }
 
 static void _scan_for_playlist_infos (gGui_t *gui, xine_stream_t *stream, int n) {
-  pthread_mutex_lock (&gui->mmk_mutex);
+  gui_playlist_lock (gui);
   if (xine_open (stream, gui->playlist.mmk[n]->mrl)) {
     char  *ident;
 
@@ -643,7 +643,7 @@ static void _scan_for_playlist_infos (gGui_t *gui, xine_stream_t *stream, int n)
     }
     xine_close(stream);
   }
-  pthread_mutex_unlock (&gui->mmk_mutex);
+  gui_playlist_unlock (gui);
 }
 
 void playlist_scan_for_infos_selected (gGui_t *gui) {
@@ -699,9 +699,9 @@ void playlist_mrlident_toggle (gGui_t *gui) {
     _playlist_create_playlists (pl);
     _playlist_update_browser_list (pl, start);
 
-    pthread_mutex_lock (&pl->gui->mmk_mutex);
+    gui_playlist_lock (pl->gui);
     mmk_editor_set_mmk (pl->gui, &pl->gui->playlist.mmk[xitk_browser_get_current_selected (pl->w[_W_playlist])]);
-    pthread_mutex_unlock (&pl->gui->mmk_mutex);
+    gui_playlist_unlock (pl->gui);
   }
 }
 
@@ -838,7 +838,7 @@ void playlist_scan_input (xitk_widget_t *w, void *data, int state) {
 
     gui->playlist.cur = gui->playlist.num ? 0 : -1;
     if (gui->playlist.cur == 0)
-      gui_set_current_mmk (gui, mediamark_get_current_mmk (gui));
+      gui_set_current_mmk_by_index (gui, GUI_MMK_CURRENT);
     /*
      * If we're in newbie mode, start playback immediately
      * (even ignoring if we're currently playing something
@@ -861,16 +861,9 @@ void playlist_scan_input (xitk_widget_t *w, void *data, int state) {
 /*
  * Raise playlist->window
  */
-void playlist_raise_window (gGui_t *gui) {
-  xui_playlist_t *pl;
-  if (!gui)
-    return;
-  pl = gui->plwin;
-
-  if (pl) {
-    raise_window (pl->gui, pl->xwin, pl->visible, 1);
-    mmk_editor_raise_window (pl->gui);
-  }
+static void playlist_raise_window (xui_playlist_t *pl) {
+  raise_window (pl->gui, pl->xwin, pl->visible, 1);
+  mmk_editor_raise_window (pl->gui);
 }
 
 /*
@@ -908,7 +901,7 @@ void playlist_update_focused_entry (gGui_t *gui) {
   if (pl->playlist_len <= 0)
     return;
 
-  pthread_mutex_lock (&pl->gui->mmk_mutex);
+  gui_playlist_lock (pl->gui);
   mmk = mediamark_get_current_mmk (gui);
   if (mmk) {
     char *pa_mrl = pl->gui->is_display_mrl ? pl->gui->mmk.mrl : pl->gui->mmk.ident;
@@ -934,7 +927,7 @@ void playlist_update_focused_entry (gGui_t *gui) {
   } else {
     xitk_inputtext_change_text (pl->w[_W_winput], NULL);
   }
-  pthread_mutex_unlock (&pl->gui->mmk_mutex);
+  gui_playlist_unlock (pl->gui);
 }
 
 /*
@@ -964,7 +957,7 @@ void playlist_change_skins (gGui_t *gui, int synthetic) {
   xitk_window_set_background_image (pl->xwin, bg_image);
   video_window_set_transient_for (pl->gui->vwin, pl->xwin);
   if (playlist_is_visible (gui))
-    playlist_raise_window (gui);
+    playlist_raise_window (pl);
   xitk_skin_unlock (pl->gui->skin_config);
 
   xitk_change_skins_widget_list (pl->widget_list, pl->gui->skin_config);
@@ -1206,7 +1199,7 @@ void playlist_editor (gGui_t *gui) {
   pl->visible = 1;
 
   playlist_update_focused_entry (pl->gui);
-  playlist_raise_window (pl->gui);
+  playlist_raise_window (pl);
 
   xitk_window_set_input_focus (pl->xwin);
   xitk_set_focus_to_widget (pl->w[_W_winput]);

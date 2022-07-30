@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2021 the xine project
+ * Copyright (C) 2000-2022 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -76,7 +76,7 @@ static void lirc_get_playlist (gGui_t *gui, char *from) {
 				 (const char *)autoplay_mrls[j], NULL, 0, -1, 0, 0);
 
         gui->playlist.cur = 0;
-	gui_set_current_mmk (gui, mediamark_get_current_mmk (gui));
+	gui_set_current_mmk_by_index (gui, GUI_MMK_CURRENT);
         playlist_update_playlist (gui);
       }
     }
