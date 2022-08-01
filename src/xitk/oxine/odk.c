@@ -465,11 +465,11 @@ void odk_free(odk_t *odk) {
 void odk_enqueue(odk_t *odk, const char *mrl)
 {
   if(mrl_look_like_playlist((char *)mrl)) {
-    if (!mediamark_concat_mediamarks (odk->gui, mrl))
-      mediamark_append_entry (odk->gui, mrl, mrl, NULL, 0, -1, 0, 0);
+    if (!gui_playlist_add_file (odk->gui, mrl))
+      gui_playlist_append (odk->gui, mrl, mrl, NULL, 0, -1, 0, 0);
   }
   else
-    mediamark_append_entry (odk->gui, mrl, mrl, NULL, 0, -1, 0, 0);
+    gui_playlist_append (odk->gui, mrl, mrl, NULL, 0, -1, 0, 0);
 }
 
 int odk_open_and_play(odk_t *odk, const char *mrl) {
@@ -485,7 +485,7 @@ int odk_open_and_play(odk_t *odk, const char *mrl) {
 
   if( odk->gui->playlist.num > entry_num ) {
     odk->gui->playlist.cur = entry_num;
-    gui_set_current_mmk (odk->gui, odk->gui->playlist.mmk[entry_num]);
+    gui_current_set_index (odk->gui, entry_num);
 
     return gui_xine_open_and_play (odk->gui, odk->gui->mmk.mrl, odk->gui->mmk.sub, 0,
            odk->gui->mmk.start, odk->gui->mmk.av_offset, odk->gui->mmk.spu_offset, 0);

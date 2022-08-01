@@ -136,7 +136,7 @@ static void playlist_play_cb(void *data, void *entry) {
 
   if (session->action == PL_ACTION_PLAY) {
     gui->playlist.cur = n;
-    gui_set_current_mmk (gui, gui->playlist.mmk[n]);
+    gui_current_set_index (gui, n);
 
     if (gui_xine_open_and_play (gui, gui->mmk.mrl, gui->mmk.sub, 0,
         gui->mmk.start, gui->mmk.av_offset, gui->mmk.spu_offset, 0) ) {

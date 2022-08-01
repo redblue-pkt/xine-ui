@@ -279,14 +279,9 @@ static int _gui_xine_play (gGui_t *gui, xine_stream_t *stream, int start_pos, in
       if (stream_infos_is_visible (gui->streaminfo))
 	stream_infos_update_infos (gui->streaminfo);
 
-      if(update_mmk && ((ident = stream_infos_get_ident_from_stream(stream)) != NULL)) {
-        gui_playlist_lock (gui);
-	free(gui->mmk.ident);
-	free(gui->playlist.mmk[gui->playlist.cur]->ident);
-
-	gui->mmk.ident = strdup(ident);
-	gui->playlist.mmk[gui->playlist.cur]->ident = strdup(ident);
-        gui_playlist_unlock (gui);
+      if (update_mmk && ((ident = stream_infos_get_ident_from_stream (stream)) != NULL)) {
+        gui_playlist_set_str_val (gui, ident, MMK_VAL_IDENT, GUI_MMK_CURRENT);
+        gui_current_set_index (gui, GUI_MMK_CURRENT);
 
         video_window_set_mrl (gui->vwin, ident);
         playlist_mrlident_toggle (gui);
@@ -344,61 +339,7 @@ static int _gui_xine_play (gGui_t *gui, xine_stream_t *stream, int start_pos, in
   return ret;
 }
 
-static void free_mmk(gGui_t *gui) {
-  free(gui->mmk.mrl);
-  free(gui->mmk.ident);
-  free(gui->mmk.sub);
-  if(mediamark_have_alternates(&(gui->mmk)))
-    mediamark_free_alternates(&(gui->mmk));
-}
-
-static void _set_mmk (gGui_t *gui, const mediamark_t *mmk) {
-  free_mmk (gui);
-
-  if (mmk) {
-    gui->mmk.mrl           = strdup(mmk->mrl);
-    gui->mmk.ident         = strdup(((mmk->ident) ? mmk->ident : mmk->mrl));
-    gui->mmk.sub           = mmk->sub ? strdup(mmk->sub): NULL;
-    gui->mmk.start         = mmk->start;
-    gui->mmk.end           = mmk->end;
-    gui->mmk.av_offset     = mmk->av_offset;
-    gui->mmk.spu_offset    = mmk->spu_offset;
-    gui->mmk.got_alternate = mmk->got_alternate;
-    mediamark_duplicate_alternates(mmk, &(gui->mmk));
-  } else {
-    /* TRANSLATORS: only ASCII characters (skin) */
-    gui->mmk.mrl           = strdup(pgettext("skin", "There is no MRL."));
-    gui->mmk.ident         = strdup ("xine-ui version " VERSION);
-    gui->mmk.sub           = NULL;
-    gui->mmk.start         = 0;
-    gui->mmk.end           = -1;
-    gui->mmk.av_offset     = 0;
-    gui->mmk.spu_offset    = 0;
-    gui->mmk.got_alternate = 0;
-    gui->mmk.alternates    = NULL;
-    gui->mmk.cur_alt       = NULL;
-  }
-}
-
-static int _gui_set_current_mmk_by_index (gGui_t *gui, int idx) {
-  mediamark_t *mmk;
-
-  if (idx == GUI_MMK_CURRENT)
-    idx = gui->playlist.cur;
-
-  if ((idx >= 0) && (idx < gui->playlist.num) && gui->playlist.mmk && gui->playlist.mmk[idx]) {
-    mmk = gui->playlist.mmk[idx];
-  } else {
-    mmk = NULL;
-    idx = GUI_MMK_NONE;
-  }
-
-  _set_mmk (gui, mmk);
-  return idx;
-}
-
-
-static void mmk_set_update(gGui_t *gui) {
+void gui_pl_updated (gGui_t *gui) {
 
   video_window_set_mrl (gui->vwin, gui->mmk.ident);
   event_sender_update_menu_buttons (gui);
@@ -559,7 +500,7 @@ int gui_xine_open_and_play (gGui_t *gui, char *_mrl, char *_sub, int start_pos,
 	  fclose(fd);
 
           mediamark_set_str_val (&gui->playlist.mmk[gui->playlist.cur], fullfilename, MMK_VAL_MRL);
-          gui_set_current_mmk_by_index (gui, GUI_MMK_CURRENT);
+          gui_current_set_index (gui, GUI_MMK_CURRENT);
 	  mrl = gui->mmk.mrl;
         }
       }
@@ -571,8 +512,8 @@ int gui_xine_open_and_play (gGui_t *gui, char *_mrl, char *_sub, int start_pos,
   }
 
   if(mrl_look_like_playlist(mrl)) {
-    if (mediamark_concat_mediamarks (gui, mrl)) {
-      gui_set_current_mmk_by_index (gui, GUI_MMK_CURRENT);
+    if (gui_playlist_add_file (gui, mrl)) {
+      gui_current_set_index (gui, GUI_MMK_CURRENT);
       mrl        = gui->mmk.mrl;
       start_pos  = 0;
       start_time = gui->mmk.start;
@@ -787,8 +728,8 @@ void gui_exit_2 (gGui_t *gui) {
 
   xitk_skin_unload_config(gui->skin_config);
 
-  mediamark_free_mediamarks (gui);
-  free_mmk(gui);
+  gui_playlist_free (gui);
+  gui_current_free (gui);
 
   if (gui->icon)
     xitk_image_free_image (&gui->icon);
@@ -873,7 +814,7 @@ void gui_stop (xitk_widget_t *w, void *data) {
   panel_update_runtime_display (gui->panel);
 
   if (is_playback_widgets_enabled (gui->panel)) {
-    if (gui_set_current_mmk_by_index (gui, GUI_MMK_CURRENT) == GUI_MMK_NONE)
+    if (gui_current_set_index (gui, GUI_MMK_CURRENT) == GUI_MMK_NONE)
       enable_playback_controls (gui->panel, 0);
   }
   gui_display_logo (gui);
@@ -908,7 +849,7 @@ void gui_close (xitk_widget_t *w, void *data) {
   panel_update_runtime_display (gui->panel);
 
   if (is_playback_widgets_enabled (gui->panel)) {
-    if (gui_set_current_mmk_by_index (gui, GUI_MMK_CURRENT) == GUI_MMK_NONE)
+    if (gui_current_set_index (gui, GUI_MMK_CURRENT) == GUI_MMK_NONE)
       enable_playback_controls (gui->panel, 0);
   }
   gui->ignore_next = 1;
@@ -965,7 +906,7 @@ void gui_eject (xitk_widget_t *w, void *data) {
         /* remove maching entries */
         for (a = b = gui->playlist.mmk, e = a + gui->playlist.num; a < e; a++) {
           if (!strncasecmp ((*a)->mrl, cur_mrl, tok_len))
-            mediamark_free_mmk (a);
+            mediamark_free (a);
           else
             *b++ = *a;
         }
@@ -981,7 +922,7 @@ void gui_eject (xitk_widget_t *w, void *data) {
 	 * Remove only the current MRL
 	 */
         gui_playlist_lock (gui);
-        mediamark_delete_entry (gui, gui->playlist.cur);
+        gui_playlist_remove (gui, gui->playlist.cur);
 	if(gui->playlist.cur)
 	  gui->playlist.cur--;
         gui_playlist_unlock (gui);
@@ -992,7 +933,7 @@ void gui_eject (xitk_widget_t *w, void *data) {
 
     }
 
-    gui_set_current_mmk_by_index (gui, GUI_MMK_CURRENT);
+    gui_current_set_index (gui, GUI_MMK_CURRENT);
     playlist_update_playlist (gui);
   }
   else {
@@ -1377,7 +1318,7 @@ void gui_dndcallback (void *_gui, const char *filename) {
 	    if(*(p + (strlen(p) - 1)) == '/')
 	      *(p + (strlen(p) - 1)) = '\0';
 
-            mediamark_collect_from_directory (gui, p);
+            gui_playlist_add_dir (gui, p);
 	    more_than_one = gui->playlist.cur;
 	    goto __do_play;
 	  }
@@ -1396,7 +1337,7 @@ void gui_dndcallback (void *_gui, const char *filename) {
 	      if(buffer2[strlen(buffer2) - 1] == '/')
 		buffer2[strlen(buffer2) - 1] = '\0';
 
-              mediamark_collect_from_directory (gui, buffer2);
+              gui_playlist_add_dir (gui, buffer2);
 	      more_than_one = gui->playlist.cur;
 	      goto __do_play;
 	    }
@@ -1418,7 +1359,7 @@ void gui_dndcallback (void *_gui, const char *filename) {
       if(buffer[strlen(buffer) - 1] == '/')
 	buffer[strlen(buffer) - 1] = '\0';
 
-      mediamark_collect_from_directory (gui, buffer);
+      gui_playlist_add_dir (gui, buffer);
       more_than_one = gui->playlist.cur;
     }
     else {
@@ -1434,13 +1375,13 @@ void gui_dndcallback (void *_gui, const char *filename) {
 	int cur = gui->playlist.cur;
 
 	more_than_one = (gui->playlist.cur - 1);
-        if (mediamark_concat_mediamarks (gui, buffer))
+        if (gui_playlist_add_file (gui, buffer))
 	  gui->playlist.cur = cur;
 	else
-          mediamark_append_entry (gui, buffer, ident, NULL, 0, -1, 0, 0);
+          gui_playlist_append (gui, buffer, ident, NULL, 0, -1, 0, 0);
       }
       else
-        mediamark_append_entry (gui, buffer, ident, NULL, 0, -1, 0, 0);
+        gui_playlist_append (gui, buffer, ident, NULL, 0, -1, 0, 0);
 
     }
 
@@ -1456,8 +1397,8 @@ void gui_dndcallback (void *_gui, const char *filename) {
 	else
 	  gui->playlist.cur = gui->playlist.num - 1;
 
-        _set_mmk  (gui, mediamark_get_current_mmk (gui));
-        mmk_set_update(gui);
+        gui_current_set_index (gui, GUI_MMK_CURRENT);
+        gui_pl_updated (gui);
 	if(gui->smart_mode)
           gui_play (NULL, gui);
 
@@ -1521,7 +1462,7 @@ void gui_step_mrl (gGui_t *gui, int by) {
 
 	  gui->ignore_next = 1;
 	  gui->playlist.cur = newcur;
-          gui_set_current_mmk_by_index (gui, GUI_MMK_CURRENT);
+          gui_current_set_index (gui, GUI_MMK_CURRENT);
           if (!gui_xine_open_and_play (gui, gui->mmk.mrl, gui->mmk.sub, 0,
 				     gui->mmk.start, gui->mmk.av_offset, gui->mmk.spu_offset, 1))
             gui_display_logo (gui);
@@ -1559,7 +1500,7 @@ void gui_step_mrl (gGui_t *gui, int by) {
 	  gui->ignore_next = 1;
           gui->playlist.cur -= by;
 	  if((gui->playlist.cur < gui->playlist.num)) {
-            gui_set_current_mmk_by_index (gui, GUI_MMK_CURRENT);
+            gui_current_set_index (gui, GUI_MMK_CURRENT);
             if (!gui_xine_open_and_play (gui, gui->mmk.mrl, gui->mmk.sub, 0,
 				       gui->mmk.start, gui->mmk.av_offset, gui->mmk.spu_offset, 1))
               gui_display_logo (gui);
@@ -1576,7 +1517,7 @@ void gui_step_mrl (gGui_t *gui, int by) {
         if ((gui->playlist.cur - by) >= 0) {
           gui->playlist.cur -= by;
 	  if((gui->playlist.cur < gui->playlist.num)) {
-            gui_set_current_mmk_by_index (gui, GUI_MMK_CURRENT);
+            gui_current_set_index (gui, GUI_MMK_CURRENT);
             if (!gui_xine_open_and_play (gui, gui->mmk.mrl, gui->mmk.sub, 0,
 				       gui->mmk.start, gui->mmk.av_offset, gui->mmk.spu_offset, 1))
               gui_display_logo (gui);
@@ -1589,7 +1530,7 @@ void gui_step_mrl (gGui_t *gui, int by) {
           int newcur = (gui->playlist.cur - by) + gui->playlist.num;
 
 	  gui->playlist.cur = newcur;
-          gui_set_current_mmk_by_index (gui, GUI_MMK_CURRENT);
+          gui_current_set_index (gui, GUI_MMK_CURRENT);
           if (!gui_xine_open_and_play (gui, gui->mmk.mrl, gui->mmk.sub, 0,
 				     gui->mmk.start, gui->mmk.av_offset, gui->mmk.spu_offset, 1))
             gui_display_logo (gui);
@@ -1651,30 +1592,6 @@ void gui_mrlbrowser_show(xitk_widget_t *w, void *data) {
 
   }
 
-}
-
-void gui_set_current_mmk (gGui_t *gui, const mediamark_t *mmk) {
-  if (!gui)
-    return;
-
-  gui_playlist_lock (gui);
-  _set_mmk (gui, mmk);
-  gui_playlist_unlock (gui);
-
-  mmk_set_update(gui);
-}
-
-int gui_set_current_mmk_by_index (gGui_t *gui, int idx) {
-  if (!gui)
-    return GUI_MMK_NONE;
-
-  gui_playlist_lock (gui);
-  idx = _gui_set_current_mmk_by_index (gui, idx);
-  gui->playlist.cur = idx;
-  gui_playlist_unlock (gui);
-
-  mmk_set_update (gui);
-  return idx;
 }
 
 void gui_acontrol_show(xitk_widget_t *w, void *data) {
@@ -1950,7 +1867,7 @@ void gui_add_mediamark (gGui_t *gui) {
     if (gui_xine_get_pos_length (gui, gui->stream, NULL, &secs, NULL)) {
       secs /= 1000;
 
-      mediamark_append_entry (gui, gui->mmk.mrl, gui->mmk.ident,
+      gui_playlist_append (gui, gui->mmk.mrl, gui->mmk.ident,
 			     gui->mmk.sub, secs, -1, gui->mmk.av_offset, gui->mmk.spu_offset);
       playlist_update_playlist (gui);
     }
@@ -2000,11 +1917,11 @@ static void fileselector_callback (filebrowser_t *fb, void *userdata) {
     /* If the file has an extension which could be a playlist, attempt to append
        it to the current list as a list; otherwise, append it as an ordinary file. */
     if(mrl_look_like_playlist(file)) {
-      if (!mediamark_concat_mediamarks (gui, file))
-        mediamark_append_entry (gui, file, ident, NULL, 0, -1, 0, 0);
+      if (!gui_playlist_add_file (gui, file))
+        gui_playlist_append (gui, file, ident, NULL, 0, -1, 0, 0);
     }
     else
-      mediamark_append_entry (gui, file, ident, NULL, 0, -1, 0, 0);
+      gui_playlist_append (gui, file, ident, NULL, 0, -1, 0, 0);
 
     playlist_update_playlist (gui);
     free(ident);
@@ -2019,7 +1936,7 @@ static void fileselector_callback (filebrowser_t *fb, void *userdata) {
       (gui->logo_mode || (xine_get_status(gui->stream) == XINE_STATUS_STOP))) {
       gui->playlist.cur = first;
       if(gui->smart_mode) {
-        gui_set_current_mmk_by_index (gui, GUI_MMK_CURRENT);
+        gui_current_set_index (gui, GUI_MMK_CURRENT);
         gui_play (NULL, gui);
       }
     }
@@ -2066,11 +1983,11 @@ static void fileselector_all_callback (filebrowser_t *fb, void *userdata) {
         /* If the file has an extension which could be a playlist, attempt to append
            it to the current list as a list; otherwise, append it as an ordinary file. */
         if(mrl_look_like_playlist(fullfilename)) {
-          if (!mediamark_concat_mediamarks (gui, fullfilename))
-            mediamark_append_entry (gui, fullfilename, files[i], NULL, 0, -1, 0, 0);
+          if (!gui_playlist_add_file (gui, fullfilename))
+            gui_playlist_append (gui, fullfilename, files[i], NULL, 0, -1, 0, 0);
         }
         else
-          mediamark_append_entry (gui, fullfilename, files[i], NULL, 0, -1, 0, 0);
+          gui_playlist_append (gui, fullfilename, files[i], NULL, 0, -1, 0, 0);
 
         i++;
       } /* End while */
@@ -2086,7 +2003,7 @@ static void fileselector_all_callback (filebrowser_t *fb, void *userdata) {
       if((first != gui->playlist.num) && (xine_get_status(gui->stream) == XINE_STATUS_STOP)) {
         gui->playlist.cur = first;
         if(gui->smart_mode) {
-          gui_set_current_mmk_by_index (gui, GUI_MMK_CURRENT);
+          gui_current_set_index (gui, GUI_MMK_CURRENT);
           gui_play (NULL, gui);
         }
       }
@@ -2136,7 +2053,7 @@ static void subselector_callback (filebrowser_t *fb, void *userdata) {
   file = filebrowser_get_full_filename (fb);
   if (file) {
     mediamark_set_str_val (&gui->playlist.mmk[gui->playlist.cur], file, MMK_VAL_SUB);
-    gui_set_current_mmk_by_index (gui, GUI_MMK_CURRENT);
+    gui_current_set_index (gui, GUI_MMK_CURRENT);
     playlist_mrlident_toggle (gui);
 
     if (xine_get_status (gui->stream) == XINE_STATUS_PLAY) {
@@ -2264,4 +2181,3 @@ void visual_anim_stop (gGui_t *gui) {
     gui->visual_anim.running = 0;
   }
 }
-

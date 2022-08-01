@@ -889,28 +889,20 @@ static void event_listener (void *user_data, const xine_event_t *event) {
 
     /* request title display change in ui */
   case XINE_EVENT_UI_SET_TITLE:
-    if(event->stream == gui->stream) {
+    if (event->stream == gui->stream) {
       xine_ui_data_t *uevent = (xine_ui_data_t *) event->data;
+      mediamark_t *m = &gui->mmk;
+      int changed;
 
+      gui_playlist_set_str_val (gui, uevent->str, MMK_VAL_IDENT, GUI_MMK_CURRENT);
       gui_playlist_lock (gui);
-      if(strcmp(gui->mmk.ident, uevent->str)) {
+      changed = mediamark_set_str_val (&m, uevent->str, MMK_VAL_IDENT);
+      gui_playlist_unlock (gui);
 
-	free(gui->mmk.ident);
-	if(gui->playlist.num && gui->playlist.cur >= 0 && gui->playlist.mmk &&
-	   gui->playlist.mmk[gui->playlist.cur]) {
-
-	  free(gui->playlist.mmk[gui->playlist.cur]->ident);
-
-	  gui->playlist.mmk[gui->playlist.cur]->ident = strdup(uevent->str);
-	}
-	gui->mmk.ident = strdup(uevent->str);
-        gui_playlist_unlock (gui);
-
+      if (changed) {
         video_window_set_mrl (gui->vwin, uevent->str);
         playlist_mrlident_toggle (gui);
         panel_update_mrl_display (gui->panel);
-      } else {
-        gui_playlist_unlock (gui);
       }
     }
     break;
@@ -1132,14 +1124,9 @@ static void event_listener (void *user_data, const xine_event_t *event) {
       gui_playlist_lock (gui);
       if(ref->alternative == 0) {
         gui->playlist.ref_append++;
-        mediamark_insert_entry(gui->playlist.ref_append, ref->mrl, ref->mrl, NULL, 0, -1, 0, 0);
+        gui_playlist_insert(gui->playlist.ref_append, ref->mrl, ref->mrl, NULL, 0, -1, 0, 0);
       } else {
-	mediamark_t *mmk = mediamark_get_mmk_by_index(gui->playlist.ref_append);
-
-	if(mmk) {
-	  mediamark_append_alternate_mrl(mmk, ref->mrl);
-	  mediamark_set_got_alternate(mmk);
-	}
+        gui_playlist_set_str_val (gui, ref->mrl, MMK_VAL_ADD_ALTER, gui->playlist.ref_append);
       }
       gui_playlist_unlock (gui);
 
@@ -1170,18 +1157,13 @@ typedef struct {
       if(ref->alternative == 0) {
         gui->playlist.ref_append++;
         /* FIXME: duration handled correctly? */
-        mediamark_insert_entry (gui, gui->playlist.ref_append, ref->mrl, *title ? title : ref->mrl, NULL,
+        gui_playlist_insert (gui, gui->playlist.ref_append, ref->mrl, *title ? title : ref->mrl, NULL,
                                ref->start_time,
                                ref->duration ? (int)(ref->start_time + ref->duration) : -1,
                                0, 0);
       } else {
         /* FIXME: title? start? duration? */
-        mediamark_t *mmk = mediamark_get_mmk_by_index (gui, gui->playlist.ref_append);
-
-	if(mmk) {
-	  mediamark_append_alternate_mrl(mmk, ref->mrl);
-	  mediamark_set_got_alternate(mmk);
-	}
+        gui_playlist_set_str_val (gui, ref->mrl, MMK_VAL_ADD_ALTER, gui->playlist.ref_append);
       }
       gui_playlist_unlock (gui);
     }
@@ -1566,9 +1548,9 @@ int main(int argc, char *argv[]) {
 
       gui_playlist_lock (gui);
       if(!gui->playlist.mmk)
-        mediamark_load_mediamarks (gui, optarg);
+        gui_playlist_load (gui, optarg);
       else
-        mediamark_concat_mediamarks (gui, optarg);
+        gui_playlist_add_file (gui, optarg);
       gui_playlist_unlock (gui);
 
       /* don't load original playlist when loading this one */
@@ -1881,7 +1863,7 @@ int main(int argc, char *argv[]) {
     char buffer[XITK_PATH_MAX + XITK_NAME_MAX + 2];
 
     snprintf(buffer, sizeof(buffer), "%s/.xine/xine-ui_old_playlist.tox", xine_get_homedir());
-    mediamark_load_mediamarks (gui, buffer);
+    gui_playlist_load (gui, buffer);
   }
 
   gui->subtitle_autoload =
@@ -2193,4 +2175,3 @@ void gui_save_window_pos (gGui_t *gui, const char *name, xitk_register_key_t key
     config_update_num (gui->xine, buf, wi.y);
   }
 }
-

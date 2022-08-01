@@ -230,13 +230,13 @@ void playlist_delete_entry (gGui_t *gui, int j) {
       gui_stop (NULL, gui);
 
     gui_playlist_lock (gui);
-    mediamark_delete_entry (gui, j);
+    gui_playlist_remove (gui, j);
     gui_playlist_unlock (gui);
 
     playlist_update_playlist (gui);
 
     if (gui->playlist.num) {
-      gui_set_current_mmk_by_index (gui, GUI_MMK_CURRENT);
+      gui_current_set_index (gui, GUI_MMK_CURRENT);
       gui->playlist.cur = 0;
     }
     else {
@@ -249,7 +249,7 @@ void playlist_delete_entry (gGui_t *gui, int j) {
       if (xine_get_status (gui->stream) != XINE_STATUS_STOP)
         gui_stop (NULL, gui);
 
-      gui_set_current_mmk_by_index (gui, GUI_MMK_NONE);
+      gui_current_set_index (gui, GUI_MMK_NONE);
       if (pl)
         xitk_inputtext_change_text (pl->w[_W_winput], NULL);
     }
@@ -295,7 +295,7 @@ void playlist_delete_all (gGui_t *gui) {
   if (!pl)
     return;
 
-  mediamark_free_mediamarks (gui);
+  gui_playlist_free (gui);
   playlist_update_playlist (gui);
   if (xine_get_status (gui->stream) != XINE_STATUS_STOP)
     gui_stop (NULL, gui);
@@ -304,7 +304,7 @@ void playlist_delete_all (gGui_t *gui) {
       xitk_inputtext_change_text (pl->w[_W_winput], NULL);
     xitk_browser_release_all_buttons (pl->w[_W_playlist]);
   }
-  gui_set_current_mmk_by_index (gui, GUI_MMK_NONE);
+  gui_current_set_index (gui, GUI_MMK_NONE);
   enable_playback_controls (gui->panel, 0);
 }
 static void _playlist_delete_all (xitk_widget_t *w, void *data) {
@@ -403,8 +403,8 @@ static void _playlist_load_callback (filebrowser_t *fb, void *data) {
   mmk_editor_end (gui);
 
   if ((file = filebrowser_get_full_filename(fb)) != NULL) {
-    mediamark_load_mediamarks (gui, file);
-    gui_set_current_mmk_by_index (gui, GUI_MMK_CURRENT);
+    gui_playlist_load (gui, file);
+    gui_current_set_index (gui, GUI_MMK_CURRENT);
     playlist_update_playlist (gui);
 
     if ((xine_get_status (gui->stream) == XINE_STATUS_PLAY))
@@ -472,7 +472,7 @@ static void _playlist_save_callback (filebrowser_t *fb, void *data) {
   char *file;
 
   if((file = filebrowser_get_full_filename(fb)) != NULL) {
-    mediamark_save_mediamarks (gui, file);
+    gui_playlist_save (gui, file);
     free(file);
   }
   gui->pl_save = NULL;
@@ -601,7 +601,7 @@ static int playlist_event (void *data, const xitk_be_event_t *e) {
 static void _playlist_apply_cb(void *data) {
   gGui_t *gui = data;
   playlist_mrlident_toggle (gui);
-  gui_set_current_mmk_by_index (gui, GUI_MMK_CURRENT);
+  gui_current_set_index (gui, GUI_MMK_CURRENT);
 }
 
 void playlist_get_input_focus (gGui_t *gui) {
@@ -630,14 +630,13 @@ static void _scan_for_playlist_infos (gGui_t *gui, xine_stream_t *stream, int n)
   if (xine_open (stream, gui->playlist.mmk[n]->mrl)) {
     char  *ident;
 
-    if((ident = stream_infos_get_ident_from_stream(stream)) != NULL) {
-
-      free (gui->playlist.mmk[n]->ident);
-      gui->playlist.mmk[n]->ident = strdup (ident);
+    if ((ident = stream_infos_get_ident_from_stream (stream)) != NULL) {
+      gui_playlist_set_str_val (gui, ident, MMK_VAL_IDENT, n);
       if (n == gui->playlist.cur) {
-        free (gui->mmk.ident);
-        gui->mmk.ident = strdup (ident);
-        panel_update_mrl_display (gui->panel);
+        mediamark_t *m = &gui->mmk;
+
+        if (mediamark_set_str_val (&m, ident, MMK_VAL_IDENT))
+          panel_update_mrl_display (gui->panel);
       }
       free(ident);
     }
@@ -817,7 +816,7 @@ void playlist_scan_input (xitk_widget_t *w, void *data, int state) {
 
     /* Flush playlist in newbie mode */
     if (gui->smart_mode) {
-      mediamark_free_mediamarks (gui);
+      gui_playlist_free (gui);
       playlist_update_playlist (gui);
       if (pl)
         xitk_inputtext_change_text (pl->w[_W_winput], NULL);
@@ -831,14 +830,14 @@ void playlist_scan_input (xitk_widget_t *w, void *data, int state) {
         ident = stream_infos_get_ident_from_stream (stream);
         xine_close (stream);
       }
-      mediamark_append_entry (gui, autoplay_mrls[j], ident ? ident : autoplay_mrls[j], NULL, 0, -1, 0, 0);
+      gui_playlist_append (gui, autoplay_mrls[j], ident ? ident : autoplay_mrls[j], NULL, 0, -1, 0, 0);
       free (ident);
     }
     xine_dispose (stream);
 
     gui->playlist.cur = gui->playlist.num ? 0 : -1;
     if (gui->playlist.cur == 0)
-      gui_set_current_mmk_by_index (gui, GUI_MMK_CURRENT);
+      gui_current_set_index (gui, GUI_MMK_CURRENT);
     /*
      * If we're in newbie mode, start playback immediately
      * (even ignoring if we're currently playing something
