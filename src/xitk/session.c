@@ -286,7 +286,7 @@ static __attribute__((noreturn)) void *ctrlsocket_func(void *data) {
           gui_stop (NULL, gui);
 
         gui->playlist.cur = 0;
-        gui_set_current_mmk_by_index (gui, GUI_MMK_CURRENT);
+        gui_current_set_index (gui, GUI_MMK_CURRENT);
         gui_play (NULL, gui);
       }
       send_ack(shdr);
@@ -298,7 +298,7 @@ static __attribute__((noreturn)) void *ctrlsocket_func(void *data) {
           gui_stop (NULL, gui);
 
         gui->playlist.cur = gui->playlist.num - 1;
-        gui_set_current_mmk_by_index (gui, GUI_MMK_CURRENT);
+        gui_current_set_index (gui, GUI_MMK_CURRENT);
         gui_play (NULL, gui);
       }
       send_ack(shdr);
@@ -325,8 +325,8 @@ static __attribute__((noreturn)) void *ctrlsocket_func(void *data) {
       break;
 
     case CMD_PLAYLIST_LOAD:
-        mediamark_load_mediamarks (gui, (const char *)shdr->data);
-      gui_set_current_mmk_by_index (gui, GUI_MMK_CURRENT);
+        gui_playlist_load (gui, (const char *)shdr->data);
+      gui_current_set_index (gui, GUI_MMK_CURRENT);
       playlist_update_playlist (gui);
       if ((!is_playback_widgets_enabled (gui->panel)) && gui->playlist.num)
         enable_playback_controls (gui->panel, 1);

@@ -346,7 +346,7 @@ static void mrl_add_noautoplay(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
 
   (void)w;
   if (mrlb && mrl) {
-    int num = mrlb->gui->playlist.num;
+    int idx = gui_playlist_append (mrlb->gui, (char *)mrl->mrl, (char *)mrl->mrl, NULL, 0, -1, 0, 0);
 
     if (!mrlb->gui->plwin) {
       playlist_editor (mrlb->gui);
@@ -356,16 +356,14 @@ static void mrl_add_noautoplay(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
         playlist_toggle_visibility (mrlb->gui);
     }
 
-    mediamark_append_entry (mrlb->gui, (char *)mrl->mrl, (char *)mrl->mrl, NULL, 0, -1, 0, 0);
-
-    if ((!num) && ((xine_get_status (mrlb->gui->stream) == XINE_STATUS_STOP) || mrlb->gui->logo_mode)) {
-      mrlb->gui->playlist.cur = mrlb->gui->playlist.num - 1;
-      gui_set_current_mmk_by_index (mrlb->gui, GUI_MMK_CURRENT);
+    if ((!idx) && ((xine_get_status (mrlb->gui->stream) == XINE_STATUS_STOP) || mrlb->gui->logo_mode)) {
+      mrlb->gui->playlist.cur = 0;
+      gui_current_set_index (mrlb->gui, GUI_MMK_CURRENT);
     }
 
     playlist_update_playlist (mrlb->gui);
 
-    if ((!is_playback_widgets_enabled (mrlb->gui->panel)) && mrlb->gui->playlist.num)
+    if ((!is_playback_widgets_enabled (mrlb->gui->panel)) && (idx >= 0))
       enable_playback_controls (mrlb->gui->panel, 1);
   }
 }
@@ -396,7 +394,6 @@ static void mrl_play(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
 
   (void)w;
   if (mrlb && mrl) {
-    mediamark_t mmk;
     char        *_mrl = mrl->mrl;
 
     if ((xine_get_status (mrlb->gui->stream) != XINE_STATUS_STOP)) {
@@ -409,8 +406,8 @@ static void mrl_play(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
       enable_playback_controls (mrlb->gui->panel, 1);
 
     if(mrl_look_like_playlist(_mrl)) {
-      if (mediamark_concat_mediamarks (mrlb->gui, _mrl)) {
-        gui_set_current_mmk_by_index (mrlb->gui, GUI_MMK_CURRENT);
+      if (gui_playlist_add_file (mrlb->gui, _mrl)) {
+        gui_current_set_index (mrlb->gui, GUI_MMK_CURRENT);
         _mrl = (char *) mediamark_get_current_mrl (mrlb->gui);
         playlist_update_playlist (mrlb->gui);
       }
@@ -431,17 +428,13 @@ static void mrl_play(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
       return;
     }
 
-    mmk.mrl           = _mrl;
-    mmk.ident         = NULL;
-    mmk.sub           = NULL;
-    mmk.start         = 0;
-    mmk.end           = -1;
-    mmk.av_offset     = 0;
-    mmk.spu_offset    = 0;
-    mmk.got_alternate = 0;
-    mmk.alternates    = NULL;
-    mmk.cur_alt       = NULL;
-    gui_set_current_mmk (mrlb->gui, &mmk);
+    {
+      mediamark_t mmk = { .mrl = _mrl, .end = -1 }, *d;
+      gui_playlist_lock (mrlb->gui);
+      d = &mrlb->gui->mmk;
+      mediamark_copy (&d, &mmk);
+      gui_playlist_unlock (mrlb->gui);
+    }
   }
 }
 

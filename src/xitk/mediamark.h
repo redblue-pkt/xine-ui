@@ -51,10 +51,15 @@ typedef struct {
 typedef enum {
   MMK_VAL_IDENT = 0,
   MMK_VAL_MRL,
-  MMK_VAL_SUB
+  MMK_VAL_SUB,
+  MMK_VAL_ADD_ALTER
 } mmk_val_t;
 
+/** you can read mediamark_t yourself. to modify, use these. */
+/** next 3 return changed. */
+int mediamark_copy (mediamark_t **to, const mediamark_t *from);
 int mediamark_set_str_val (mediamark_t **mmk, const char *value, mmk_val_t what);
+int mediamark_free (mediamark_t **mmk);
 
 #define mediamark_have_alternates(_mmk) ((_mmk)->alternates != NULL)
 void mediamark_free_alternates(mediamark_t *mmk);
@@ -64,37 +69,45 @@ char *mediamark_get_current_alternate_mrl(mediamark_t *mmk);
 void mediamark_append_alternate_mrl(mediamark_t *mmk, const char *mrl);
 void mediamark_duplicate_alternates (const mediamark_t *s_mmk, mediamark_t *d_mmk);
 int mediamark_got_alternate(mediamark_t *mmk);
-void mediamark_set_got_alternate(mediamark_t *mmk);
 void mediamark_unset_got_alternate(mediamark_t *mmk);
 
-int mediamark_free_mmk(mediamark_t **mmk);
-int mediamark_store_mmk(mediamark_t **mmk, const char *mrl, const char *ident, const char *sub, int start, int end, int av_offset, int spu_offset);
-mediamark_t *mediamark_clone_mmk(mediamark_t *mmk);
-#define mediamark_append_entry(_gui,_mrl,_ident,_sub,_start,_end,_av_offset,_spu_offset) \
-  mediamark_insert_entry (_gui, -1, _mrl, _ident, _sub, _start, _end, _av_offset, _spu_offset)
-int mediamark_insert_entry (gGui_t *gui, int index, const char *mrl, const char *ident,
+
+/** gui currently played item. */
+#define GUI_MMK_NONE -1
+#define GUI_MMK_CURRENT -2
+/** returns the real index used. */
+int gui_current_set_index (gGui_t *gui, int idx);
+void gui_current_free (gGui_t *gui);
+
+
+/** gui playlist stuff. */
+void gui_playlist_load (gGui_t *gui, const char *filename);
+void gui_playlist_add_dir (gGui_t *gui, const char *filepathname);
+int gui_playlist_add_file (gGui_t *gui, const char *filename);
+#define gui_playlist_append(_gui,_mrl,_ident,_sub,_start,_end,_av_offset,_spu_offset) \
+  gui_playlist_insert (_gui, -1, _mrl, _ident, _sub, _start, _end, _av_offset, _spu_offset)
+int gui_playlist_insert (gGui_t *gui, int index, const char *mrl, const char *ident,
   const char *sub, int start, int end, int av_offset, int spu_offset);
-void mediamark_free_mediamarks (gGui_t *gui);
-void mediamark_delete_entry (gGui_t *gui, int offset);
+void gui_playlist_remove (gGui_t *gui, int offset);
+/** returns the real index used. */
+int gui_playlist_set_str_val (gGui_t *gui, const char *value, mmk_val_t what, int idx);
+mediamark_t *mediamark_get_current_mmk (gGui_t *gui);
+const char *mediamark_get_current_mrl (gGui_t *gui);
+const char *mediamark_get_current_ident (gGui_t *gui);
+mediamark_t *mediamark_get_mmk_by_index (gGui_t *gui, int index);
+void gui_playlist_save (gGui_t *gui, const char *filename);
+void gui_playlist_free (gGui_t *gui);
+
 void mediamark_reset_played_state (gGui_t *gui);
 int mediamark_all_played (gGui_t *gui);
 int mediamark_get_shuffle_next (gGui_t *gui);
 int mediamark_get_entry_from_id (gGui_t *gui, const char *ident);
 
-mediamark_t *mediamark_get_current_mmk (gGui_t *gui);
-const char *mediamark_get_current_mrl (gGui_t *gui);
-const char *mediamark_get_current_ident (gGui_t *gui);
-const char *mediamark_get_current_sub (gGui_t *gui);
-mediamark_t *mediamark_get_mmk_by_index (gGui_t *gui, int index);
-
-int mediamark_concat_mediamarks (gGui_t *gui, const char *filename);
-void mediamark_load_mediamarks (gGui_t *gui, const char *filename);
-void mediamark_save_mediamarks (gGui_t *gui, const char *filename);
-
 int mrl_look_like_playlist (const char *mrl);
 int mrl_look_like_file(char *mrl);
-void mediamark_collect_from_directory (gGui_t *gui, char *filepathname);
 
+
+/** mediamark editor window. */
 void mmk_edit_mediamark (gGui_t *gui, mediamark_t **mmk, apply_callback_t callback, void *data);
 void mmk_editor_toggle_visibility (gGui_t *gui);
 void mmk_editor_raise_window (gGui_t *gui);

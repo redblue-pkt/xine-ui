@@ -62,11 +62,7 @@ void gui_step_mrl (gGui_t *gui, int by);
 void gui_nextprev_mrl (xitk_widget_t *w, void *gui_nextprev);
 void gui_set_current_mmk (gGui_t *gui, const mediamark_t *mmk);
 
-/** returns the real index used. */
-#define GUI_MMK_NONE -1
-#define GUI_MMK_CURRENT -2
-int gui_set_current_mmk_by_index (gGui_t *gui, int idx);
-
+void gui_pl_updated (gGui_t *gui);
 void gui_add_mediamark (gGui_t *gui);
 void gui_file_selector (gGui_t *gui);
 
@@ -122,3 +118,4 @@ void visual_anim_play_next (gGui_t *gui);
 void visual_anim_stop (gGui_t *gui);
 
 #endif
+

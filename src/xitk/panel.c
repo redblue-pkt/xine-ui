@@ -557,13 +557,9 @@ static void *slider_loop (void *data) {
         if (stream_infos_ident_get (panel->sl.ident, &panel->sl.istr, panel->gui->stream)) {
           if (!pthread_mutex_trylock (&panel->gui->mmk_mutex)) {
             if (panel->sl.istr.s && panel->sl.istr.s[0]) {
-              if (panel->gui->playlist.num && (panel->gui->playlist.cur >= 0) &&
-                panel->gui->playlist.mmk && panel->gui->playlist.mmk[panel->gui->playlist.cur] &&
-                (strcmp (panel->gui->mmk.ident, panel->sl.istr.s))) {
-                free (panel->gui->mmk.ident);
-                panel->gui->mmk.ident = strdup (panel->sl.istr.s);
-                free (panel->gui->playlist.mmk[panel->gui->playlist.cur]->ident);
-                panel->gui->playlist.mmk[panel->gui->playlist.cur]->ident = strdup (panel->sl.istr.s);
+              if (gui_playlist_set_str_val (panel->gui, panel->sl.istr.s, MMK_VAL_IDENT, GUI_MMK_CURRENT)) {
+                mediamark_t *m = &panel->gui->mmk;
+                mediamark_set_str_val (&m, panel->sl.istr.s, MMK_VAL_IDENT);
                 gui_playlist_unlock (panel->gui);
                 video_window_set_mrl (panel->gui->vwin, panel->sl.istr.s);
                 playlist_mrlident_toggle (panel->gui);
