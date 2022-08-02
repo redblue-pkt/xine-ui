@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2021 the xine project
+ * Copyright (C) 2000-2022 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -476,19 +476,34 @@ int xitk_label_change_label(xitk_widget_t *w, const char *newlabel) {
 /*
  *
  */
-static int _label_click (_label_private_t *wp, int button, int bUp, int x, int y) {
+static int _label_input (_label_private_t *wp, const widget_event_t *event) {
   int  ret = 0;
 
-  (void)x;
-  (void)y;
-  if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL)) {
-    if (button == 1) {
-      if (wp->callback) {
-        if (bUp)
-          wp->callback (&wp->w, wp->userdata);
-        ret = 1;
-      }
+  if (event->type == WIDGET_EVENT_KEY) {
+    static const char k[] = {
+      XITK_CTRL_KEY_PREFIX, XITK_KEY_RETURN,
+      ' ', 0
+    };
+    int i, n = sizeof (k) / sizeof (k[0]);
+
+    if (event->modifier & ~(MODIFIER_SHIFT | MODIFIER_NUML))
+      return 0;
+    if (!event->string)
+      return 0;
+    for (i = 0; i < n; i += 2) {
+      if (!memcmp (event->string, k + i, 2))
+        break;
     }
+    if (i >= n)
+      return 0;
+  } else { /* WIDGET_EVENT_CLICK */
+    if (event->button != 1)
+      return 0;
+  }
+  if (wp->callback) {
+    if (!event->pressed)
+      wp->callback (&wp->w, wp->userdata);
+    ret = 1;
   }
   return ret;
 }
@@ -512,7 +527,8 @@ static int notify_event (xitk_widget_t *w, const widget_event_t *event) {
       }
       break;
     case WIDGET_EVENT_CLICK:
-      return _label_click (wp, event->button, !event->pressed, event->x, event->y);
+    case WIDGET_EVENT_KEY:
+      return _label_input (wp, event);
     case WIDGET_EVENT_CHANGE_SKIN:
       _label_new_skin (wp, event->skonfig);
       break;
