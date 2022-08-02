@@ -82,12 +82,16 @@ void gui_current_free (gGui_t *gui);
 
 /** gui playlist stuff. */
 void gui_playlist_load (gGui_t *gui, const char *filename);
-void gui_playlist_add_dir (gGui_t *gui, const char *filepathname);
+/** recursively scan this dir for playable files or add this file. return found count. */
+int gui_playlist_add_dir (gGui_t *gui, const char *filepathname);
+/** add refs from this playlist file. */
 int gui_playlist_add_file (gGui_t *gui, const char *filename);
+/** add 1 entry manually. */
 #define gui_playlist_append(_gui,_mrl,_ident,_sub,_start,_end,_av_offset,_spu_offset) \
   gui_playlist_insert (_gui, -1, _mrl, _ident, _sub, _start, _end, _av_offset, _spu_offset)
 int gui_playlist_insert (gGui_t *gui, int index, const char *mrl, const char *ident,
   const char *sub, int start, int end, int av_offset, int spu_offset);
+/** remove 1 entry manually. */
 void gui_playlist_remove (gGui_t *gui, int offset);
 /** returns the real index used. */
 int gui_playlist_set_str_val (gGui_t *gui, const char *value, mmk_val_t what, int idx);

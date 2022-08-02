@@ -1364,11 +1364,7 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
     char *file = p->filenames[i];
 
     /* grab recursively all files from dir */
-    if(is_a_dir(file)) {
-
-      if(file[strlen(file) - 1] == '/')
-	file[strlen(file) - 1] = '\0';
-
+    if (is_a_dir (file)) {
       gui_playlist_add_dir (gui, file);
     }
     else {
@@ -1387,7 +1383,8 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
 	  }
 	}
 
-        gui_playlist_append (gui, (const char *)file, (const char *)file, sub, 0, -1, 0, 0);
+        if (gui_playlist_add_dir (gui, file) && sub)
+          gui_playlist_set_str_val (gui, sub, MMK_VAL_SUB, gui->playlist.num - 1);
       }
     }
   }

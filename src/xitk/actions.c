@@ -1287,131 +1287,96 @@ void gui_seek_relative (gGui_t *gui, int off_sec) {
 
 void gui_dndcallback (void *_gui, const char *filename) {
   gGui_t *gui = _gui;
-  int   more_than_one = -2;
-  char *mrl           = filename ? strdup(filename) : NULL;
+  char *buf, *start, *lastpart, *end;
+  size_t fnlen;
+  int more_than_one = -2;
+  const union {
+    char z[4];
+    uint32_t v;
+  } _file = {{ 'f', 'i', 'l', 'e' }};
+  uint32_t v;
 
-  if(mrl) {
-    char  buffer[strlen(mrl) + 10];
-    char  buffer2[strlen(mrl) + 10];
-    char *p;
+  if (!filename)
+    return;
 
-    memset(&buffer, 0, sizeof(buffer));
-    memset(&buffer2, 0, sizeof(buffer2));
+  fnlen = strlen (filename);
+  buf = malloc (8 + fnlen + 8);
+  if (!buf)
+    return;
+  memset (buf, 0, 8);
+  start = lastpart = buf + 8;
+  memcpy (start, filename, fnlen + 1);
+  end = start + fnlen;
+  memset (end, 0, 8);
 
-    gui_playlist_lock (gui);
-
-    if((strlen(mrl) > 6) &&
-       (!strncmp(mrl, "file:", 5))) {
-
-      if((p = strstr(mrl, ":/")) != NULL) {
-	struct stat pstat;
-
-	p += 2;
-
-	if(*(p + 1) == '/')
-	  p++;
-
-      __second_stat:
-
-	if((stat(p, &pstat)) == 0) {
-	  if(is_a_dir(p)) {
-	    if(*(p + (strlen(p) - 1)) == '/')
-	      *(p + (strlen(p) - 1)) = '\0';
-
-            gui_playlist_add_dir (gui, p);
-	    more_than_one = gui->playlist.cur;
-	    goto __do_play;
-	  }
-	  else
-	    snprintf(buffer, sizeof(buffer), "file:/%s", p);
-	}
-	else {
-	  snprintf(buffer2, sizeof(buffer2), "/%s", p);
-
-	  /* file don't exist, add it anyway */
-	  if((stat(buffer2, &pstat)) == -1)
-	    strlcpy(buffer, mrl, sizeof(buffer));
-	  else {
-	    if(is_a_dir(buffer2)) {
-
-	      if(buffer2[strlen(buffer2) - 1] == '/')
-		buffer2[strlen(buffer2) - 1] = '\0';
-
-              gui_playlist_add_dir (gui, buffer2);
-	      more_than_one = gui->playlist.cur;
-	      goto __do_play;
-	    }
-	    else
-	      snprintf(buffer, sizeof(buffer), "file:/%s", buffer2);
-	  }
-
-	}
-      }
-      else {
-	p = mrl + 5;
-	goto __second_stat;
-      }
+  memcpy (&v, start, 4);
+  if (((v | 0x20202020) == _file.v) && (start[4] == ':')) {
+    start += 5;
+    if (start[0] == '/') {
+      start++;
+      if ((start[0] == '/') && (start[1] == '/'))
+        start++;
     }
-    else
-      strlcpy(buffer, mrl, sizeof(buffer));
-
-    if(is_a_dir(buffer)) {
-      if(buffer[strlen(buffer) - 1] == '/')
-	buffer[strlen(buffer) - 1] = '\0';
-
-      gui_playlist_add_dir (gui, buffer);
-      more_than_one = gui->playlist.cur;
-    }
-    else {
-      char *ident;
-
-      /* If possible, use only base name as identifier to better fit into the display */
-      if((ident = strrchr(buffer, '/')) && ident[1])
-	ident++;
-      else
-	ident = buffer;
-
-      if(mrl_look_like_playlist(buffer)) {
-	int cur = gui->playlist.cur;
-
-	more_than_one = (gui->playlist.cur - 1);
-        if (gui_playlist_add_file (gui, buffer))
-	  gui->playlist.cur = cur;
-	else
-          gui_playlist_append (gui, buffer, ident, NULL, 0, -1, 0, 0);
-      }
-      else
-        gui_playlist_append (gui, buffer, ident, NULL, 0, -1, 0, 0);
-
-    }
-
-  __do_play:
-
-    playlist_update_playlist (gui);
-
-    if(!(gui->playlist.control & PLAYLIST_CONTROL_IGNORE)) {
-
-      if((xine_get_status(gui->stream) == XINE_STATUS_STOP) || gui->logo_mode) {
-	if((more_than_one > -2) && ((more_than_one + 1) < gui->playlist.num))
-	  gui->playlist.cur = more_than_one + 1;
-	else
-	  gui->playlist.cur = gui->playlist.num - 1;
-
-        gui_current_set_index (gui, GUI_MMK_CURRENT);
-        gui_pl_updated (gui);
-	if(gui->smart_mode)
-          gui_play (NULL, gui);
-
-      }
-    }
-
-    if ((!is_playback_widgets_enabled (gui->panel)) && gui->playlist.num)
-      enable_playback_controls (gui->panel, 1);
-
-    gui_playlist_unlock (gui);
   }
 
-  free(mrl);
+  do {
+    struct stat sbuf;
+    int r = stat (start, &sbuf);
+    if (r) {
+      *--start = '/';
+      r = stat (start, &sbuf);
+    }
+    if (!r) {
+      gui_playlist_lock (gui);
+      if (S_ISDIR (sbuf.st_mode)) {
+        if (end[-1] == '/')
+          *--end = 0;
+        gui_playlist_add_dir (gui, start);
+        more_than_one = gui->playlist.cur;
+        gui_playlist_unlock (gui);
+        break;
+      } else if (S_ISREG (sbuf.st_mode)) {
+        start[-1] = '/';
+#ifdef ALWAYS_USE_FILE_PREFIX
+        start -= 6;
+        memcpy (start, "file:", 5);
+#endif
+        for (lastpart = end; lastpart[-1] != '/'; lastpart--) ;
+      }
+      if (mrl_look_like_playlist (start)) {
+        int cur = gui->playlist.cur;
+        more_than_one = cur - 1;
+        if (gui_playlist_add_file (gui, start)) {
+          gui->playlist.cur = cur;
+          gui_playlist_unlock (gui);
+          break;
+        }
+      }
+      gui_playlist_unlock (gui);
+    }
+    gui_playlist_append (gui, start, lastpart, NULL, 0, -1, 0, 0);
+  } while (0);
+  free (buf);
+
+  playlist_update_playlist (gui);
+
+  if (!(gui->playlist.control & PLAYLIST_CONTROL_IGNORE)) {
+    if ((xine_get_status (gui->stream) == XINE_STATUS_STOP) || gui->logo_mode) {
+      gui_playlist_lock (gui);
+      if ((more_than_one > -2) && ((more_than_one + 1) < gui->playlist.num))
+        gui->playlist.cur = more_than_one + 1;
+      else
+        gui->playlist.cur = gui->playlist.num - 1;
+      gui_playlist_unlock (gui);
+      gui_current_set_index (gui, GUI_MMK_CURRENT);
+      gui_pl_updated (gui);
+      if (gui->smart_mode)
+        gui_play (NULL, gui);
+    }
+  }
+
+  if ((!is_playback_widgets_enabled (gui->panel)) && gui->playlist.num)
+    enable_playback_controls (gui->panel, 1);
 }
 
 void gui_step_mrl (gGui_t *gui, int by) {
@@ -2181,3 +2146,5 @@ void visual_anim_stop (gGui_t *gui) {
     gui->visual_anim.running = 0;
   }
 }
+
+

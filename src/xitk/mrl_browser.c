@@ -346,7 +346,10 @@ static void mrl_add_noautoplay(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
 
   (void)w;
   if (mrlb && mrl) {
-    int idx = gui_playlist_append (mrlb->gui, (char *)mrl->mrl, (char *)mrl->mrl, NULL, 0, -1, 0, 0);
+    int idx;
+
+    gui_playlist_add_dir (mrlb->gui, mrl->mrl);
+    idx = mrlb->gui->playlist.num - 1;
 
     if (!mrlb->gui->plwin) {
       playlist_editor (mrlb->gui);
@@ -459,4 +462,3 @@ void open_mrlbrowser_from_playlist(xitk_widget_t *w, void *data) {
     mrl_browser (gui, mrl_add_noautoplay, mrl_play, NULL, gui_dndcallback);
   }
 }
-

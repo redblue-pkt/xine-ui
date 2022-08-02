@@ -35,6 +35,8 @@
 #include <fcntl.h>
 #include <errno.h>
 
+#include <xine/sorted_array.h>
+
 #include "common.h"
 #include "mediamark.h"
 #include "download.h"
@@ -3006,54 +3008,157 @@ void gui_playlist_save (gGui_t *gui, const char *filename) {
   free(fullfn);
 }
 
-void gui_playlist_add_dir (gGui_t *gui, const char *filepathname) {
-  DIR           *dir;
-  struct dirent *dentry;
+static int _gui_mmk_cmp (void *a, void *b) {
+  mediamark_t *d = (mediamark_t *)a;
+  mediamark_t *e = (mediamark_t *)b;
 
-  if((dir = opendir(filepathname))) {
+  return strcmp (d->ident, e->ident);
+}
 
-    while((dentry = readdir(dir))) {
-      char fullpathname[XITK_PATH_MAX + XITK_NAME_MAX + 2] = "";
+static void _gui_mmk_sort (xine_sarray_t *sarray, mediamark_t **list, uint32_t n) {
+  uint32_t u;
 
-      snprintf(fullpathname, sizeof(fullpathname) - 1, "%s/%s", filepathname, dentry->d_name);
+  if (!sarray)
+    return;
 
-	if(fullpathname[strlen(fullpathname) - 1] == '/')
-	  fullpathname[strlen(fullpathname) - 1] = '\0';
+  xine_sarray_clear (sarray);
+  for (u = 0; u < n; u++)
+    xine_sarray_add (sarray, list[u]);
+  for (u = 0; u < n; u++)
+    list[u] = xine_sarray_get (sarray, u);
+}
 
-	if(is_a_dir(fullpathname)) {
-	  if(!((strlen(dentry->d_name) == 1) && (dentry->d_name[0] == '.'))
-	     && !((strlen(dentry->d_name) == 2) &&
-		  ((dentry->d_name[0] == '.') && dentry->d_name[1] == '.'))) {
-            gui_playlist_add_dir (gui, fullpathname);
-	  }
-	}
-	else {
-          char   *extension = strrchr(fullpathname, '.');
-          size_t  ext_len = extension ? strlen(extension) : 0;
-          if (ext_len > 1 && ext_len < 7) {
-            char   lo_ext[10];
-            size_t i;
-            for (i = 0; i < ext_len; i++) {
-              lo_ext[i] = tolower(extension[i]);
-            }
-            lo_ext[i++] = ' ';
-            lo_ext[i]   = 0;
-            static const char valid_endings[] =
-	      ".pls .m3u .sfv .tox .asx .smi .smil .xml .fxd " /* Playlists */
-	      ".4xm .ac3 .aif .aiff .asf .wmv .wma .wvx .wax .aud .avi .cin .cpk .cak "
-	      ".film .dv .dif .fli .flc .mjpg .mov .qt .m2p .mp4 .mp3 .mp2 .mpa .mpega .mpg .mpeg "
-	      ".mpv .mve .mv8 .nsf .nsv .ogg .ogm .spx .pes .png .mng .pva .ra .rm "
-	      ".ram .rmvb .roq .snd .au .str .iki .ik2 .dps .dat .xa .xa1 .xa2 .xas .xap .ts .m2t "
-	      ".trp .vob .voc .vox .vqa .wav .wve .y4m ";
+int gui_playlist_add_dir (gGui_t *gui, const char *filepathname) {
+#define _MAX_DIR_LEVEL 8
+  DIR *dirs[_MAX_DIR_LEVEL];
+  char *add[_MAX_DIR_LEVEL];
+  int num_subdirs[_MAX_DIR_LEVEL];
+  xine_sarray_t *sarray;
+  struct stat sbuf;
+  char buf[2048], *start, *end = buf + sizeof (buf) - 4;
+  int n, level, sort_start = 0;
 
-            if (strstr(valid_endings, lo_ext)) {
-              gui_playlist_append (gui, fullpathname, fullpathname, NULL, 0, -1, 0, 0);
-            }
-	  }
-	}
-    }
-    closedir(dir);
+  memset (buf, 0, 4);
+  start = buf + 4;
+  add[0] = start + strlcpy (start, filepathname, end - start);
+  if (add[0] >= end)
+    add[0] = end - 1;
+  if (add[0][-1] == '/')
+    (add[0])--;
+  add[0][0] = 0;
+
+  /* add not found item to get the user error msg. */
+  n = stat (start, &sbuf);
+  if (n || S_ISREG (sbuf.st_mode)) {
+    char *lastpart;
+
+    start[-1] = '/';
+    for (lastpart = add[0]; lastpart[-1] != '/'; lastpart--) ;
+    return gui_playlist_append (gui, start, lastpart, NULL, 0, -1, 0, 0) >= 0 ? 1 : 0;
   }
+
+  sarray = xine_sarray_new (512, _gui_mmk_cmp);
+  n = 0;
+  level = 0;
+  *(add[level])++ = '/';
+  dirs[level] = NULL;
+  num_subdirs[level] = 0;
+
+  while (1) {
+    struct dirent *entry;
+    char *stop;
+    /* enter pass 1 */
+    if (!dirs[level]) {
+      sort_start = gui->playlist.num;
+      add[level][0] = 0;
+      dirs[level] = opendir (start);
+      if (!dirs[level]) {
+        if (--level < 0)
+          break;
+        continue;
+      }
+      num_subdirs[level] = 0;
+    }
+    /* get entry */
+    entry = readdir (dirs[level]);
+    /* sort, then enter pass 2 or level up */
+    if (!entry) {
+      closedir (dirs[level]);
+      dirs[level] = NULL;
+      if (num_subdirs[level] >= 0) {
+        _gui_mmk_sort (sarray, gui->playlist.mmk + sort_start, gui->playlist.num - sort_start);
+        if (num_subdirs[level] > 0) {
+          add[level][0] = 0;
+          dirs[level] = opendir (start);
+          if (dirs[level]) {
+            num_subdirs[level] = -1;
+            continue;
+          }
+        }
+      }
+      if (--level < 0)
+        break;
+      continue;
+    }
+    /* add entry name */
+    stop = add[level] + strlcpy (add[level], entry->d_name, end - add[level]);
+    if (stop >= end)
+      stop = end;
+    /* try to get info */
+    stop[0] = 0;
+    if (stat (start, &sbuf))
+      continue;
+    /* dir */
+    if (S_ISDIR (sbuf.st_mode)) {
+      if (add[level][0] == '.') {
+        if (!add[level][1] || ((add[level][1] == '.') && !add[level][2]))
+          continue;
+      }
+      if (num_subdirs[level] >= 0) { /* pass 1: files */
+        num_subdirs[level]++;
+      } else { /* pass 2: dirs */
+        if (level >= _MAX_DIR_LEVEL - 1)
+          continue;
+        add[level + 1] = stop;
+        level++;
+        *(add[level])++ = '/';
+        dirs[level] = NULL;
+        num_subdirs[level] = 0;
+      }
+    } else if (S_ISREG (sbuf.st_mode)) {
+      char *ext;
+
+      if (num_subdirs[level] < 0)
+        continue;
+
+      add[level][-1] = '.';
+      for (ext = stop; ext[-1] != '.'; ext--) ;
+      add[level][-1] = '/';
+      if (ext <= add[level])
+        ext = stop;
+      if ((ext + 8 >= stop) && (ext + 2 <= stop)) {
+        static const char valid_endings[] =
+          "asx fxd m3u pls sfv smi smil tox xml " /* Playlists */
+          "4xm ac3 aif aiff asf au aud avi cak cin cpk dat dif dps dv "
+          "film flc fli flv ik2 iki jpeg jpg "
+          "m2p m2t mjpg mkv mng mov mp2 mp3 mp4 mp4a mp4v mpa mpeg mpega mpg mpv mv8 mve "
+          "nsf nsv ogg ogm opus pes png pva qt ra ram rm rmvb roq snd spx str "
+          "trp ts wav voc vob vox wax wma wmv vqa wve wvx "
+          "xa xa1 xa2 xap xas y4m ";
+        char ebuf[10], *p;
+
+        for (p = ebuf; ext < stop; ext++, p++)
+          p[0] = tolower (ext[0]);
+        *p++ = ' ';
+        *p = 0;
+        if (strstr (valid_endings, ebuf)) {
+          n += gui_playlist_append (gui, start, add[level], NULL, 0, -1, 0, 0) >= 0 ? 1 : 0;
+        }
+      }
+    }
+  }
+  xine_sarray_delete (sarray);
+  return n;
 }
 
 /** gui mediamark editor window ********************************************************/
