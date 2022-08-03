@@ -2063,10 +2063,7 @@ static void do_playlist(const commands_t *cmd, client_info_t *client_info) {
 	    if((gui->playlist.cur == j) && ((xine_get_status(gui->stream) != XINE_STATUS_STOP)))
               gui_stop (NULL, gui);
 
-            gui_playlist_lock (gui);
             gui_playlist_remove (gui, j);
-	    gui->playlist.cur = 0;
-            gui_playlist_unlock (gui);
 	  }
 	}
 

@@ -404,17 +404,6 @@ int mrl_look_like_playlist (const char *mrl) {
   return 0;
 }
 
-int mrl_look_like_file(char *mrl) {
-
-  if(mrl && strlen(mrl)) {
-    if((strncasecmp(mrl, "file:", 5)) &&
-       strstr (mrl, ":/") && (strstr (mrl, ":/") < strchr(mrl, '/')))
-      return 0;
-  }
-
-  return 1;
-}
-
 int gui_playlist_set_str_val (gGui_t *gui, const char *value, mmk_val_t what, int idx) {
   gui_playlist_lock (gui);
   if (idx == GUI_MMK_CURRENT)
@@ -2711,7 +2700,82 @@ int gui_playlist_insert (gGui_t *gui, int index, const char *mrl, const char *id
   return index;
 }
 
+int gui_playlist_move (gGui_t *gui, int index, int n, int diff) {
+  int res;
+
+  gui_playlist_lock (gui);
+  do {
+    mediamark_t *stemp[32], **temp = stemp;
+
+    res = GUI_MMK_NONE;
+    if (gui->playlist.num <= 0)
+      break;
+    if (index == GUI_MMK_CURRENT)
+      index = gui->playlist.cur;
+    if ((index < 0) || (index >= gui->playlist.num))
+      break;
+    res = index;
+    if (n > gui->playlist.num - index)
+      n = gui->playlist.num - index;
+    if (diff == 0)
+      break;
+
+    if (diff < 0) {
+      diff = -diff;
+      if (diff > index) {
+        diff = index;
+        if (diff <= 0)
+          break;
+      }
+      if (diff > 32) {
+        temp = malloc (diff * sizeof (*temp));
+        if (!temp)
+          break;
+      }
+      if (gui->playlist.cur < index) {
+        if (gui->playlist.cur >= index - diff)
+          gui->playlist.cur += n;
+      } else {
+        if (gui->playlist.cur < index + n)
+          gui->playlist.cur -= diff;
+      }
+      memcpy (temp, gui->playlist.mmk + index - diff, diff * sizeof (*temp));
+      memmove (gui->playlist.mmk + index - diff, gui->playlist.mmk + index, n * sizeof (*temp));
+      memcpy (gui->playlist.mmk + index - diff + n, temp, diff * sizeof (*temp));
+      res = index - diff;
+    } else /* diff > 0 */ {
+      if (diff > gui->playlist.num - index - n) {
+        diff = gui->playlist.num - index - n;
+        if (diff <= 0)
+          break;
+      }
+      if (diff > 32) {
+        temp = malloc (diff * sizeof (*temp));
+        if (!temp)
+          break;
+      }
+      if (gui->playlist.cur < index + n) {
+        if (gui->playlist.cur >= index)
+          gui->playlist.cur += diff;
+      } else {
+        if (gui->playlist.cur < index + n + diff)
+          gui->playlist.cur -= n;
+      }
+      memcpy (temp, gui->playlist.mmk + index + n, diff * sizeof (*temp));
+      memmove (gui->playlist.mmk + index + diff, gui->playlist.mmk + index, n * sizeof (*temp));
+      memcpy (gui->playlist.mmk + index, temp, diff * sizeof (*temp));
+      res = index + diff;
+    }
+
+    if (temp != stemp)
+      free (temp);
+  } while (0);
+  gui_playlist_unlock (gui);
+  return res;
+}
+
 void gui_playlist_free (gGui_t *gui) {
+  gui_playlist_lock (gui);
   if(gui->playlist.num > 0) {
     int i;
 
@@ -2719,9 +2783,11 @@ void gui_playlist_free (gGui_t *gui) {
       mediamark_free(&gui->playlist.mmk[i]);
 
     SAFE_FREE(gui->playlist.mmk);
+    gui->playlist.max = 0;
     gui->playlist.num = 0;
     gui->playlist.cur = -1;
   }
+  gui_playlist_unlock (gui);
 }
 
 void mediamark_reset_played_state (gGui_t *gui) {
@@ -2789,17 +2855,26 @@ int mediamark_get_shuffle_next (gGui_t *gui) {
   return next;
 }
 
-void gui_playlist_remove (gGui_t *gui, int offset) {
+int gui_playlist_remove (gGui_t *gui, int index) {
+  int i;
   gui_playlist_lock (gui);
-  if ((offset < gui->playlist.num) && (offset >= 0) && gui->playlist.mmk && gui->playlist.mmk[offset]) {
-    int i;
-    mediamark_free (&gui->playlist.mmk[offset]);
-    for (i = offset; i < gui->playlist.num - 1; i++)
+
+  if (index == GUI_MMK_CURRENT)
+    index = gui->playlist.cur;
+
+  if ((index < gui->playlist.num) && (index >= 0) && gui->playlist.mmk) {
+    mediamark_free (&gui->playlist.mmk[index]);
+    for (i = index; i < gui->playlist.num - 1; i++)
       gui->playlist.mmk[i] = gui->playlist.mmk[i + 1];
     gui->playlist.num--;
     gui->playlist.mmk[gui->playlist.num] = NULL;
+    if (gui->playlist.cur >= gui->playlist.num)
+      gui->playlist.cur = -1;
   }
+
+  i = gui->playlist.num;
   gui_playlist_unlock (gui);
+  return i;
 }
 
 static _lf_t *_lf_get (gGui_t *gui, const char *_filename) {
@@ -3008,6 +3083,83 @@ void gui_playlist_save (gGui_t *gui, const char *filename) {
   free(fullfn);
 }
 
+size_t mrl_get_lowercase_prot (char *buf, size_t bsize, const char *mrl) {
+  union {uint8_t s[16]; uint32_t v[4];} _buf;
+  uint8_t *p = (uint8_t *)mrl, *s = _buf.s, *e = s + 14;
+  uint32_t u;
+
+  if (!p)
+    return 0;
+
+  while ((*p >= 'A') && (p < e))
+    *s++ = *p++;
+  if (p[0] != ':')
+    return 0;
+  if (p[1] != '/')
+    return 0;
+  for (u = 0; u < 4; u++)
+    _buf.v[u] |= 0x20202020;
+  s[0] = 0;
+  u = s - _buf.s;
+
+  if (buf && (bsize > u))
+    memcpy (buf, _buf.s, u + 1);
+  return u;
+}
+
+int mrl_look_like_file (const char *mrl) {
+  char buf[16];
+  size_t l = mrl_get_lowercase_prot (buf, sizeof (buf), mrl);
+
+  if (l == 0)
+    return 1;
+  return (l == 4) && !memcmp (buf, "file", 4) ? 1 : 0;
+}
+
+static const uint8_t tab_unhex[256] = {
+  16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,
+  16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,
+  16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,
+   0, 1, 2, 3, 4, 5, 6, 7, 8, 9,16,16,16,16,16,16,
+  16,10,11,12,13,14,15,16,16,16,16,16,16,16,16,16,
+  16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,
+  16,10,11,12,13,14,15,16,16,16,16,16,16,16,16,16,
+  16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,
+  16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,
+  16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,
+  16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,
+  16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,
+  16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,
+  16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,
+  16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,
+  16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16
+};
+
+static size_t _gui_string_unescape (char *_s, size_t len) {
+  uint8_t *s = (uint8_t *)_s, *e = s + len, *d, save[2];
+
+  memcpy (save, e, 2);
+  memset (e, '%', 2);
+  while (*s != '%')
+    s++;
+  d = s;
+  while (s < e) {
+    uint8_t a = tab_unhex[s[1]], b = tab_unhex[s[2]];
+
+    if (!((a | b) & 16)) {
+      s += 3;
+      *d++ = (a << 4) + b;
+    } else {
+      s += (s[1] == '%') ? 2 : 1;
+      *d++ = '%';
+    }
+    while (*s != '%')
+      *d++ = *s++;
+  }
+  memcpy (e, save, 2);
+  return d - (uint8_t *)_s;
+}
+
 static int _gui_mmk_cmp (void *a, void *b) {
   mediamark_t *d = (mediamark_t *)a;
   mediamark_t *e = (mediamark_t *)b;
@@ -3047,14 +3199,45 @@ int gui_playlist_add_dir (gGui_t *gui, const char *filepathname) {
     (add[0])--;
   add[0][0] = 0;
 
+  {
+    const union {char z[4]; uint32_t v;} _file = {{'f', 'i', 'l', 'e'}};
+    uint32_t v;
+
+    memcpy (&v, start, 4);
+    if (((v | 0x20202020) == _file.v) && (start[4] == ':')) {
+      start += 5;
+      if (start[0] == '/')
+        start++;
+      if (!memcmp (start, "//", 2))
+        start++;
+      add[0] = start + _gui_string_unescape (start, add[0] - start);
+      add[0][0] = 0;
+    }
+  }
+
   /* add not found item to get the user error msg. */
   n = stat (start, &sbuf);
   if (n || S_ISREG (sbuf.st_mode)) {
-    char *lastpart;
+    char *lastpart, *sub;
+
+    /* test for "/some/dir/video.flv;;/some/dir/subtitiles.txt" */
+    start[-2] = start[-1] = ';';
+    for (sub = add[0]; sub >= start + 3; sub--) {
+      while (sub[-1] != ';')
+        sub--;
+      if (sub[-2] == ';')
+        break;
+    }
+    if (sub >= start + 3) {
+      sub[-2] = 0;
+      add[0] = sub;
+    } else {
+      sub = NULL;
+    }
 
     start[-1] = '/';
     for (lastpart = add[0]; lastpart[-1] != '/'; lastpart--) ;
-    return gui_playlist_append (gui, start, lastpart, NULL, 0, -1, 0, 0) >= 0 ? 1 : 0;
+    return gui_playlist_append (gui, start, lastpart, sub, 0, -1, 0, 0) >= 0 ? 1 : 0;
   }
 
   sarray = xine_sarray_new (512, _gui_mmk_cmp);

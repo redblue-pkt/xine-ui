@@ -226,23 +226,17 @@ void playlist_delete_entry (gGui_t *gui, int j) {
   pl = gui->plwin;
 
   if (j >= 0) {
+    int num;
+
     if ((gui->playlist.cur == j) && (xine_get_status (gui->stream) != XINE_STATUS_STOP))
       gui_stop (NULL, gui);
 
-    gui_playlist_lock (gui);
-    gui_playlist_remove (gui, j);
-    gui_playlist_unlock (gui);
-
+    num = gui_playlist_remove (gui, j);
     playlist_update_playlist (gui);
 
-    if (gui->playlist.num) {
+    if (num) {
       gui_current_set_index (gui, GUI_MMK_CURRENT);
-      gui->playlist.cur = 0;
-    }
-    else {
-
-      gui->playlist.cur = -1;
-
+    } else {
       if (is_playback_widgets_enabled (gui->panel))
         enable_playback_controls (gui->panel, 0);
 
@@ -316,7 +310,7 @@ static void _playlist_delete_all (xitk_widget_t *w, void *data) {
 /*
  * Move entry up/down in playlist
  */
-static void _playlist_move_current_updown (xui_playlist_t *pl, int dir) {
+static void _playlist_move_current_updown (xui_playlist_t *pl, int diff) {
   int j;
 
   if (!pl)
@@ -325,45 +319,18 @@ static void _playlist_move_current_updown (xui_playlist_t *pl, int dir) {
   mmk_editor_end (pl->gui);
 
   if ((j = xitk_browser_get_current_selected (pl->w[_W_playlist])) >= 0) {
-    mediamark_t *mmk;
-    int          start = xitk_browser_get_current_start (pl->w[_W_playlist]);
-    int          max_vis_len = xitk_browser_get_num_entries (pl->w[_W_playlist]);
+    int start = xitk_browser_get_current_start (pl->w[_W_playlist]);
+    int max_vis_len = xitk_browser_get_num_entries (pl->w[_W_playlist]);
+    int new_pos = gui_playlist_move (pl->gui, j, 1, diff);
 
-    if ((dir == -1) && (j > 0)) {
-      gui_playlist_lock (pl->gui);
-      mmk = pl->gui->playlist.mmk[j - 1];
-
-      if (j == pl->gui->playlist.cur)
-        pl->gui->playlist.cur--;
-
-      pl->gui->playlist.mmk[j - 1] = pl->gui->playlist.mmk[j];
-      pl->gui->playlist.mmk[j] = mmk;
-      j--;
-      gui_playlist_unlock (pl->gui);
-    }
-    else if ((dir == 1) && (j < (pl->gui->playlist.num - 1))) {
-      gui_playlist_lock (pl->gui);
-      mmk = pl->gui->playlist.mmk[j + 1];
-
-      if (j == pl->gui->playlist.cur)
-        pl->gui->playlist.cur++;
-
-      pl->gui->playlist.mmk[j + 1] = pl->gui->playlist.mmk[j];
-      pl->gui->playlist.mmk[j] = mmk;
-      j++;
-      gui_playlist_unlock (pl->gui);
-    }
-
+    if ((new_pos < 0) || (new_pos == j))
+      return;
     _playlist_create_playlists (pl);
-
-    if(j <= start)
-      _playlist_update_browser_list (pl, j);
-    else if(j >= (start + max_vis_len))
-      _playlist_update_browser_list (pl, start + 1);
-    else
-      _playlist_update_browser_list (pl, -1);
-
-    xitk_browser_set_select (pl->w[_W_playlist], j);
+    _playlist_update_browser_list (pl,
+        (new_pos < start) ? new_pos :
+        (new_pos > start + max_vis_len - 1) ? new_pos + 1 - max_vis_len :
+        -1);
+    xitk_browser_set_select (pl->w[_W_playlist], new_pos);
   }
 }
 
