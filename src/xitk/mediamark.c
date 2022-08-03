@@ -2946,13 +2946,15 @@ int gui_playlist_add_file (gGui_t *gui, const char *filename) {
     for (; i < (int)lf->num_entries; i++)
       mediamark_free (&mmk[i]);
   }
-  gui->playlist.cur = gui->playlist.num;
+  gui->playlist.cur = gui->playlist.num - lf->num_entries;
   gui_playlist_unlock (gui);
 
-
   SAFE_FREE (mmk);
-  _lf_delete (lf);
-  return 1;
+  {
+    int n = lf->num_entries;
+    _lf_delete (lf);
+    return n;
+  }
 }
 
 void gui_playlist_load (gGui_t *gui, const char *filename) {
