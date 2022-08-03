@@ -921,11 +921,7 @@ void gui_eject (xitk_widget_t *w, void *data) {
 	/*
 	 * Remove only the current MRL
 	 */
-        gui_playlist_lock (gui);
-        gui_playlist_remove (gui, gui->playlist.cur);
-	if(gui->playlist.cur)
-	  gui->playlist.cur--;
-        gui_playlist_unlock (gui);
+        gui_playlist_remove (gui, GUI_MMK_CURRENT);
       }
 
       if (is_playback_widgets_enabled (gui->panel) && (!gui->playlist.num))
@@ -1287,86 +1283,28 @@ void gui_seek_relative (gGui_t *gui, int off_sec) {
 
 void gui_dndcallback (void *_gui, const char *filename) {
   gGui_t *gui = _gui;
-  char *buf, *start, *lastpart, *end;
-  size_t fnlen;
-  int more_than_one = -2;
-  const union {
-    char z[4];
-    uint32_t v;
-  } _file = {{ 'f', 'i', 'l', 'e' }};
-  uint32_t v;
+  int n;
 
   if (!filename)
     return;
 
-  fnlen = strlen (filename);
-  buf = malloc (8 + fnlen + 8);
-  if (!buf)
-    return;
-  memset (buf, 0, 8);
-  start = lastpart = buf + 8;
-  memcpy (start, filename, fnlen + 1);
-  end = start + fnlen;
-  memset (end, 0, 8);
-
-  memcpy (&v, start, 4);
-  if (((v | 0x20202020) == _file.v) && (start[4] == ':')) {
-    start += 5;
-    if (start[0] == '/') {
-      start++;
-      if ((start[0] == '/') && (start[1] == '/'))
-        start++;
-    }
+  if (mrl_look_like_file (filename)) {
+    if (mrl_look_like_playlist (filename))
+      n = gui_playlist_add_file (gui, filename);
+    else
+      n = gui_playlist_add_dir (gui, filename);
+  } else {
+    n = gui_playlist_append (gui, filename, NULL, NULL, 0, -1, 0, 0);
   }
-
-  do {
-    struct stat sbuf;
-    int r = stat (start, &sbuf);
-    if (r) {
-      *--start = '/';
-      r = stat (start, &sbuf);
-    }
-    if (!r) {
-      gui_playlist_lock (gui);
-      if (S_ISDIR (sbuf.st_mode)) {
-        if (end[-1] == '/')
-          *--end = 0;
-        gui_playlist_add_dir (gui, start);
-        more_than_one = gui->playlist.cur;
-        gui_playlist_unlock (gui);
-        break;
-      } else if (S_ISREG (sbuf.st_mode)) {
-        start[-1] = '/';
-#ifdef ALWAYS_USE_FILE_PREFIX
-        start -= 6;
-        memcpy (start, "file:", 5);
-#endif
-        for (lastpart = end; lastpart[-1] != '/'; lastpart--) ;
-      }
-      if (mrl_look_like_playlist (start)) {
-        int cur = gui->playlist.cur;
-        more_than_one = cur - 1;
-        if (gui_playlist_add_file (gui, start)) {
-          gui->playlist.cur = cur;
-          gui_playlist_unlock (gui);
-          break;
-        }
-      }
-      gui_playlist_unlock (gui);
-    }
-    gui_playlist_append (gui, start, lastpart, NULL, 0, -1, 0, 0);
-  } while (0);
-  free (buf);
+  if (!n)
+    return;
 
   playlist_update_playlist (gui);
 
   if (!(gui->playlist.control & PLAYLIST_CONTROL_IGNORE)) {
     if ((xine_get_status (gui->stream) == XINE_STATUS_STOP) || gui->logo_mode) {
       gui_playlist_lock (gui);
-      if ((more_than_one > -2) && ((more_than_one + 1) < gui->playlist.num))
-        gui->playlist.cur = more_than_one + 1;
-      else
-        gui->playlist.cur = gui->playlist.num - 1;
+      gui->playlist.cur = gui->playlist.num - n;
       gui_playlist_unlock (gui);
       gui_current_set_index (gui, GUI_MMK_CURRENT);
       gui_pl_updated (gui);
@@ -2146,5 +2084,3 @@ void visual_anim_stop (gGui_t *gui) {
     gui->visual_anim.running = 0;
   }
 }
-
-

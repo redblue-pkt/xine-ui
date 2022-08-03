@@ -1361,31 +1361,15 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
    * init playlist
    */
   for (i = 0; i < p->num_files; i++) {
-    char *file = p->filenames[i];
+    const char *file = p->filenames[i];
 
-    /* grab recursively all files from dir */
-    if (is_a_dir (file)) {
-      gui_playlist_add_dir (gui, file);
-    }
-    else {
-
-      if(mrl_look_like_playlist(file))
-	(void) gui_playlist_add_file (gui, file);
-      else {
-	char *sub = NULL;
-
-	if((sub = (char *)get_last_double_semicolon(file)) != NULL) {
-	  if(is_ipv6_last_double_semicolon(file))
-	    sub = NULL;
-	  else {
-	    *sub = 0;
-	    sub += 2;
-	  }
-	}
-
-        if (gui_playlist_add_dir (gui, file) && sub)
-          gui_playlist_set_str_val (gui, sub, MMK_VAL_SUB, gui->playlist.num - 1);
-      }
+    if (mrl_look_like_file (file)) {
+      if (mrl_look_like_playlist (file))
+        gui_playlist_add_file (gui, file);
+      else
+        gui_playlist_add_dir (gui, file);
+    } else {
+      gui_playlist_append (gui, file, NULL, NULL, 0, -1, 0, 0);
     }
   }
 

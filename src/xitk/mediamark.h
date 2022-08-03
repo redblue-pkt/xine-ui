@@ -91,8 +91,10 @@ int gui_playlist_add_file (gGui_t *gui, const char *filename);
   gui_playlist_insert (_gui, -1, _mrl, _ident, _sub, _start, _end, _av_offset, _spu_offset)
 int gui_playlist_insert (gGui_t *gui, int index, const char *mrl, const char *ident,
   const char *sub, int start, int end, int av_offset, int spu_offset);
-/** remove 1 entry manually. */
-void gui_playlist_remove (gGui_t *gui, int offset);
+/** move n entries starting at index by diff. return new start index. */
+int gui_playlist_move (gGui_t *gui, int index, int n, int diff);
+/** remove 1 entry manually. return new entries count. */
+int gui_playlist_remove (gGui_t *gui, int index);
 /** returns the real index used. */
 int gui_playlist_set_str_val (gGui_t *gui, const char *value, mmk_val_t what, int idx);
 mediamark_t *mediamark_get_current_mmk (gGui_t *gui);
@@ -107,8 +109,9 @@ int mediamark_all_played (gGui_t *gui);
 int mediamark_get_shuffle_next (gGui_t *gui);
 int mediamark_get_entry_from_id (gGui_t *gui, const char *ident);
 
+size_t mrl_get_lowercase_prot (char *buf, size_t bsize, const char *mrl);
 int mrl_look_like_playlist (const char *mrl);
-int mrl_look_like_file(char *mrl);
+int mrl_look_like_file (const char *mrl);
 
 
 /** mediamark editor window. */
