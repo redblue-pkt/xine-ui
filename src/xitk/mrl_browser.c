@@ -348,7 +348,7 @@ static void mrl_add_noautoplay(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
   if (mrlb && mrl) {
     int idx;
 
-    gui_playlist_add_dir (mrlb->gui, mrl->mrl);
+    gui_playlist_add_dir (mrlb->gui, mrl->mrl, 1);
     idx = mrlb->gui->playlist.num - 1;
 
     if (!mrlb->gui->plwin) {

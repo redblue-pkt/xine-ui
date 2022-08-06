@@ -41,6 +41,16 @@ typedef struct {
   int                       av_offset;
   int                       spu_offset;
 
+  enum {
+    MMK_TYPE_FILE = 0,
+    MMK_TYPE_NET
+  }                         type;
+  enum {
+    MMK_FROM_USER = 0,
+    MMK_FROM_PLAYLIST,
+    MMK_FROM_DIR
+  }                         from;
+
   int                       played; /* used with shuffle loop mode */
 
   int                       got_alternate;
@@ -82,8 +92,11 @@ void gui_current_free (gGui_t *gui);
 
 /** gui playlist stuff. */
 void gui_playlist_load (gGui_t *gui, const char *filename);
-/** recursively scan this dir for playable files or add this file. return found count. */
-int gui_playlist_add_dir (gGui_t *gui, const char *filepathname);
+#define GUI_MAX_DIR_LEVELS 8
+/** recursively scan this dir for playable files or add this file. return found count.
+ *  a negative max_levels will add _all_ files, even hidden and unknown ext ones.
+ *  a zero max_levels forbids scanning dirs and playlist files. */
+int gui_playlist_add_dir (gGui_t *gui, const char *filepathname, int max_levels);
 /** add refs from this playlist file. */
 int gui_playlist_add_file (gGui_t *gui, const char *filename);
 /** add 1 entry manually. */
