@@ -150,6 +150,8 @@ int mediamark_copy (mediamark_t **to, const mediamark_t *from) {
     m->av_offset = from->av_offset, n++;
   if (m->spu_offset == from->spu_offset)
     m->spu_offset = from->spu_offset, n++;
+  m->type = from->type;
+  m->from = from->from;
   if (m->got_alternate == from->got_alternate)
     m->got_alternate = from->got_alternate, n++;
   mediamark_duplicate_alternates (from, m);
@@ -380,6 +382,11 @@ void gui_current_free (gGui_t *gui) {
 }
 
 /** gui playlist ***********************************************************************/
+
+static const union {
+  char s[8 * 4];
+  uint32_t v[8];
+} _mrl_playlist_exts = {{".m3u.asx.smi.pls.sfv.xml.tox.fxd"}};
 
 int mrl_look_like_playlist (const char *mrl) {
   /* TJ. I dont know whether someone really needs to treat
@@ -1883,9 +1890,6 @@ static void smil_properties(smil_t *smil, smil_node_t **snode,
     smil_node_t *node = (*snode);
     int          repeat = node->prop.repeat;
 
-    if((*snode)->mmk->ident == NULL)
-      (*snode)->mmk->ident = strdup((*snode)->mmk->mrl);
-
     if(sprop) {
       if(sprop->clip_begin && (node->prop.clip_begin == 0))
 	node->mmk->start = sprop->clip_begin;
@@ -2587,6 +2591,11 @@ int gui_playlist_insert (gGui_t *gui, int index, const char *mrl, const char *id
   DIR           *dir;
   struct dirent *dentry;
 
+  if (!mrl)
+    return -1;
+  if (!mrl[0])
+    return -1;
+
   gui_playlist_lock (gui);
 
   if ((index < 0) || (index >= gui->playlist.num))
@@ -2690,6 +2699,8 @@ int gui_playlist_insert (gGui_t *gui, int index, const char *mrl, const char *id
       .sub = (char *)sub,
       .start = start,
       .end = end,
+      .type = MMK_TYPE_FILE,
+      .from = MMK_FROM_USER,
       .av_offset = av_offset,
       .spu_offset = spu_offset
     };
@@ -2893,6 +2904,40 @@ static _lf_t *_lf_get (gGui_t *gui, const char *_filename) {
   return lf;
 }
 
+static void _gui_playlist_add_lf (gGui_t *gui, _lf_t *lf, mediamark_t **mmk) {
+  if (gui->playlist.num + (int)lf->num_entries > gui->playlist.max) {
+    int nmax = (gui->playlist.num + lf->num_entries + 32) & ~31;
+    mediamark_t **nmmk = realloc (gui->playlist.mmk, nmax * sizeof (*nmmk));
+    if (nmmk) {
+      gui->playlist.mmk = nmmk;
+      gui->playlist.max = nmax;
+    }
+  }
+  {
+    int n = gui->playlist.max - gui->playlist.num, i;
+    if (n > (int)lf->num_entries)
+      n = lf->num_entries;
+    for (i = 0; i < n; i++) {
+      mmk[i]->from = MMK_FROM_PLAYLIST;
+      if (!mmk[i]->ident) {
+        char *start = mmk[i]->mrl;
+        if (start[0] == '/') {
+          char *lastpart;
+          for (lastpart = start + strlen (start); lastpart[-1] != '/'; lastpart--) ;
+          mmk[i]->ident = strdup (lastpart);
+        }
+      }
+      if (!mmk[i]->ident)
+        mmk[i]->ident = mmk[i]->mrl;
+      gui->playlist.mmk[gui->playlist.num + i] = mmk[i];
+    }
+    gui->playlist.num += i;
+    for (; i < (int)lf->num_entries; i++)
+      mediamark_free (&mmk[i]);
+  }
+  gui->playlist.cur = gui->playlist.num - lf->num_entries;
+}
+
 int gui_playlist_add_file (gGui_t *gui, const char *filename) {
   _lf_t *lf;
   size_t i;
@@ -2928,25 +2973,7 @@ int gui_playlist_add_file (gGui_t *gui, const char *filename) {
   }
 
   gui_playlist_lock (gui);
-  if (gui->playlist.num + (int)lf->num_entries > gui->playlist.max) {
-    int nmax = (gui->playlist.num + lf->num_entries + 32) & ~31;
-    mediamark_t **nmmk = realloc (gui->playlist.mmk, nmax * sizeof (*nmmk));
-    if (nmmk) {
-      gui->playlist.mmk = nmmk;
-      gui->playlist.max = nmax;
-    }
-  }
-  {
-    int n = gui->playlist.max - gui->playlist.num, i;
-    if (n > (int)lf->num_entries)
-      n = lf->num_entries;
-    for (i = 0; i < n; i++)
-      gui->playlist.mmk[gui->playlist.num + i] = mmk[i];
-    gui->playlist.num += i;
-    for (; i < (int)lf->num_entries; i++)
-      mediamark_free (&mmk[i]);
-  }
-  gui->playlist.cur = gui->playlist.num - lf->num_entries;
+  _gui_playlist_add_lf (gui, lf, mmk);
   gui_playlist_unlock (gui);
 
   SAFE_FREE (mmk);
@@ -2959,8 +2986,8 @@ int gui_playlist_add_file (gGui_t *gui, const char *filename) {
 
 void gui_playlist_load (gGui_t *gui, const char *filename) {
   _lf_t *lf;
-  int i, onum;
-  mediamark_t **mmk = NULL, **ommk;
+  int i;
+  mediamark_t **mmk = NULL;
   static const playlist_guess_func_t guess_functions[] = {
     guess_xml_based_playlist,
     guess_toxine_playlist,
@@ -2991,22 +3018,15 @@ void gui_playlist_load (gGui_t *gui, const char *filename) {
     return;
   }
 
-  ommk = gui->playlist.mmk;
-  onum = gui->playlist.num;
+  gui_playlist_lock (gui);
+  for (i = 0; i < gui->playlist.num; i++)
+    mediamark_free (gui->playlist.mmk + i);
+  gui->playlist.num = 0;
+  _gui_playlist_add_lf (gui, lf, mmk);
+  gui->playlist.cur = (gui->playlist.loop == PLAYLIST_LOOP_SHUFFLE) ? mediamark_get_shuffle_next (gui) : 0;
+  gui_playlist_unlock (gui);
 
-  gui->playlist.mmk = mmk;
-  gui->playlist.num = lf->num_entries;
-
-  if(gui->playlist.loop == PLAYLIST_LOOP_SHUFFLE)
-    gui->playlist.cur = mediamark_get_shuffle_next (gui);
-  else
-    gui->playlist.cur = 0;
-
-  for(i = 0; i < onum; i++)
-    (void) mediamark_free(&ommk[i]);
-
-  SAFE_FREE(ommk);
-
+  SAFE_FREE (mmk);
   _lf_delete (lf);
 }
 
@@ -3182,15 +3202,29 @@ static void _gui_mmk_sort (xine_sarray_t *sarray, mediamark_t **list, uint32_t n
     list[u] = xine_sarray_get (sarray, u);
 }
 
-int gui_playlist_add_dir (gGui_t *gui, const char *filepathname) {
-#define _MAX_DIR_LEVEL 8
-  DIR *dirs[_MAX_DIR_LEVEL];
-  char *add[_MAX_DIR_LEVEL];
-  int num_subdirs[_MAX_DIR_LEVEL];
-  xine_sarray_t *sarray;
+static int _gui_playlist_dupl_cmp (void *a, void *b) {
+  mediamark_t **d = (mediamark_t **)a;
+  mediamark_t **e = (mediamark_t **)b;
+
+  return strcmp ((*d)->mrl + (*d)->start, (*e)->mrl + (*e)->start);
+}
+
+int gui_playlist_add_dir (gGui_t *gui, const char *filepathname, int max_levels) {
+  DIR *dirs[GUI_MAX_DIR_LEVELS];
+  char *add[GUI_MAX_DIR_LEVELS];
+  int num_subdirs[GUI_MAX_DIR_LEVELS];
+  xine_sarray_t *sarray, *dupl;
   struct stat sbuf;
   char buf[2048], *start, *end = buf + sizeof (buf) - 4;
-  int n, level, sort_start = 0;
+  int n, level, sort_start = 0, all_files = 0, old_num;
+  int type;
+
+  if (max_levels < 0) {
+    max_levels = -max_levels;
+    all_files = 1;
+  }
+  if (max_levels > GUI_MAX_DIR_LEVELS)
+    max_levels = GUI_MAX_DIR_LEVELS;
 
   memset (buf, 0, 4);
   start = buf + 4;
@@ -3201,6 +3235,7 @@ int gui_playlist_add_dir (gGui_t *gui, const char *filepathname) {
     (add[0])--;
   add[0][0] = 0;
 
+  type = MMK_TYPE_NET;
   {
     const union {char z[4]; uint32_t v;} _file = {{'f', 'i', 'l', 'e'}};
     uint32_t v;
@@ -3214,13 +3249,16 @@ int gui_playlist_add_dir (gGui_t *gui, const char *filepathname) {
         start++;
       add[0] = start + _gui_string_unescape (start, add[0] - start);
       add[0][0] = 0;
+      type = MMK_TYPE_FILE;
+    } else if (mrl_get_lowercase_prot (NULL, 0, start) == 0) {
+      type = MMK_TYPE_FILE;
     }
   }
 
   /* add not found item to get the user error msg. */
   n = stat (start, &sbuf);
   if (n || S_ISREG (sbuf.st_mode)) {
-    char *lastpart, *sub;
+    char *lastpart, *ext, *sub;
 
     /* test for "/some/dir/video.flv;;/some/dir/subtitiles.txt" */
     start[-2] = start[-1] = ';';
@@ -3239,15 +3277,47 @@ int gui_playlist_add_dir (gGui_t *gui, const char *filepathname) {
 
     start[-1] = '/';
     for (lastpart = add[0]; lastpart[-1] != '/'; lastpart--) ;
-    return gui_playlist_append (gui, start, lastpart, sub, 0, -1, 0, 0) >= 0 ? 1 : 0;
+
+    lastpart[-1] = '.';
+    for (ext = add[0]; ext[-1] != '.'; ext--) ;
+    lastpart[-1] = '/';
+    if (max_levels && (ext > lastpart) && (ext + 3 <= add[0])) {
+      uint32_t u, v;
+
+      memcpy (&v, ext - 1, 4);
+      v |= 0x20202020;
+      for (u = 0; u < sizeof (_mrl_playlist_exts) / 4; u++) {
+        if (v == _mrl_playlist_exts.v[u])
+          break;
+      }
+      /* [0] == "m3u" but != "m3u8". */
+      if ((u < sizeof (_mrl_playlist_exts) / 4) && ((u != 0) || (ext[3] != '8'))) {
+        int n = gui_playlist_add_file (gui, start);
+
+        if (n > 0)
+          return n;
+      }
+    }
+
+    if (gui_playlist_append (gui, start, lastpart, sub, 0, -1, 0, 0) < 0)
+      return 0;
+    gui->playlist.mmk[gui->playlist.num - 1]->type = type;
+    return 1;
   }
 
+  if (!max_levels)
+    return 0;
+
   sarray = xine_sarray_new (512, _gui_mmk_cmp);
+  dupl = xine_sarray_new (512, _gui_playlist_dupl_cmp);
   n = 0;
   level = 0;
   *(add[level])++ = '/';
   dirs[level] = NULL;
   num_subdirs[level] = 0;
+
+  gui_playlist_lock (gui);
+  old_num = gui->playlist.num;
 
   while (1) {
     struct dirent *entry;
@@ -3302,7 +3372,7 @@ int gui_playlist_add_dir (gGui_t *gui, const char *filepathname) {
       if (num_subdirs[level] >= 0) { /* pass 1: files */
         num_subdirs[level]++;
       } else { /* pass 2: dirs */
-        if (level >= _MAX_DIR_LEVEL - 1)
+        if (level >= max_levels - 1)
           continue;
         add[level + 1] = stop;
         level++;
@@ -3321,7 +3391,29 @@ int gui_playlist_add_dir (gGui_t *gui, const char *filepathname) {
       add[level][-1] = '/';
       if (ext <= add[level])
         ext = stop;
-      if ((ext + 8 >= stop) && (ext + 2 <= stop)) {
+      /* playlist file ? */
+      if ((level < max_levels - 1) && (ext > add[level]) && (ext + 3 <= stop)) {
+        uint32_t u, v;
+
+        memcpy (&v, ext - 1, 4);
+        v |= 0x20202020;
+        for (u = 0; u < sizeof (_mrl_playlist_exts) / 4; u++) {
+          if (v == _mrl_playlist_exts.v[u])
+            break;
+        }
+        /* [0] == "m3u" but != "m3u8". */
+        if ((u < sizeof (_mrl_playlist_exts) / 4) && ((u != 0) || (ext[3] != '8'))) {
+          int r = gui_playlist_add_file (gui, start);
+
+          if (r > 0) {
+            n += r;
+            continue;
+          }
+        }
+      }
+      /* want all files ? */
+      if (!all_files) {
+        /* media file ? */
         static const char valid_endings[] =
           "asx fxd m3u pls sfv smi smil tox xml " /* Playlists */
           "4xm ac3 aif aiff asf au aud avi cak cin cpk dat dif dps dv "
@@ -3331,17 +3423,61 @@ int gui_playlist_add_dir (gGui_t *gui, const char *filepathname) {
           "trp ts wav voc vob vox wax wma wmv vqa wve wvx "
           "xa xa1 xa2 xap xas y4m ";
         char ebuf[10], *p;
-
+        if ((ext + 8 < stop) || (ext + 2 > stop))
+          continue;
         for (p = ebuf; ext < stop; ext++, p++)
           p[0] = tolower (ext[0]);
         *p++ = ' ';
         *p = 0;
-        if (strstr (valid_endings, ebuf)) {
-          n += gui_playlist_append (gui, start, add[level], NULL, 0, -1, 0, 0) >= 0 ? 1 : 0;
+        if (!strstr (valid_endings, ebuf))
+          continue;
+      }
+      if (gui_playlist_append (gui, start, add[level], NULL, add[0] - start, -1, 0, 0) < 0)
+        continue;
+      gui->playlist.mmk[gui->playlist.num - 1]->from = MMK_FROM_DIR;
+      xine_sarray_add (dupl, gui->playlist.mmk + gui->playlist.num - 1);
+      n++;
+    }
+  }
+  {
+    int i, t;
+    /* we may have got some media files _and_ some playlists referencing them.
+     * playlist shall take effect, mark the duplicates with MMK_FROM_USER,
+     * which cannot happen here. */
+    for (i = old_num; i < gui->playlist.num; i++) {
+      if ((gui->playlist.mmk[i]->from == MMK_FROM_PLAYLIST) &&
+        !strncmp (gui->playlist.mmk[i]->mrl, start, add[0] - start)) {
+        int d_indx, real_start;
+
+        real_start = gui->playlist.mmk[i]->start;
+        gui->playlist.mmk[i]->start = add[0] - start;
+        d_indx = xine_sarray_binary_search (dupl, gui->playlist.mmk + i);
+        gui->playlist.mmk[i]->start = real_start;
+
+        if (d_indx >= 0) {
+          mediamark_t **m = xine_sarray_get (dupl, d_indx);
+          (*m)->from = MMK_FROM_USER;
         }
       }
     }
+    /* comb out the duplicates, and reset the dupl sort hints */
+    for (t = i = old_num; i < gui->playlist.num; i++) {
+      if (gui->playlist.mmk[i]->from == MMK_FROM_DIR) {
+        gui->playlist.mmk[i]->start = 0;
+        gui->playlist.mmk[t++] = gui->playlist.mmk[i];
+      } else if (gui->playlist.mmk[i]->from == MMK_FROM_PLAYLIST) {
+        gui->playlist.mmk[t++] = gui->playlist.mmk[i];
+      } else /* MMK_FROM_USER */ {
+        mediamark_free (gui->playlist.mmk + i);
+      }
+    }
+    gui->playlist.num = t;
+    n = gui->playlist.num - old_num;
   }
+
+  gui_playlist_unlock (gui);
+
+  xine_sarray_delete (dupl);
   xine_sarray_delete (sarray);
   return n;
 }

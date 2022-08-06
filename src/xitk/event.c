@@ -1364,10 +1364,7 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
     const char *file = p->filenames[i];
 
     if (mrl_look_like_file (file)) {
-      if (mrl_look_like_playlist (file))
-        gui_playlist_add_file (gui, file);
-      else
-        gui_playlist_add_dir (gui, file);
+      gui_playlist_add_dir (gui, file, GUI_MAX_DIR_LEVELS);
     } else {
       gui_playlist_append (gui, file, NULL, NULL, 0, -1, 0, 0);
     }

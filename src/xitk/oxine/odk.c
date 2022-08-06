@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2021 Stefan Holst
+ * Copyright (C) 2002-2022 Stefan Holst
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -464,12 +464,7 @@ void odk_free(odk_t *odk) {
 
 void odk_enqueue(odk_t *odk, const char *mrl)
 {
-  if(mrl_look_like_playlist((char *)mrl)) {
-    if (!gui_playlist_add_file (odk->gui, mrl))
-      gui_playlist_append (odk->gui, mrl, mrl, NULL, 0, -1, 0, 0);
-  }
-  else
-    gui_playlist_append (odk->gui, mrl, mrl, NULL, 0, -1, 0, 0);
+  gui_playlist_add_dir (odk->gui, mrl, 1);
 }
 
 int odk_open_and_play(odk_t *odk, const char *mrl) {

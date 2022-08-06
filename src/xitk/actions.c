@@ -1289,10 +1289,7 @@ void gui_dndcallback (void *_gui, const char *filename) {
     return;
 
   if (mrl_look_like_file (filename)) {
-    if (mrl_look_like_playlist (filename))
-      n = gui_playlist_add_file (gui, filename);
-    else
-      n = gui_playlist_add_dir (gui, filename);
+    n = gui_playlist_add_dir (gui, filename, GUI_MAX_DIR_LEVELS);
   } else {
     n = gui_playlist_append (gui, filename, NULL, NULL, 0, -1, 0, 0);
   }
@@ -1810,24 +1807,15 @@ static void fileselector_callback (filebrowser_t *fb, void *userdata) {
   free(cur_dir);
 
   /* Get the file path/name */
-  if(((file = filebrowser_get_full_filename(fb)) != NULL) && strlen(file)) {
+  file = filebrowser_get_full_filename (fb);
+  if (file && file[0]) {
     int first  = gui->playlist.num;
-    char *ident;
-
-    /* Get the name only to use as an identifier in the playlist display */
-    ident = filebrowser_get_current_filename(fb);
 
     /* If the file has an extension which could be a playlist, attempt to append
        it to the current list as a list; otherwise, append it as an ordinary file. */
-    if(mrl_look_like_playlist(file)) {
-      if (!gui_playlist_add_file (gui, file))
-        gui_playlist_append (gui, file, ident, NULL, 0, -1, 0, 0);
-    }
-    else
-      gui_playlist_append (gui, file, ident, NULL, 0, -1, 0, 0);
+    gui_playlist_add_dir (gui, file, 1);
 
     playlist_update_playlist (gui);
-    free(ident);
 
     /* Enable controls on display */
     if ((!is_playback_widgets_enabled (gui->panel)) && gui->playlist.num)
@@ -1854,46 +1842,31 @@ static void fileselector_callback (filebrowser_t *fb, void *userdata) {
    currently selected directory to the current playlist. */
 static void fileselector_all_callback (filebrowser_t *fb, void *userdata) {
   gGui_t *gui = userdata;
-  char **files;
-  char  *path = filebrowser_get_current_dir(fb);
+  char *path = filebrowser_get_current_dir (fb);
 
-  /* Update the configuration with the current path */
-  if(path && strlen(path)) {
-    strlcpy(gui->curdir, path, sizeof(gui->curdir));
+  if (path && path[0]) {
+    char **files;
+    /* Update the configuration with the current path */
+    strlcpy (gui->curdir, path, sizeof (gui->curdir));
     config_update_string (gui->xine, "media.files.origin_path", gui->curdir);
-  }
+    /* Get all of the file names in the current directory as an array of pointers to strings */
+    files = filebrowser_get_all_files (fb);
+    if (files && files[0]) {
+      char buf[2048], *add, *e = buf + sizeof (buf);
+      int i, first = gui->playlist.num; /* current count of entries in playlist */
 
-  /* Get all of the file names in the current directory as an array of pointers to strings */
-  if((files = filebrowser_get_all_files(fb)) != NULL) {
-    int i = 0;
-
-    if(path && strlen(path)) {
-      char pathname[XITK_PATH_MAX + 1 + 1]; /* +1 for trailing '/' */
-      char fullfilename[XITK_PATH_MAX + XITK_NAME_MAX + 2];
-      int  first = gui->playlist.num; /* current count of entries in playlist */
-
-      /* If the path is anything other than "/", append a slash to it so that it can
-         be concatenated with the file name */
-      if(strcasecmp(path, "/"))
-        snprintf(pathname, sizeof(pathname), "%s/", path);
-      else
-	strlcpy(pathname, path, sizeof(pathname));
-
-      /* For each file, concatenate the path with the name and append it to the playlist */
-      while(files[i]) {
-        snprintf(fullfilename, sizeof(fullfilename), "%s%s", pathname, files[i]);
-
+      add = buf + strlcpy (buf, path, e - buf - 2);
+      if (add > e - 3)
+        add = e - 3;
+      if (add[-1] != '/')
+        *add++ = '/';
+      for (i = 0; files[i]; i++) {
+        strlcpy (add, files[i], e - add);
+        free (files[i]);
         /* If the file has an extension which could be a playlist, attempt to append
            it to the current list as a list; otherwise, append it as an ordinary file. */
-        if(mrl_look_like_playlist(fullfilename)) {
-          if (!gui_playlist_add_file (gui, fullfilename))
-            gui_playlist_append (gui, fullfilename, files[i], NULL, 0, -1, 0, 0);
-        }
-        else
-          gui_playlist_append (gui, fullfilename, files[i], NULL, 0, -1, 0, 0);
-
-        i++;
-      } /* End while */
+        gui_playlist_add_dir (gui, buf, 1);
+      }
 
       playlist_update_playlist (gui);
 
@@ -1910,16 +1883,10 @@ static void fileselector_all_callback (filebrowser_t *fb, void *userdata) {
           gui_play (NULL, gui);
         }
       }
-    } /* If valid path */
-
-    i = 0;
-    while(files[i])
-      free(files[i++]);
-
-    free(files);
-  } /* If valid file list */
-
-  free(path);
+    }
+    free (files);
+  }
+  free (path);
 
   gui->load_stream = NULL;
 }
