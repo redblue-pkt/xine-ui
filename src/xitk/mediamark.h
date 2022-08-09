@@ -137,6 +137,8 @@ int mediamark_get_entry_from_id (gGui_t *gui, const char *ident);
  *    mp4
  *  args:
  *    ?again=1
+ *  info:
+ *    #start=0:02:55
  *  end:
  *    \0, free[n]
  *  max:
@@ -144,11 +146,13 @@ int mediamark_get_entry_from_id (gGui_t *gui, const char *ident);
  *  buf[sizeof (buf)]
  */
 typedef struct {
-  char *start, *protend, *root, *lastpart, *ext, *args, *end, *max;
+  char *start, *protend, *root, *lastpart, *ext, *args, *info, *end, *max;
   char buf[2048];
 } mrl_buf_t;
 void mrl_buf_init (mrl_buf_t *mrlb);
-void mrl_buf_set (mrl_buf_t *mrlb, const char *name);
+/** base here is just a hint for interpreting ? and #. can be NULL. */
+void mrl_buf_set (mrl_buf_t *mrlb, mrl_buf_t *base, const char *name);
+/** for security, this will drop info for network type base. */
 void mrl_buf_merge (mrl_buf_t *to, mrl_buf_t *base, mrl_buf_t *name);
 int mrl_buf_is_file (mrl_buf_t *mrlb);
 
