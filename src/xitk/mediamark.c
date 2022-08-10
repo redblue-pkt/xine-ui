@@ -127,9 +127,86 @@ static size_t _gui_string_unescape (char *_s, size_t len) {
 }
 
 void mrl_buf_init (mrl_buf_t *mrlb) {
-  mrlb->start = mrlb->protend = mrlb->root = mrlb->lastpart = mrlb->ext = mrlb->args = mrlb->info = mrlb->end = mrlb->buf + 8;
+  mrlb->start = mrlb->protend = mrlb->host = mrlb->root = mrlb->lastpart =
+  mrlb->ext = mrlb->args = mrlb->info = mrlb->end = mrlb->buf + 8;
   mrlb->max = mrlb->buf + sizeof (mrlb->buf) - 8;
   memset (mrlb->buf, 0, 16);
+}
+
+static void _mrl_buf_working_dir (mrl_buf_t *mrlb) {
+  if (getcwd (mrlb->start, mrlb->max - mrlb->start)) {
+    mrlb->args = mrlb->start + strlen (mrlb->start);
+    mrlb->start[-1] = '/';
+    if (mrlb->args[-1] != '/') {
+      memcpy (mrlb->args, "/", 2);
+      mrlb->args++;
+    }
+    mrlb->protend = mrlb->host = mrlb->root = mrlb->start;
+    mrlb->lastpart = mrlb->ext = mrlb->info = mrlb->end = mrlb->args;
+  } else {
+    mrl_buf_init (mrlb);
+  }
+}
+
+static size_t _mrl_buf_resolve_dots (char *s, size_t len) {
+  uint8_t *start = (uint8_t *)s, *p, *t, *e = start + len, save1[2], save2[2];
+  /* set safe plugs */
+  memcpy (save1, start - 2, 2);
+  memcpy (save2, e, 2);
+  memcpy (start - 2, "//", 2);
+  memcpy (e, "//", 2);
+  /* check only part 1 */
+  for (t = p = start; p < e;) {
+    uint8_t *here = p;
+
+    for (p++; p[0] != '/'; p++) ;
+    if (here[1] == '.') {
+      if (here[2] == '/')
+        break;
+      if (!memcmp (here + 2, "./", 2)) {
+        for (t = here - 1; t[0] != '/'; t--) ;
+        if (t < start)
+          t = start;
+        break;
+      }
+    }
+    t = p;
+  }
+  /* move part 2 */
+  if (t < p) {
+    uint8_t *f;
+    for (f = p; p < e;) {
+      uint8_t *here = p;
+
+      for (p++; p[0] != '/'; p++) ;
+      if (here[1] == '.') {
+        if (here[2] == '/') {
+          if (here > f) {
+            memmove (t, f, here - f);
+            t += here - f;
+            f = p;
+          }
+        } else if (!memcmp (here + 2, "./", 2)) {
+          if (here > f) {
+            memmove (t, f, here - f);
+            t += here - f;
+            f = p;
+          }
+          for (t--; t[0] != '/'; t--) ;
+          if (t < start)
+            t = start;
+        }
+      }
+    }
+    if (p > f) {
+      memmove (t, f, p - f);
+      t += p - f;
+    }
+  }
+  /* remove plugs */
+  memcpy (start - 2, save1, 2);
+  memcpy (e, save2, 2);
+  return t - start;
 }
 
 void mrl_buf_set (mrl_buf_t *mrlb, mrl_buf_t *base, const char *name) {
@@ -150,17 +227,31 @@ void mrl_buf_set (mrl_buf_t *mrlb, mrl_buf_t *base, const char *name) {
   mrlb->end = mrlb->start + size;
 
   plen = mrl_get_lowercase_prot (prot, sizeof (prot), mrlb->start);
-  if (plen) {
+  do {
     /* protocol */
     mrlb->protend = mrlb->start + plen;
-    p = (uint8_t *)mrlb->start + plen + 2;
-    if (!memcmp (p, "//", 2))
-      p++;
+    if ((plen == 4) && !memcmp (prot, "file", 4)) {
+      p = (uint8_t *)mrlb->protend + 2;
+      if (!memcmp (p, "//", 2))
+        p++;
+      mrlb->start = mrlb->protend = mrlb->host = mrlb->root = (char *)p;
+      break;
+    }
+    if (!plen && memcmp (mrlb->protend, ":/", 2)) {
+      /* plain file or relative path */
+      mrlb->host = mrlb->root = mrlb->protend;
+      break;
+    }
+    /* host */
+    p = (uint8_t *)mrlb->protend + 2;
+    for (; p[0] == '/'; p++) ;
+    mrlb->host = (char *)p;
+    /* root */
+    mrlb->end[0] = '/';
+    for (; p[0] != '/'; p++) ;
+    mrlb->end[0] = 0;
     mrlb->root = (char *)p;
-  } else {
-    /* plain file or relative path */
-    mrlb->protend = mrlb->root = mrlb->start;
-  }
+  } while (0);
   /* most filesystems accept #, ext even does ?.
    * test them after last / only then. */
   if (!plen && !(base && !mrl_buf_is_file (base))) {
@@ -183,7 +274,6 @@ void mrl_buf_set (mrl_buf_t *mrlb, mrl_buf_t *base, const char *name) {
   mrlb->info[0] = save;
   /* file:// */
   if ((plen == 4) && !memcmp (prot, "file", 4)) {
-    mrlb->start = mrlb->protend = mrlb->root;
     mrlb->args = mrlb->start + _gui_string_unescape (mrlb->start, mrlb->args - mrlb->start);
     if (mrlb->info > mrlb->args) {
       memmove (mrlb->args, mrlb->info, mrlb->end - mrlb->info + 1);
@@ -206,20 +296,28 @@ void mrl_buf_set (mrl_buf_t *mrlb, mrl_buf_t *base, const char *name) {
 }
 
 void mrl_buf_merge (mrl_buf_t *to, mrl_buf_t *base, mrl_buf_t *name) {
-  mrl_buf_init (to);
+  to->max = to->buf + sizeof (to->buf) - 8;
   if (name->protend > name->start) {
+    /* full new mrl */
     memcpy (to->start, name->start, name->end - name->start + 1);
     to->protend  = to->start + (name->protend  - name->start);
+    to->host     = to->start + (name->host     - name->start);
     to->root     = to->start + (name->root     - name->start);
     to->lastpart = to->start + (name->lastpart - name->start);
     to->ext      = to->start + (name->ext      - name->start);
     to->args     = to->start + (name->args     - name->start);
     to->info     = to->start + (name->info     - name->start);
     to->end      = to->start + (name->end      - name->start);
-  } else if (name->root > name->protend) {
-    memcpy (to->start, base->start, base->protend - base->start);
-    to->protend  = to->start + (base->protend  - base->start);
+  } else if (name->host > name->protend) {
+    /* yes i havr seen "://host/foo/bar" :-) */
+    if (to != base) {
+      int l = base->protend - base->start;
+      if (l > 0)
+        memcpy (to->start, base->start, l);
+      to->protend  = to->start + (base->protend - base->start);
+    }
     memcpy (to->protend, name->start, name->end - name->start + 1);
+    to->host     = to->protend + (name->host     - name->start);
     to->root     = to->protend + (name->root     - name->start);
     to->lastpart = to->protend + (name->lastpart - name->start);
     to->ext      = to->protend + (name->ext      - name->start);
@@ -227,9 +325,15 @@ void mrl_buf_merge (mrl_buf_t *to, mrl_buf_t *base, mrl_buf_t *name) {
     to->info     = to->protend + (name->info     - name->start);
     to->end      = to->protend + (name->end      - name->start);
   } else if (name->root[0] == '/') {
-    memcpy (to->start, base->start, base->root - base->start);
-    to->protend  = to->start + (base->protend - base->start);
-    to->root     = to->start + (base->root    - base->start);
+    /* absolute path on same host */
+    if (to != base) {
+      int l = base->root - base->start;
+      if (l > 0)
+        memcpy (to->start, base->start, l);
+      to->protend  = to->start + (base->protend - base->start);
+      to->host     = to->start + (base->host    - base->start);
+      to->root     = to->start + (base->root    - base->start);
+    }
     memcpy (to->root, name->start, name->end - name->start + 1);
     to->lastpart = to->root + (name->lastpart - name->start);
     to->ext      = to->root + (name->ext      - name->start);
@@ -237,16 +341,33 @@ void mrl_buf_merge (mrl_buf_t *to, mrl_buf_t *base, mrl_buf_t *name) {
     to->info     = to->root + (name->info     - name->start);
     to->end      = to->root + (name->end      - name->start);
   } else {
-    /* TODO: resolve ./ ../ */
-    memcpy (to->start, base->start, base->lastpart - base->start);
-    to->protend  = to->start + (base->protend - base->start);
-    to->root     = to->start + (base->root    - base->start);
-    to->lastpart = to->start + (base->lastpart - base->start);
+    /* relative path */
+    int l;
+    if (to != base) {
+      l = base->lastpart - base->start;
+      if (l > 0)
+        memcpy (to->start, base->start, l);
+      to->protend  = to->start + (base->protend - base->start);
+      to->host     = to->start + (base->host    - base->start);
+      to->root     = to->start + (base->root    - base->start);
+      to->lastpart = to->start + (base->lastpart - base->start);
+    }
     memcpy (to->lastpart , name->start, name->end - name->start + 1);
     to->ext      = to->lastpart + (name->ext      - name->start);
     to->args     = to->lastpart + (name->args     - name->start);
     to->info     = to->lastpart + (name->info     - name->start);
     to->end      = to->lastpart + (name->end      - name->start);
+    to->lastpart += name->lastpart - name->start;
+    l = to->lastpart - to->root;
+    l -= _mrl_buf_resolve_dots (to->root, l);
+    if (l > 0) {
+      memmove (to->lastpart - l, to->lastpart, to->end - to->lastpart + 1);
+      to->lastpart -= l;
+      to->ext -= l;
+      to->args -= l;
+      to->info -= l;
+      to->end -= l;
+    }
   }
   /* security */
   if (!mrl_buf_is_file (base)) {
@@ -682,7 +803,7 @@ static void _lf_add2 (_lf_t *lf, mediamark_t *mmk) {
 static _lf_t *_lf_new (size_t size) {
   _lf_t *lf;
   uint32_t *w;
-  size_t num_words = (size + 4) & ~4;
+  size_t num_words = (size + 4) & ~3;
   char *m = malloc (sizeof (*lf) + 2 * num_words);
 
   if (!m) {
@@ -837,7 +958,7 @@ static int _file_exist(char *filename) {
 
 static _lf_t *_read_file (gGui_t *gui, const char *filename) {
   struct stat st;
-  mrl_buf_t base;
+  mrl_buf_t base, name;
   _lf_t *lf;
   int fd, bytes_read;
   size_t size;
@@ -847,10 +968,14 @@ static _lf_t *_read_file (gGui_t *gui, const char *filename) {
     return NULL;
   }
 
-  mrl_buf_init (&base);
-  mrl_buf_set (&base, NULL, filename);
   if (mrl_look_like_playlist (filename) && is_downloadable ((char *)filename))
     return _download_file (gui, filename);
+
+  mrl_buf_init (&base);
+  mrl_buf_init (&name);
+  _mrl_buf_working_dir (&base);
+  mrl_buf_set (&name, &base, filename);
+  mrl_buf_merge (&base, &base, &name);
 
   if (stat (base.start, &st) < 0) {
     fprintf (stderr, "%s(): Unable to stat() '%s' file: %s.\n", __XINE_FUNCTION__, base.start, strerror (errno));
@@ -2975,11 +3100,6 @@ static _lf_t *_lf_get (gGui_t *gui, const char *_filename) {
   _lf_t *lf;
   const char *filename = _filename;
 
-  if(_filename) {
-    if(!strncasecmp("file:/", _filename, 6))
-      filename = (_filename + 6);
-  }
-
   lf = _read_file (gui, filename);
   if (!lf)
     return NULL;
@@ -3196,7 +3316,7 @@ size_t mrl_get_lowercase_prot (char *buf, size_t bsize, const char *mrl) {
   if (!p)
     return 0;
 
-  while ((*p >= 'A') && (p < e))
+  while ((*p >= 'A') && (s < e))
     *s++ = *p++;
   if (p[0] != ':')
     return 0;
@@ -3249,12 +3369,13 @@ static int _gui_playlist_dupl_cmp (void *a, void *b) {
 }
 
 int gui_playlist_add_dir (gGui_t *gui, const char *filepathname, int max_levels) {
+  mrl_buf_t base, name;
   DIR *dirs[GUI_MAX_DIR_LEVELS];
   char *add[GUI_MAX_DIR_LEVELS];
   int num_subdirs[GUI_MAX_DIR_LEVELS];
   xine_sarray_t *sarray, *dupl;
   struct stat sbuf;
-  char buf[2048], *start, *end = buf + sizeof (buf) - 4;
+  char *start, *end;
   int n, level, sort_start = 0, all_files = 0, old_num;
   int type;
 
@@ -3265,33 +3386,30 @@ int gui_playlist_add_dir (gGui_t *gui, const char *filepathname, int max_levels)
   if (max_levels > GUI_MAX_DIR_LEVELS)
     max_levels = GUI_MAX_DIR_LEVELS;
 
-  memset (buf, 0, 4);
-  start = buf + 4;
-  add[0] = start + strlcpy (start, filepathname, end - start);
-  if (add[0] >= end)
-    add[0] = end - 1;
-  if (add[0][-1] == '/')
-    (add[0])--;
-  add[0][0] = 0;
-
-  type = MMK_TYPE_NET;
-  {
-    const union {char z[4]; uint32_t v;} _file = {{'f', 'i', 'l', 'e'}};
-    uint32_t v;
-
-    memcpy (&v, start, 4);
-    if (((v | 0x20202020) == _file.v) && (start[4] == ':')) {
-      start += 5;
-      if (start[0] == '/')
-        start++;
-      if (!memcmp (start, "//", 2))
-        start++;
-      add[0] = start + _gui_string_unescape (start, add[0] - start);
-      add[0][0] = 0;
-      type = MMK_TYPE_FILE;
-    } else if (mrl_get_lowercase_prot (NULL, 0, start) == 0) {
-      type = MMK_TYPE_FILE;
+  mrl_buf_init (&name);
+  mrl_buf_set (&name, NULL, filepathname);
+  if (mrl_buf_is_file (&name)) {
+    if (name.root[0] != '/') {
+      mrl_buf_init (&base);
+      _mrl_buf_working_dir (&base);
+      mrl_buf_merge (&base, &base, &name);
+      start = base.root;
+      add[0] = base.end;
+      end = base.max;
+    } else {
+      start = name.start;
+      add[0] = name.end;
+      end = name.max;
     }
+    type = MMK_TYPE_FILE;
+    start[-1] = 0;
+    if (add[0][-1] == '/')
+      (--add[0])[0] = 0;
+  } else {
+    start = name.start;
+    add[0] = name.end;
+    end = name.max;
+    type = MMK_TYPE_NET;
   }
 
   /* add not found item to get the user error msg. */
@@ -3884,5 +4002,4 @@ void mmk_edit_mediamark (gGui_t *gui, mediamark_t **mmk, apply_callback_t callba
   raise_window (mmkedit->gui, mmkedit->xwin, 1, 1);
   xitk_window_set_input_focus (mmkedit->xwin);
 }
-
 

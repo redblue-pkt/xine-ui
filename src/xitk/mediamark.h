@@ -128,9 +128,11 @@ int mediamark_get_entry_from_id (gGui_t *gui, const char *ident);
  *  start:
  *    https
  *  protend:
- *    :/
+ *    ://
+ *  host:
+ *    vids.anywhere.net
  *  root:
- *    /vids.anywhere.net/ready/to/rumble/
+ *    /ready/to/rumble/
  *  lastpart:
  *    trailer.
  *  ext:
@@ -146,7 +148,7 @@ int mediamark_get_entry_from_id (gGui_t *gui, const char *ident);
  *  buf[sizeof (buf)]
  */
 typedef struct {
-  char *start, *protend, *root, *lastpart, *ext, *args, *info, *end, *max;
+  char *start, *protend, *host, *root, *lastpart, *ext, *args, *info, *end, *max;
   char buf[2048];
 } mrl_buf_t;
 void mrl_buf_init (mrl_buf_t *mrlb);
