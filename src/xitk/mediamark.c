@@ -80,6 +80,42 @@ struct xui_mmkedit_s {
   xitk_register_key_t           widget_key;
 };
 
+/** tools ******************************************************************************/
+
+static inline uint32_t _find_byte (const char *s, uint32_t byte) {
+  const uint32_t eor = ~((byte << 24) | (byte << 16) | (byte << 8) | byte);
+  const uint32_t left = (uintptr_t)s & 3;
+  const uint32_t *p = (const uint32_t *)(s - left);
+  static const union {
+    uint8_t b[4];
+    uint32_t v;
+  } mask[4] = {
+    {{0xff, 0xff, 0xff, 0xff}},
+    {{0x00, 0xff, 0xff, 0xff}},
+    {{0x00, 0x00, 0xff, 0xff}},
+    {{0x00, 0x00, 0x00, 0xff}},
+  };
+  static const uint8_t rest[32] = {
+    0, 1, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, /* big wndian */
+    0, 4, 3, 4, 2, 4, 3, 4, 1, 4, 3, 4, 2, 4, 3, 4  /* little endian */
+  };
+  const union {
+    uint32_t v;
+    uint8_t b[4];
+  } endian = {16};
+  uint32_t w = (*p++ ^ eor) & mask[left].v;
+  while (1) {
+    w = w & 0x80808080 & ((w & 0x7f7f7f7f) + 0x01010101);
+    if (w)
+      break;
+    w = *p++ ^ eor;
+  }
+  /* bits 31, 23, 15, 7 -> 3, 2, 1, 0 */
+  w = (w * 0x00204081) & 0xffffffff;
+  w >>= 28;
+  return ((const char *)p - s) - rest[endian.b[0] + w];
+}
+
 /** mrl_buf handling *******************************************************************/
 
 static const uint8_t tab_unhex[256] = {
@@ -106,8 +142,7 @@ static size_t _gui_string_unescape (char *_s, size_t len) {
 
   memcpy (save, e, 2);
   memset (e, '%', 2);
-  while (*s != '%')
-    s++;
+  s += _find_byte ((char *)s, '%');
   d = s;
   while (s < e) {
     uint8_t a = tab_unhex[s[1]], b = tab_unhex[s[2]];
@@ -135,7 +170,7 @@ void mrl_buf_init (mrl_buf_t *mrlb) {
 
 static void _mrl_buf_working_dir (mrl_buf_t *mrlb) {
   if (getcwd (mrlb->start, mrlb->max - mrlb->start)) {
-    mrlb->args = mrlb->start + strlen (mrlb->start);
+    mrlb->args = mrlb->start + _find_byte (mrlb->start, 0);
     mrlb->start[-1] = '/';
     if (mrlb->args[-1] != '/') {
       memcpy (mrlb->args, "/", 2);
@@ -212,7 +247,8 @@ static size_t _mrl_buf_resolve_dots (char *s, size_t len) {
 void mrl_buf_set (mrl_buf_t *mrlb, mrl_buf_t *base, const char *name) {
   size_t size;
   char prot[16], save;
-  uint8_t *scan_args, *p;
+  char *scan_args;
+  uint8_t *p;
   uint32_t plen;
 
   if (!name)
@@ -220,7 +256,7 @@ void mrl_buf_set (mrl_buf_t *mrlb, mrl_buf_t *base, const char *name) {
   if (!name[0])
     return;
 
-  size = strlen (name);
+  size = _find_byte (name, 0);
   if ((int)size > mrlb->max - mrlb->start)
     size = mrlb->max - mrlb->start;
   memcpy (mrlb->start, name, size + 1);
@@ -257,20 +293,18 @@ void mrl_buf_set (mrl_buf_t *mrlb, mrl_buf_t *base, const char *name) {
   if (!plen && !(base && !mrl_buf_is_file (base))) {
     mrlb->start[-1] = '/';
     for (p = (uint8_t *)mrlb->end; p[-1] != '/'; p--) ;
-    scan_args = p;
+    scan_args = (char *)p;
   } else {
-    scan_args = (uint8_t *)mrlb->root;
+    scan_args = mrlb->root;
   }
   /* extra info */
   mrlb->end[0] = '#';
-  for (p = scan_args; p[0] != '#'; p++) ;
-  mrlb->info = (char *)p;
+  mrlb->info = scan_args + _find_byte (scan_args, '#');
   mrlb->end[0] = 0;
   /* args */
   save = mrlb->info[0];
   mrlb->info[0] = '?';
-  for (p = scan_args; p[0] != '?'; p++) ;
-  mrlb->args = (char *)p;
+  mrlb->args = scan_args + _find_byte (scan_args, '?');
   mrlb->info[0] = save;
   /* file:// */
   if ((plen == 4) && !memcmp (prot, "file", 4)) {
@@ -763,10 +797,9 @@ typedef struct {
   char *buf1, *buf2, ext[8], **lines;
   mrl_buf_t base;
   const char *type;
-  size_t size, num_lines, num_words, num_entries;
+  size_t size, num_lines, num_entries;
   mediamark_t **mmk;
   uint32_t have, used;
-  char fnbuf[2048];
 } _lf_t;
 
 static void _lf_add (_lf_t *lf, int index, const mediamark_t *mmk) {
@@ -802,9 +835,8 @@ static void _lf_add2 (_lf_t *lf, mediamark_t *mmk) {
   
 static _lf_t *_lf_new (size_t size) {
   _lf_t *lf;
-  uint32_t *w;
-  size_t num_words = (size + 4) & ~3;
-  char *m = malloc (sizeof (*lf) + 2 * num_words);
+  size_t need = (size + 4 + 1 + 4 + 3) & ~3;
+  char *m = malloc (sizeof (*lf) + 2 * need);
 
   if (!m) {
     fprintf(stderr, "%s(): malloc() failed.\n", __XINE_FUNCTION__);
@@ -818,15 +850,13 @@ static _lf_t *_lf_new (size_t size) {
   lf->num_entries = 0;
   lf->lines = NULL;
   lf->size = size;
-  lf->num_words = num_words >> 2;
   m += sizeof (*lf);
-  lf->buf1 = m;
-  w = (uint32_t *)m;
-  w[lf->num_words - 1] = 0;
-  m += num_words;
-  lf->buf2 = m;
-  w = (uint32_t *)m;
-  w[lf->num_words - 1] = 0;
+  memset (m, 0, 4);
+  lf->buf1 = m + 4;
+  m += need;
+  memset (m - 4, 0, 8);
+  lf->buf2 = m + 4;
+  memset (m + need - 4, 0, 4);
   lf->mmk = NULL;
   lf->have = 0;
   lf->used = 0;
@@ -841,65 +871,42 @@ static char *_lf_dup (_lf_t *lf) {
 }
 
 static int _lf_split_lines (_lf_t *lf) {
+  char *line, *nextline;
+  uint32_t have, used;
+
   if (lf->lines)
     return lf->num_lines;
 
-  {
-    uint32_t *w = (uint32_t *)lf->buf2;
-    size_t n1 = lf->num_words;
+  have = used = 0;
+  memcpy (lf->buf2, lf->buf1, lf->size);
+  lf->buf2[-1] = 0;
+  lf->buf2[lf->size] = '\n';
+  for (line = lf->buf2; line < lf->buf2 + lf->size; line = nextline) {
+    char *lend;
 
-    memcpy (lf->buf2, lf->buf1, lf->num_words << 2);
-    lf->num_lines = 0;
-    while (n1) {
-      uint32_t v = 0;
-      size_t n2 = n1 > 255 ? 255 : n1;
+    if (used + 3 > have) {
+      char **n = realloc (lf->lines, (have + 128) * sizeof (*n));
 
-      n1 -= n2;
-      lf->num_lines += 4 * n2;
-      while (n2) {
-        uint32_t t = *w++;
-
-        t ^= 0x0a0a0a0a;
-        t |= t >> 4;
-        t |= t >> 2;
-        t |= t >> 1;
-        t &= 0x01010101;
-        v += t;
-        n2 -= 1;
-      }
-      lf->num_lines -= (v & 255) + ((v >> 8) & 255) + ((v >> 16) & 255) + (v >> 24);
-    }
-  }
-  if (lf->size && (lf->buf2[lf->size - 1] != '\n'))
-    lf->num_lines += 1;
-
-  lf->lines = malloc ((lf->num_lines + 1) * sizeof (*lf->lines));
-  if (lf->lines) {
-    char **lb = lf->lines, *p1 = lf->buf2;
-
-    while (1) {
-      char *p2 = strchr (p1, '\n');
-
-      if (!p2)
+      if (!n)
         break;
-      *lb++ = p1;
-      p2[0] = 0;
-      if ((p2 > p1) && (p2[-1] == '\r'))
-        p2[-1] = 0;
-      p1 = p2 + 1;
+      lf->lines = n;
+      have += 128;
     }
-    {
-      char *p2 = lf->buf2 + lf->size;
-
-      if ((p2 > p1) && (p2[-1] == '\r'))
-        *--p2 = 0;
-      if (p1 < p2)
-        *lb++ = p1;
-    }
-    *lb = NULL;
-    return lf->num_lines;
+    lend = line + _find_byte (line, '\n');
+    nextline = lend + 1;
+    lend[0] = 0;
+    if (lend[-1] == '\r')
+      *--lend = 0;
+    if (lend > line)
+      lf->lines[used++] = line;
   }
-  return 0;
+  line[0] = 0;
+  if (lf->lines) {
+    lf->lines[used] = line;
+    lf->lines[used + 1] = NULL;
+  }
+  lf->num_lines = used;
+  return used;
 }
 
 static void _lf_delete (_lf_t *lf) {
@@ -1053,16 +1060,17 @@ static void guess_pls_playlist (_lf_t *lf) {
       int   found_nument  = 0;
       int   stored_nument = 0;
       int   pl_line       = 0;
-      int   linen         = 0;
+      uint32_t linen      = 0;
       int   count         = 0;
-      const char *ln;
       mrl_buf_t mrl1, mrl2;
       mediamark_t m = { .end = -1 };
 
       mrl_buf_init (&mrl1);
       mrl_buf_init (&mrl2);
       do {
-        while ((ln = lf->lines[linen++]) != NULL) {
+        while (linen < lf->num_lines) {
+          const char *ln = lf->lines[linen++];
+
           if (valid_pls) {
             if (entries_pls) {
               int entry;
@@ -1126,14 +1134,15 @@ static void guess_m3u_playlist (_lf_t *lf) {
     int   valid_m3u   = 0;
     int   entries_m3u = 0;
     char *title       = NULL;
-    int   linen = 0;
-    const char *ln;
+    uint32_t linen    = 0;
     mrl_buf_t mrl1, mrl2;
     mediamark_t m = { .end = -1 };
 
     mrl_buf_init (&mrl1);
     mrl_buf_init (&mrl2);
-    while ((ln = lf->lines[linen++]) != NULL) {
+    while (linen < lf->num_lines) {
+      const char *ln = lf->lines[linen++];
+
       if (valid_m3u) {
         if (!strncmp (ln, "#EXTINF", 7)) {
           char *ptitle;
@@ -1170,19 +1179,20 @@ static void guess_sfv_playlist (_lf_t *lf) {
     if (_lf_split_lines (lf)) {
       int    valid_sfv = 0;
       int    entries_sfv = 0;
-      int    linen = 0;
-      char  *ln;
+      uint32_t linen = 0;
       mrl_buf_t mrl1, mrl2;
       mediamark_t m = { .end = -1 };
 
       mrl_buf_init (&mrl1);
       mrl_buf_init (&mrl2);
-      while ((ln = lf->lines[linen++]) != NULL) {
+      while (linen < lf->num_lines) {
+        char  *ln = lf->lines[linen++];
+
         if (valid_sfv) {
-          if (strncmp (ln, ";", 1)) {
+          if (ln[0] != ';') {
             if (ln[0]) {
               long long int crc = 0;
-              char *p = ln + strlen (ln) - 1, *q = NULL;
+              char *p = lf->lines[linen] - 2, *q = NULL;
 
               while ((p > ln) && (*p != ' '))
                 p--;
@@ -1209,7 +1219,7 @@ static void guess_sfv_playlist (_lf_t *lf) {
                 *q = ' ';
             }
           }
-        } else if (strlen(ln) > 1) {
+        } else if (ln[0] && ln[1]) {
           long int   size;
           int        h, m, s;
           int        Y, M, D;
@@ -1232,14 +1242,15 @@ static void guess_sfv_playlist (_lf_t *lf) {
 static void guess_raw_playlist (_lf_t *lf) {
   if (_lf_split_lines (lf)) {
     int   entries_raw = 0;
-    int   linen = 0;
-    const char *ln;
+    uint32_t linen = 0;
     mrl_buf_t mrl1, mrl2;
     mediamark_t m = { .end = -1 };
 
     mrl_buf_init (&mrl1);
     mrl_buf_init (&mrl2);
-    while ((ln = lf->lines[linen++]) != NULL) {
+    while (linen < lf->num_lines) {
+      const char *ln = lf->lines[linen++];
+
       if ((strncmp (ln, ";", 1)) && (strncmp (ln, "#", 1))) {
         mrl_buf_set (&mrl1, &lf->base, ln);
         mrl_buf_merge (&mrl2, &lf->base, &mrl2);
@@ -1387,159 +1398,126 @@ static void guess_toxine_playlist (_lf_t *lf) {
  * XML based playlists
  */
 static void xml_asx_playlist (_lf_t *lf, xml_node_t *xml_tree) {
-  if(xml_tree) {
-    xml_node_t      *asx_entry, *asx_ref;
+  int entries_asx = 0;
+
+  if (!strcasecmp (xml_tree->name, "ASX")) {
+    mediamark_t m = { .end = -1 };
     xml_property_t  *asx_prop;
-    int              entries_asx = 0;
+    int version_ok = 0;
 
-    if(!strcasecmp(xml_tree->name, "ASX")) {
-      mediamark_t m = { .end = -1 };
+    for (asx_prop = xml_tree->props; asx_prop && strcasecmp (asx_prop->name, "VERSION"); asx_prop = asx_prop->next) ;
+    if (asx_prop) {
+      int  version_major, version_minor = 0;
 
-      asx_prop = xml_tree->props;
-
-      while((asx_prop) && (strcasecmp(asx_prop->name, "VERSION")))
-	asx_prop = asx_prop->next;
-
-      if(asx_prop) {
-	int  version_major, version_minor = 0;
-
-	if((((sscanf(asx_prop->value, "%d.%d", &version_major, &version_minor)) == 2) ||
-	    ((sscanf(asx_prop->value, "%d", &version_major)) == 1)) &&
-	   ((version_major == 3) && (version_minor == 0))) {
-
-	__parse_anyway:
-	  asx_entry = xml_tree->child;
-	  while(asx_entry) {
-	    if((!strcasecmp(asx_entry->name, "ENTRY")) ||
-	       (!strcasecmp(asx_entry->name, "ENTRYREF"))) {
-	      char *title  = NULL;
-	      char *href   = NULL;
-	      char *author = NULL;
-	      char *sub    = NULL;
-
-	      asx_ref = asx_entry->child;
-	      while(asx_ref) {
-
-		if(!strcasecmp(asx_ref->name, "TITLE")) {
-
-		  if(!title)
-		    title = asx_ref->data;
-
-		}
-		else if(!strcasecmp(asx_ref->name, "AUTHOR")) {
-
-		  if(!author)
-		    author = asx_ref->data;
-
-		}
-		else if(!strcasecmp(asx_ref->name, "REF")) {
-
-		  for(asx_prop = asx_ref->props; asx_prop; asx_prop = asx_prop->next) {
-
-		    if(!strcasecmp(asx_prop->name, "HREF")) {
-
-		      if(!href)
-			href = asx_prop->value;
-		    }
-		    /* This is not part of the ASX specs */
-		    else if(!strcasecmp(asx_prop->name, "SUBTITLE")) {
-
-		      if(!sub)
-			sub = asx_prop->value;
-		    }
-
-		    if(href && sub)
-		      break;
-		  }
-		}
-
-		asx_ref = asx_ref->next;
-	      }
-
-              if (href && href[0]) {
-                char *atitle     = NULL;
-                char *aauthor    = NULL;
-                char *real_title = NULL;
-                int   len        = 0;
-
-                if (title && title[0]) {
-                  atitle = strdup (title);
-                  len = str_unquote (atitle);
-
-                  if (author && author[0]) {
-                    aauthor = strdup (author);
-                    len += str_unquote (aauthor) + 3;
-		  }
-
-		  len++;
-		}
-
-		if(atitle && strlen(atitle)) {
-		  real_title = (char *) malloc(len);
-		  strcpy(real_title, atitle);
-
-		  if(aauthor && strlen(aauthor))
-		    snprintf(real_title+strlen(real_title), len-strlen(real_title), " (%s)", aauthor);
-		}
-
-                m.mrl = href;
-                m.ident = real_title;
-                m.sub = sub;
-                _lf_add (lf, entries_asx, &m);
-		lf->num_entries = ++entries_asx;
-
-		SAFE_FREE(real_title);
-                SAFE_FREE (atitle);
-                SAFE_FREE (aauthor);
-	      }
-
-	      href = title = author = NULL;
-	    }
-	    asx_entry = asx_entry->next;
-	  }
-	}
-	else
-	  fprintf(stderr, "%s(): Wrong ASX version: %s\n", __XINE_FUNCTION__, asx_prop->value);
-
+      if ((((sscanf (asx_prop->value, "%d.%d", &version_major, &version_minor)) == 2) ||
+        ((sscanf (asx_prop->value, "%d", &version_major)) == 1)) &&
+        ((version_major == 3) && (version_minor == 0))) {
+        version_ok = 1;
+      } else {
+        fprintf (stderr, "%s(): Wrong ASX version: %s\n", __XINE_FUNCTION__, asx_prop->value);
       }
-      else {
-	fprintf(stderr, "%s(): Unable to find VERSION tag.\n", __XINE_FUNCTION__);
-	fprintf(stderr, "%s(): last chance: try to parse it anyway\n", __XINE_FUNCTION__);
-	goto __parse_anyway;
-      }
-
+    } else {
+      fprintf (stderr, "%s(): Unable to find VERSION tag.\n", __XINE_FUNCTION__);
+      fprintf (stderr, "%s(): last chance: try to parse it anyway\n", __XINE_FUNCTION__);
+      version_ok = 2;
     }
+
+    if (version_ok) {
+      xml_node_t *asx_entry;
+
+      for (asx_entry = xml_tree->child; asx_entry; asx_entry = asx_entry->next) {
+        if (!strcasecmp (asx_entry->name, "ENTRY") ||
+          !strcasecmp (asx_entry->name, "ENTRYREF")) {
+          char *title = NULL, *href = NULL, *author = NULL, *sub = NULL;
+          char *atitle = NULL, *aauthor = NULL, *real_title = NULL;
+          xml_node_t *asx_ref;
+          int len = 0;
+
+          for (asx_ref = asx_entry->child; asx_ref; asx_ref = asx_ref->next) {
+            if (!strcasecmp (asx_ref->name, "TITLE")) {
+              if (!title)
+                title = asx_ref->data;
+            } else if (!strcasecmp (asx_ref->name, "AUTHOR")) {
+              if (!author)
+                author = asx_ref->data;
+            } else if (!strcasecmp (asx_ref->name, "REF")) {
+              for (asx_prop = asx_ref->props; asx_prop; asx_prop = asx_prop->next) {
+                if (!strcasecmp (asx_prop->name, "HREF")) {
+                  if (!href) {
+                    href = asx_prop->value;
+                  } else if (!strcasecmp (asx_prop->name, "SUBTITLE")) {
+                    /* This is not part of the ASX specs */
+                    if (!sub)
+                      sub = asx_prop->value;
+                  }
+                  if (href && sub)
+                    break;
+                }
+              }
+            }
+          }
+          if (href && href[0]) {
+            if (title && title[0]) {
+              atitle = strdup (title);
+              len = str_unquote (atitle);
+            }
+            if (author && author[0]) {
+              aauthor = strdup (author);
+              len += str_unquote (aauthor) + 3;
+            }
+            len++;
+          }
+          if (atitle && atitle[0]) {
+            real_title = malloc (len);
+            strcpy (real_title, atitle);
+            if (aauthor && aauthor[0]) {
+              int rtl = _find_byte (real_title, 0);
+
+              snprintf (real_title + rtl, len - rtl, " (%s)", aauthor);
+            }
+          }
+          m.mrl = href;
+          m.ident = real_title;
+          m.sub = sub;
+          _lf_add (lf, entries_asx, &m);
+          lf->num_entries = ++entries_asx;
+          SAFE_FREE (real_title);
+          SAFE_FREE (atitle);
+          SAFE_FREE (aauthor);
+        }
+      }
+    }
+  }
 #ifdef DEBUG
-    else
-      fprintf(stderr, "%s(): Unsupported XML type: '%s'.\n", __XINE_FUNCTION__, xml_tree->name);
+  else
+    fprintf (stderr, "%s(): Unsupported XML type: '%s'.\n", __XINE_FUNCTION__, xml_tree->name);
 #endif
 
-    /* Maybe it's 'ASF <url> */
-    if (entries_asx == 0) {
-      if (_lf_split_lines (lf)) {
-        int    linen = 0;
-        const char *ln;
-        mediamark_t m = { .end = -1 };
+  /* Maybe it's 'ASF <url> */
+  if (entries_asx == 0) {
+    if (_lf_split_lines (lf)) {
+      uint32_t linen = 0;
+      mediamark_t m = { .end = -1 };
 
-        while ((ln = lf->lines[linen++]) != NULL) {
-          if (!strncasecmp ("ASF", ln, 3)) {
-            const char *p = ln + 3;
+      while (linen < lf->num_lines) {
+        const char *ln = lf->lines[linen++];
 
-            while (p && ((*p == ' ') || (*p == '\t')))
-              p++;
-            if (p && p[0]) {
-              m.mrl = (char *)p; /** << will not be written to. */
-              _lf_add (lf, entries_asx, &m);
-              lf->num_entries = ++entries_asx;
-            }
+        if (!strncasecmp ("ASF", ln, 3)) {
+          const char *p = ln + 3;
+
+          while ((*p == ' ') || (*p == '\t'))
+            p++;
+          if (p[0]) {
+            m.mrl = (char *)p; /** << will not be written to. */
+            _lf_add (lf, entries_asx, &m);
+            lf->num_entries = ++entries_asx;
           }
         }
       }
     }
-    if (entries_asx) {
-      lf->type = "ASX3";
-    }
   }
+  if (entries_asx)
+    lf->type = "ASX3";
 }
 
 static void __gx_get_entries (_lf_t *lf, int *entries, xml_node_t *entry) {
@@ -1582,10 +1560,8 @@ static void __gx_get_entries (_lf_t *lf, int *entries, xml_node_t *entry) {
 
 	  for(prop = ref->props; prop; prop = prop->next) {
 	    if(!strcasecmp(prop->name, "START")) {
-
-	      if(prop->value && strlen(prop->value))
-		start = atoi(prop->value);
-
+              if (prop->value && prop->value[0])
+                start = atoi (prop->value);
 	    }
 	  }
 	}
@@ -1593,7 +1569,7 @@ static void __gx_get_entries (_lf_t *lf, int *entries, xml_node_t *entry) {
 	ref = ref->next;
       }
 
-      if(href && strlen(href)) {
+      if (href && href[0]) {
 	char *atitle = NULL;
 
         if (title && title[0]) {
@@ -1618,141 +1594,106 @@ static void __gx_get_entries (_lf_t *lf, int *entries, xml_node_t *entry) {
   }
 }
 static void xml_gx_playlist (_lf_t *lf, xml_node_t *xml_tree) {
-  if(xml_tree) {
-    xml_node_t      *gx_entry;
-    xml_property_t  *gx_prop;
-    int              entries_gx = 0;
+  int              entries_gx = 0;
 
-    if(!strcasecmp(xml_tree->name, "GXINEMM")) {
+  if (!strcasecmp (xml_tree->name, "GXINEMM")) {
+    xml_property_t *gx_prop;
 
-      gx_prop = xml_tree->props;
+    for (gx_prop = xml_tree->props; gx_prop && strcasecmp (gx_prop->name, "VERSION"); gx_prop = gx_prop->next) ;
+    if (gx_prop) {
+      int  version_major;
 
-      while((gx_prop) && (strcasecmp(gx_prop->name, "VERSION")))
-	gx_prop = gx_prop->next;
+      if (((sscanf (gx_prop->value, "%d", &version_major)) == 1) && (version_major == 1)) {
+        xml_node_t *gx_entry;
 
-      if(gx_prop) {
-	int  version_major;
-
-	if(((sscanf(gx_prop->value, "%d", &version_major)) == 1) && (version_major == 1)) {
-
-	  gx_entry = xml_tree->child;
-	  while(gx_entry) {
-
-	    if(!strcasecmp(gx_entry->name, "SUB")) {
-	      __gx_get_entries (lf, &entries_gx, gx_entry->child);
-	    }
-	    else if(!strcasecmp(gx_entry->name, "ENTRY"))
-	      __gx_get_entries (lf, &entries_gx, gx_entry);
-
-	    gx_entry = gx_entry->next;
-	  }
-	}
-	else
-	  fprintf(stderr, "%s(): Wrong GXINEMM version: %s\n", __XINE_FUNCTION__, gx_prop->value);
+        for (gx_entry = xml_tree->child; gx_entry; gx_entry = gx_entry->next) {
+          if (!strcasecmp (gx_entry->name, "SUB")) {
+            __gx_get_entries (lf, &entries_gx, gx_entry->child);
+          } else if (!strcasecmp (gx_entry->name, "ENTRY")) {
+            __gx_get_entries (lf, &entries_gx, gx_entry);
+          }
+        }
+      } else {
+        fprintf (stderr, "%s(): Wrong GXINEMM version: %s\n", __XINE_FUNCTION__, gx_prop->value);
       }
-      else
-	fprintf(stderr, "%s(): Unable to find VERSION tag.\n", __XINE_FUNCTION__);
-    }
-#ifdef DEBUG
-    else
-      fprintf(stderr, "%s(): Unsupported XML type: '%s'.\n", __XINE_FUNCTION__, xml_tree->name);
-#endif
-
-    if(entries_gx) {
-      lf->type = "GXMM";
+    } else {
+      fprintf (stderr, "%s(): Unable to find VERSION tag.\n", __XINE_FUNCTION__);
     }
   }
+#ifdef DEBUG
+  else
+    fprintf (stderr, "%s(): Unsupported XML type: '%s'.\n", __XINE_FUNCTION__, xml_tree->name);
+#endif
+  if (entries_gx)
+    lf->type = "GXMM";
 }
 
 static void xml_noatun_playlist (_lf_t *lf, xml_node_t *xml_tree) {
-  if(xml_tree) {
-    xml_node_t      *noa_entry;
-    xml_property_t  *noa_prop;
-    int              entries_noa = 0;
+  int              entries_noa = 0;
 
-    if(!strcasecmp(xml_tree->name, "PLAYLIST")) {
-      int found = 0;
-      mediamark_t m = { .end = -1 };
+  if (!strcasecmp (xml_tree->name, "PLAYLIST")) {
+    mediamark_t m = { .end = -1 };
+    xml_property_t *noa_prop;
+    int found = 0;
 
-      noa_prop = xml_tree->props;
+    for (noa_prop = xml_tree->props; noa_prop; noa_prop = noa_prop->next) {
+      if (!strcasecmp (noa_prop->name, "CLIENT") && strcasecmp (noa_prop->value, "NOATUN")) {
+        found++;
+      } else if (!strcasecmp (noa_prop->name, "VERSION")) {
+        int  version_major;
 
-      while(noa_prop) {
-	if((!strcasecmp(noa_prop->name, "CLIENT")) && (!strcasecmp(noa_prop->value, "NOATUN")))
-	  found++;
-	else if(!strcasecmp(noa_prop->name, "VERSION")) {
-	  int  version_major;
-
-	  if(((sscanf(noa_prop->value, "%d", &version_major)) == 1) && (version_major == 1))
-	    found++;
-	}
-
-	noa_prop = noa_prop->next;
-      }
-
-      if(found >= 2) {
-	noa_entry = xml_tree->child;
-
-	while(noa_entry) {
-
-	  if(!strcasecmp(noa_entry->name, "ITEM")) {
-	    char *real_title = NULL;
-	    char *title      = NULL;
-	    char *album      = NULL;
-	    char *artist     = NULL;
-	    char *url        = NULL;
-
-	    for(noa_prop = noa_entry->props; noa_prop; noa_prop = noa_prop->next) {
-	      if(!strcasecmp(noa_prop->name, "TITLE"))
-		title = noa_prop->value;
-	      else if(!strcasecmp(noa_prop->name, "ALBUM"))
-		album = noa_prop->value;
-	      else if(!strcasecmp(noa_prop->name, "ARTIST"))
-		artist = noa_prop->value;
-	      else if(!strcasecmp(noa_prop->name, "URL"))
-		url = noa_prop->value;
-	    }
-
-	    if(url) {
-	      /*
-		title (artist - album)
-	      */
-              if(title && title[0]) {
-                if(artist && artist[0] && album && album[0]) {
-                  real_title = xitk_asprintf("%s (%s - %s)", title, artist, album);
-                }
-                else if(artist && artist[0]) {
-                  real_title = xitk_asprintf("%s (%s)", title, artist);
-                }
-                else if(album && album[0]) {
-                  real_title = xitk_asprintf("%s (%s)", title, album);
-                }
-                else
-                  real_title = strdup(title);
-	      }
-
-              m.mrl = url;
-              m.ident = real_title;
-              _lf_add (lf, entries_noa, &m);
-              lf->num_entries = ++entries_noa;
-
-	      free(real_title);
-
-	    }
-	  }
-
-	  noa_entry = noa_entry->next;
-	}
+        if (((sscanf (noa_prop->value, "%d", &version_major)) == 1) && (version_major == 1))
+          found++;
       }
     }
-#ifdef DEBUG
-    else
-      fprintf(stderr, "%s(): Unsupported XML type: '%s'.\n", __XINE_FUNCTION__, xml_tree->name);
-#endif
 
-    if(entries_noa) {
-      lf->type = "NOATUN";
+    if (found >= 2) {
+      xml_node_t *noa_entry;
+
+      for (noa_entry = xml_tree->child; noa_entry; noa_entry = noa_entry->next) {
+        if (!strcasecmp (noa_entry->name, "ITEM")) {
+          char *title = NULL, *album = NULL, *artist = NULL, *url = NULL;
+
+          for (noa_prop = noa_entry->props; noa_prop; noa_prop = noa_prop->next) {
+            if (!strcasecmp (noa_prop->name, "TITLE"))
+              title = noa_prop->value;
+            else if (!strcasecmp (noa_prop->name, "ALBUM"))
+              album = noa_prop->value;
+            else if (!strcasecmp (noa_prop->name, "ARTIST"))
+              artist = noa_prop->value;
+            else if (!strcasecmp (noa_prop->name, "URL"))
+              url = noa_prop->value;
+          }
+          if (url) {
+            char *real_title = NULL;
+            /* title (artist - album) */
+            if (title && title[0]) {
+              if (artist && artist[0] && album && album[0]) {
+                real_title = xitk_asprintf ("%s (%s - %s)", title, artist, album);
+              } else if (artist && artist[0]) {
+                real_title = xitk_asprintf ("%s (%s)", title, artist);
+              } else if (album && album[0]) {
+                real_title = xitk_asprintf ("%s (%s)", title, album);
+              } else {
+                real_title = strdup (title);
+              }
+            }
+            m.mrl = url;
+            m.ident = real_title;
+            _lf_add (lf, entries_noa, &m);
+            lf->num_entries = ++entries_noa;
+            free (real_title);
+          }
+        }
+      }
     }
   }
+#ifdef DEBUG
+  else
+    fprintf (stderr, "%s(): Unsupported XML type: '%s'.\n", __XINE_FUNCTION__, xml_tree->name);
+#endif
+  if (entries_noa)
+    lf->type = "NOATUN";
 }
 
 /*
@@ -2112,7 +2053,7 @@ static void smil_properties(smil_t *smil, smil_node_t **snode,
 	if(sprop && sprop->anchor)
 	  (*snode)->mmk->mrl = strdup(sprop->anchor);
 	else {
-          size_t l1 = smil->base ? strlen (smil->base) : 0, l2 = strlen (prop->value) + 1;
+            size_t l1 = smil->base ? _find_byte (smil->base, 0) : 0, l2 = _find_byte (prop->value, 0) + 1;
           char *p = malloc (l1 + l2 + 1);
           (*snode)->mmk->mrl = p;
           if (p) {
@@ -2657,96 +2598,71 @@ static void xml_smil_playlist (_lf_t *lf, xml_node_t *xml_tree) {
  */
 
 static void xml_freevo_playlist (_lf_t *lf, xml_node_t *xml_tree) {
-  if(xml_tree) {
-    xml_node_t      *fvo_entry;
-    xml_property_t  *fvo_prop;
-    int              entries_fvo = 0;
+  int entries_fvo = 0;
 
-    if(!strcasecmp(xml_tree->name, "FREEVO")) {
-      char *url    = NULL;
-      char *sub    = NULL;
-      char *title  = NULL;
-      mrl_buf_t mrl1, mrl2, mrls;
-      mediamark_t m = { .end = -1 };
+  if (!strcasecmp (xml_tree->name, "FREEVO")) {
+    mrl_buf_t mrl1, mrl2, mrls;
+    mediamark_t m = { .end = -1 };
+    xml_node_t *fvo_entry;
 
-      mrl_buf_init (&mrl1);
-      mrl_buf_init (&mrl2);
-      mrl_buf_init (&mrls);
+    mrl_buf_init (&mrl1);
+    mrl_buf_init (&mrl2);
+    mrl_buf_init (&mrls);
 
-      fvo_entry = xml_tree->child;
+    for (fvo_entry = xml_tree->child; fvo_entry; fvo_entry = fvo_entry->next) {
+      if (!strcasecmp (fvo_entry->name, "MOVIE")) {
+        char *url = NULL, *sub = NULL, *title = NULL;
+        xml_node_t *sentry;
+        xml_property_t *fvo_prop;
 
-      while(fvo_entry) {
-	if(!strcasecmp(fvo_entry->name, "MOVIE")) {
-	  xml_node_t *sentry;
+        for (fvo_prop = fvo_entry->props; fvo_prop; fvo_prop = fvo_prop->next) {
+          if (!strcasecmp (fvo_prop->name, "TITLE"))
+            title = fvo_prop->value;
+        }
+        for (sentry = fvo_entry->child; sentry; sentry = sentry->next) {
+          if ((!strcasecmp (sentry->name, "VIDEO")) || (!strcasecmp (sentry->name, "AUDIO"))) {
+            xml_node_t *ssentry;
 
-	  for(fvo_prop = fvo_entry->props; fvo_prop; fvo_prop = fvo_prop->next) {
-	    if(!strcasecmp(fvo_prop->name, "TITLE")) {
-	      title = fvo_prop->value;
-	    }
-	  }
-
-	  sentry = fvo_entry->child;
-	  while(sentry) {
-
-	    if((!strcasecmp(sentry->name, "VIDEO")) || (!strcasecmp(sentry->name, "AUDIO"))) {
-	      xml_node_t *ssentry = sentry->child;
-
-	      while(ssentry) {
-
-		if(!strcasecmp(ssentry->name, "SUBTITLE")) {
-                  mrl_buf_set (&mrl1, &lf->base, ssentry->data);
-                  mrl_buf_merge (&mrls, &lf->base, &mrl1);
-                  sub = mrls.start;
-		}
-                else if (!strcasecmp (ssentry->name, "URL") || !strcasecmp (ssentry->name, "DVD") ||
-                  !strcasecmp (ssentry->name, "VCD") || !strcasecmp (ssentry->name, "FILE")) {
-                  mrl_buf_set (&mrl1, &lf->base, ssentry->data);
-                  mrl_buf_merge (&mrl2, &lf->base, &mrl1);
-                  url = mrl2.start;
-                }
-		ssentry = ssentry->next;
-	      }
-
-              if (url) {
-                m.mrl = url;
-                m.ident = _mrl_buf_title (&mrl2, title);
-                m.sub = sub;
-                _lf_add (lf, entries_fvo, &m);
-                lf->num_entries = ++entries_fvo;
-                url = NULL;
+            for (ssentry = sentry->child; ssentry; ssentry = ssentry->next) {
+              if (!strcasecmp (ssentry->name, "SUBTITLE")) {
+                mrl_buf_set (&mrl1, &lf->base, ssentry->data);
+                mrl_buf_merge (&mrls, &lf->base, &mrl1);
+                sub = mrls.start;
+              } else if (!strcasecmp (ssentry->name, "URL") || !strcasecmp (ssentry->name, "DVD") ||
+                !strcasecmp (ssentry->name, "VCD") || !strcasecmp (ssentry->name, "FILE")) {
+                mrl_buf_set (&mrl1, &lf->base, ssentry->data);
+                mrl_buf_merge (&mrl2, &lf->base, &mrl1);
+                url = mrl2.start;
               }
-              sub = NULL;
-
-	    }
-
-	    sentry = sentry->next;
-	  }
-
-	}
-
-	title     = NULL;
-	fvo_entry = fvo_entry->next;
+            }
+            if (url) {
+              m.mrl = url;
+              m.ident = _mrl_buf_title (&mrl2, title);
+              m.sub = sub;
+              _lf_add (lf, entries_fvo, &m);
+              lf->num_entries = ++entries_fvo;
+              url = NULL;
+            }
+            sub = NULL;
+          }
+        }
+        title = NULL;
       }
     }
-#ifdef DEBUG
-    else
-      fprintf(stderr, "%s(): Unsupported XML type: '%s'.\n", __XINE_FUNCTION__, xml_tree->name);
-#endif
-
-    if(entries_fvo) {
-      lf->type = "FREEVO";
-    }
   }
+#ifdef DEBUG
+  else
+    fprintf (stderr, "%s(): Unsupported XML type: '%s'.\n", __XINE_FUNCTION__, xml_tree->name);
+#endif
+  if (entries_fvo)
+    lf->type = "FREEVO";
 }
 
 static void guess_xml_based_playlist (_lf_t *lf) {
   char            *xml_content;
-  int              result;
-  xml_node_t      *xml_tree, *top_xml_tree;
 
   if ((xml_content = _lf_dup (lf)) != NULL) {
-    int                         i;
-    playlist_xml_guess_func_t guess_functions[] = {
+    static const playlist_xml_guess_func_t guess_functions[] = {
       xml_asx_playlist,
       xml_gx_playlist,
       xml_noatun_playlist,
@@ -2754,22 +2670,19 @@ static void guess_xml_based_playlist (_lf_t *lf) {
       xml_freevo_playlist,
       NULL
     };
+    xml_node_t *xml_tree = NULL;
 
     xml_parser_init_R (xml_parser_t *xml, xml_content, lf->size, XML_PARSER_CASE_INSENSITIVE);
-    if ((result = xml_parser_build_tree_R (xml, &xml_tree)) != XML_PARSER_OK)
-      goto __failure;
-
-    top_xml_tree = xml_tree;
-
-    /* Check all playlists */
-    for (i = 0; guess_functions[i]; i++) {
-      guess_functions[i] (lf, xml_tree);
-      if (lf->type)
-        break;
+    if ((xml_parser_build_tree_R (xml, &xml_tree) == XML_PARSER_OK) && xml_tree) {
+      int i;
+      /* Check all playlists */
+      for (i = 0; guess_functions[i]; i++) {
+        guess_functions[i] (lf, xml_tree);
+        if (lf->type[0])
+          break;
+      }
+      xml_parser_free_tree (xml_tree);
     }
-
-    xml_parser_free_tree (top_xml_tree);
-    __failure:
     xml_parser_finalize_R (xml);
   }
 }
@@ -2849,7 +2762,7 @@ int gui_playlist_insert (gGui_t *gui, int index, const char *mrl, const char *id
       if((ending = strrchr(autosub, '.')))
 	ending++;
       else {
-	ending = autosub + strlen(autosub);
+	ending = autosub + _find_byte (autosub, 0);
 	*ending++ = '.';
       }
 
@@ -2858,7 +2771,7 @@ int gui_playlist_insert (gGui_t *gui, int index, const char *mrl, const char *id
       pvsubs = vsubs;
       while((ext = xine_strsep(&pvsubs, ",")) && !sub) {
 	strcpy(ending, ext);
-	*(ending + strlen(ext) + 1) = '\0';
+	*(ending + _find_byte (ext, 0) + 1) = '\0';
 
 	if(((stat(autosub, &pstat)) > -1) && (S_ISREG(pstat.st_mode)) && strcmp(autosub, _mrl))
 	  sub = autosub;
@@ -2881,7 +2794,7 @@ int gui_playlist_insert (gGui_t *gui, int index, const char *mrl, const char *id
 
         if((dir = opendir(path))) {
           while((dentry = readdir(dir))) {
-            if( (strncmp(dentry->d_name, d_name, strlen(d_name)) == 0) &&
+            if( (strncmp(dentry->d_name, d_name, _find_byte (d_name, 0)) == 0) &&
                 (ending = strrchr(dentry->d_name, '.')) ) {
 
               if( strstr(know_subs, ending+1) ) {
@@ -3128,7 +3041,7 @@ static void _gui_playlist_add_lf (gGui_t *gui, _lf_t *lf) {
         char *start = lf->mmk[i]->mrl;
         if (start[0] == '/') {
           char *lastpart;
-          for (lastpart = start + strlen (start); lastpart[-1] != '/'; lastpart--) ;
+          for (lastpart = start + _find_byte (start, 0); lastpart[-1] != '/'; lastpart--) ;
           lf->mmk[i]->ident = strdup (lastpart);
         }
       }
@@ -3161,7 +3074,7 @@ int gui_playlist_add_file (gGui_t *gui, const char *filename) {
 
   for (i = 0; guess_functions[i]; i++) {
     guess_functions[i] (lf);
-    if (lf->type && lf->type[0])
+    if (lf->type[0])
       break;
   }
 
@@ -3207,7 +3120,7 @@ void gui_playlist_load (gGui_t *gui, const char *filename) {
 
   for (i = 0; guess_functions[i]; i++) {
     guess_functions[i] (lf);
-    if (lf->type && lf->type[0])
+    if (lf->type[0])
       break;
   }
 
@@ -3263,7 +3176,7 @@ void gui_playlist_save (gGui_t *gui, const char *filename) {
     char buffer[_PATH_MAX + _NAME_MAX + 2], current_dir[_PATH_MAX + 1];
 
     if (getcwd (current_dir, sizeof (current_dir))) {
-      size_t dl = strlen (current_dir);
+      size_t dl = _find_byte (current_dir, 0);
       if (dl && (current_dir[dl - 1] != '/'))
         strcpy (current_dir + dl, "/");
     } else
@@ -3811,7 +3724,7 @@ static void _mmkedit_select_sub (xitk_widget_t *w, void *data, int state) {
       path += 5;
 
     p = strrchr(open_path, '/');
-    if (p && strlen(p))
+    if (p && p[0])
       *p = '\0';
   }
   else
