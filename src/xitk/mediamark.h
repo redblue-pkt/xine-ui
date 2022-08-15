@@ -153,7 +153,7 @@ typedef struct {
 } mrl_buf_t;
 void mrl_buf_init (mrl_buf_t *mrlb);
 /** base here is just a hint for interpreting ? and #. can be NULL. */
-void mrl_buf_set (mrl_buf_t *mrlb, mrl_buf_t *base, const char *name);
+int mrl_buf_set (mrl_buf_t *mrlb, mrl_buf_t *base, const char *name);
 /** for security, this will drop info for network type base. */
 void mrl_buf_merge (mrl_buf_t *to, mrl_buf_t *base, mrl_buf_t *name);
 int mrl_buf_is_file (mrl_buf_t *mrlb);
