@@ -784,10 +784,11 @@ static void fb_callback_button_cb (xitk_widget_t *w, void *data, int state) {
 
 static void fb_dbl_select(xitk_widget_t *w, void *data, int selected, int modifier) {
   filebrowser_t *fb = (filebrowser_t *) data;
-  uint32_t l = strlen (fb->dir_list.array[selected]);
 
   (void)modifier;
   if (w == fb->w[_W_directories_browser]) {
+    uint32_t l = strlen (fb->dir_list.array[selected]);
+
     if (!memcmp (fb->dir_list.array[selected], "./", 3)) {
       /* Want to re-read current dir */
       ;
@@ -833,6 +834,8 @@ static void fb_dbl_select(xitk_widget_t *w, void *data, int selected, int modifi
     fb_update_origin(fb);
     fb_getdir(fb);
   } else if (w == fb->w[_W_files_browser]) {
+    uint32_t l = strlen (fb->file_list.array[selected]);
+
     if (fb->filestop + l < sizeof (fb->path)) {
       memcpy (fb->path + fb->filestart, fb->file_list.array[selected], l + 1);
       fb->filestop = fb->filestart + l;

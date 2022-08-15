@@ -183,6 +183,34 @@ static void _mrl_buf_working_dir (mrl_buf_t *mrlb) {
   }
 }
 
+static int _mrl_buf_mkdir_p (mrl_buf_t *path) {
+  struct stat sbuf;
+  char *p, save;
+
+  save = path->lastpart[0];
+  path->lastpart[0] = '/';
+  p = path->root;
+  if (p[0] == '/')
+    p++;
+  while (p < path->lastpart) {
+    p += _find_byte (p, '/');
+    p[0] = 0;
+    if (!stat (path->root, &sbuf)) {
+      if (!S_ISDIR (sbuf.st_mode)) {
+        p[0] = '/';
+        break;
+      }
+    } else if (mkdir (path->root, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH)) {
+      p[0] = '/';
+      break;
+    }
+    p[0] = '/';
+    p++;
+  }
+  path->lastpart[0] = save;
+  return p >= path->lastpart;
+}
+
 static size_t _mrl_buf_resolve_dots (char *s, size_t len) {
   uint8_t *start = (uint8_t *)s, *p, *t, *e = start + len, save1[2], save2[2];
   /* set safe plugs */
@@ -244,7 +272,7 @@ static size_t _mrl_buf_resolve_dots (char *s, size_t len) {
   return t - start;
 }
 
-void mrl_buf_set (mrl_buf_t *mrlb, mrl_buf_t *base, const char *name) {
+int mrl_buf_set (mrl_buf_t *mrlb, mrl_buf_t *base, const char *name) {
   size_t size;
   char prot[16], save;
   char *scan_args;
@@ -252,10 +280,11 @@ void mrl_buf_set (mrl_buf_t *mrlb, mrl_buf_t *base, const char *name) {
   uint32_t plen;
 
   if (!name)
-    return;
+    return 0;
   if (!name[0])
-    return;
+    return 0;
 
+  mrlb->start = mrlb->buf + 8;
   size = _find_byte (name, 0);
   if ((int)size > mrlb->max - mrlb->start)
     size = mrlb->max - mrlb->start;
@@ -327,6 +356,8 @@ void mrl_buf_set (mrl_buf_t *mrlb, mrl_buf_t *base, const char *name) {
   mrlb->lastpart[-1] = '/';
   mrlb->ext = p[-1] == '.' ? (char *)p : mrlb->args;
   mrlb->start[-1] = 0;
+
+  return 1;
 }
 
 void mrl_buf_merge (mrl_buf_t *to, mrl_buf_t *base, mrl_buf_t *name) {
@@ -413,11 +444,51 @@ int mrl_buf_is_file (mrl_buf_t *mrlb) {
   return mrlb->root == mrlb->start;
 }
 
-static char *_mrl_buf_title (mrl_buf_t *mrlb, char *user_title) {
-  return (user_title && user_title[0]) ? user_title : mrlb->lastpart[0] ? mrlb->lastpart : NULL;
-}
-
 /** basic mediamark_t ******************************************************************/
+
+static int _mediamark_new_from_mrl_buf (mediamark_t **m, const char *ident, mrl_buf_t *mrl, mrl_buf_t *sub) {
+  mediamark_t *n;
+  size_t l;
+
+  if (*m)
+    return 0;
+  *m = n = calloc (1, sizeof (*n));
+  if (!n)
+    return 0;
+
+  l = mrl->end - mrl->start;
+  n->mrl = malloc (l + 1);
+  if (n->mrl) {
+    memcpy (n->mrl, mrl->start, l + 1);
+    n->mrl[l] = 0;
+  }
+
+  n->ident = n->mrl;
+  l = ident ? _find_byte (ident, 0) : 0;
+  if (!l) {
+    ident = mrl->lastpart;
+    l = mrl->args - mrl->lastpart;
+  }
+  if (l) {
+    n->ident = malloc (l + 1);
+    if (n->ident) {
+      memcpy (n->ident, ident, l);
+      n->ident[l] = 0;
+    }
+  }
+
+  l = sub->end - sub->start;
+  if (l) {
+    n->sub = malloc (l + 1);
+    if (n->sub) {
+      memcpy (n->sub, sub->start, l);
+      n->sub[l] = 0;
+    }
+  }
+
+  n->end = -1;
+  return 1;
+}
 
 int mediamark_copy (mediamark_t **to, const mediamark_t *from) {
   const char *_ident, *_mrl, *_sub, *_none = "";
@@ -481,11 +552,9 @@ int mediamark_copy (mediamark_t **to, const mediamark_t *from) {
     m->start = from->start, n++;
   if (m->end != from->end)
     m->end = from->end, n++;
-  if (m->av_offset == from->av_offset)
+  if (m->av_offset != from->av_offset)
     m->av_offset = from->av_offset, n++;
-  if (m->av_offset == from->av_offset)
-    m->av_offset = from->av_offset, n++;
-  if (m->spu_offset == from->spu_offset)
+  if (m->spu_offset != from->spu_offset)
     m->spu_offset = from->spu_offset, n++;
   m->type = from->type;
   m->from = from->from;
@@ -795,28 +864,50 @@ const char *mediamark_get_current_ident (gGui_t *gui) {
 
 typedef struct {
   char *buf1, *buf2, ext[8], **lines;
-  mrl_buf_t base;
+  mrl_buf_t base, mrl, sub, item;
   const char *type;
   size_t size, num_lines, num_entries;
   mediamark_t **mmk;
   uint32_t have, used;
 } _lf_t;
 
-static void _lf_add (_lf_t *lf, int index, const mediamark_t *mmk) {
+static int _lf_add (_lf_t *lf, int index, const mediamark_t *mmk) {
   if (index < 0)
-    return;
+    return 0;
+
   if ((uint32_t)index >= lf->have) {
     uint32_t nhave = (index + 32) & ~31;
     mediamark_t **n = realloc (lf->mmk, nhave * sizeof (*n));
     if (!n)
-      return;
+      return 0;
     memset (n + lf->have, 0, (nhave - lf->have) * sizeof (*n));
     lf->mmk = n;
     lf->have = nhave;
   }
+  if (!mmk)
+    return 0;
   if ((uint32_t)index >= lf->used)
     lf->used = index + 1;
-  mediamark_copy (lf->mmk + index, mmk);
+
+  if (mrl_buf_set (&lf->item, &lf->base, mmk->mrl))
+    mrl_buf_merge (&lf->mrl, &lf->base, &lf->item);
+  else
+    mrl_buf_init (&lf->mrl);
+  if (mrl_buf_set (&lf->item, &lf->base, mmk->sub))
+    mrl_buf_merge (&lf->sub, &lf->base, &lf->item);
+  else
+    mrl_buf_init (&lf->sub);
+  if (!_mediamark_new_from_mrl_buf (lf->mmk + index, mmk->ident, &lf->mrl, &lf->sub))
+    return 0;
+
+  lf->mmk[index]->start = mmk->start;
+  lf->mmk[index]->end = mmk->end;
+  lf->mmk[index]->av_offset = mmk->av_offset;
+  lf->mmk[index]->spu_offset = mmk->spu_offset;
+
+  lf->mmk[index]->type = mmk->type;
+  lf->mmk[index]->from = mmk->from;
+  return 1;
 }
   
 static void _lf_add2 (_lf_t *lf, mediamark_t *mmk) {
@@ -846,6 +937,9 @@ static _lf_t *_lf_new (size_t size) {
   lf = (_lf_t *)m;
   lf->ext[0] = 0;
   mrl_buf_init (&lf->base);
+  mrl_buf_init (&lf->mrl);
+  mrl_buf_init (&lf->sub);
+  mrl_buf_init (&lf->item);
   lf->type = "";
   lf->num_entries = 0;
   lf->lines = NULL;
@@ -1026,29 +1120,6 @@ static void _lf_ext (_lf_t *lf)  {
   lf->ext[el] = 0;
 }
 
-static int is_mrl(const char *entry) {
-  char *path;
-
-  path = strstr(entry, ":/");
-  if (path) {
-    while (entry < path) {
-      if (!isalnum(entry[0])) return 0;
-      entry++;
-    }
-    return 1;
-  }
-  return 0;
-}
-
-static const char *concat_basedir(char *buffer, size_t size, const char *origin, const char *entry) {
-  if(origin && entry[0] != '/' && !is_mrl(entry)) {
-    snprintf(buffer, size, "%s%s", origin, entry);
-    return buffer;
-  } else {
-    return entry;
-  }
-}
-
 /*
  * Playlists guessing
  */
@@ -1062,11 +1133,8 @@ static void guess_pls_playlist (_lf_t *lf) {
       int   pl_line       = 0;
       uint32_t linen      = 0;
       int   count         = 0;
-      mrl_buf_t mrl1, mrl2;
-      mediamark_t m = { .end = -1 };
+      mediamark_t m = { .end = -1, .from = MMK_FROM_PLAYLIST };
 
-      mrl_buf_init (&mrl1);
-      mrl_buf_init (&mrl2);
       do {
         while (linen < lf->num_lines) {
           const char *ln = lf->lines[linen++];
@@ -1078,15 +1146,10 @@ static void guess_pls_playlist (_lf_t *lf) {
               if ((!strncasecmp (ln, "file", 4)) && (( sscanf(ln + 4, "%d=", &entry)) == 1)) {
                 char *mrl = strchr (ln, '=');
 
-                if (mrl)
-                  mrl++;
-                if ((entry && mrl) && ((entry) <= entries_pls) && (lf->mmk && (!lf->mmk[entry - 1]))) {
-                  stored_nument++;
-                  mrl_buf_set (&mrl1, &lf->base, mrl);
-                  mrl_buf_merge (&mrl2, &lf->base, &mrl1);
-                  m.mrl = mrl2.start;
-                  m.ident = _mrl_buf_title (&mrl2, NULL);
-                  _lf_add (lf, entry - 1, &m);
+                if (mrl && (entry > 0) && (entry <= entries_pls)) {
+                  m.mrl = mrl + 1;
+                  m.ident = NULL;
+                  stored_nument += _lf_add (lf, entry - 1, &m);
                 }
               }
             } else {
@@ -1112,10 +1175,9 @@ static void guess_pls_playlist (_lf_t *lf) {
 
       if (lf->mmk && valid_pls && entries_pls) {
         int i;
-
         /* Fill missing entries */
-        m.mrl = _("!!Invalid entry!!");
-        mediamark_t m = { .end = -1 };
+        m.mrl = NULL;
+        m.ident = _("!!Invalid entry!!");
         for (i = 0; i < entries_pls; i++) {
           if (!lf->mmk[i])
             _lf_add (lf, i, &m);
@@ -1135,34 +1197,22 @@ static void guess_m3u_playlist (_lf_t *lf) {
     int   entries_m3u = 0;
     char *title       = NULL;
     uint32_t linen    = 0;
-    mrl_buf_t mrl1, mrl2;
-    mediamark_t m = { .end = -1 };
+    mediamark_t m = { .end = -1, .from = MMK_FROM_PLAYLIST };
 
-    mrl_buf_init (&mrl1);
-    mrl_buf_init (&mrl2);
     while (linen < lf->num_lines) {
-      const char *ln = lf->lines[linen++];
+      char *ln = lf->lines[linen++];
 
       if (valid_m3u) {
         if (!strncmp (ln, "#EXTINF", 7)) {
-          char *ptitle;
+          char *ptitle = strchr (ln, ',');
 
-          if ((ptitle = strchr (ln, ',')) != NULL) {
-            ptitle++;
-            SAFE_FREE (title);
-            if (ptitle[0])
-              title = strdup (ptitle);
-          }
+          title = ptitle ? ptitle + 1 : NULL;
         } else if (ln[0] != '#') {
-          mrl_buf_set (&mrl1, &lf->base, ln);
-          mrl_buf_merge (&mrl2, &lf->base, &mrl1);
-
-          m.mrl = mrl2.start;
-          m.ident = _mrl_buf_title (&mrl2, title);
+          m.mrl = ln;
+          m.ident = title;
           _lf_add (lf, entries_m3u, &m);
           lf->num_entries = ++entries_m3u;
-
-          SAFE_FREE (title);
+          title = NULL;
         }
       } else if ((!strcasecmp (ln, "#EXTM3U")))
         valid_m3u = 1;
@@ -1170,7 +1220,6 @@ static void guess_m3u_playlist (_lf_t *lf) {
     if (valid_m3u && entries_m3u) {
       lf->type = "M3U";
     }
-    free (title);
   }
 }
 
@@ -1180,11 +1229,8 @@ static void guess_sfv_playlist (_lf_t *lf) {
       int    valid_sfv = 0;
       int    entries_sfv = 0;
       uint32_t linen = 0;
-      mrl_buf_t mrl1, mrl2;
-      mediamark_t m = { .end = -1 };
+      mediamark_t m = { .end = -1, .from = MMK_FROM_PLAYLIST };
 
-      mrl_buf_init (&mrl1);
-      mrl_buf_init (&mrl2);
       while (linen < lf->num_lines) {
         char  *ln = lf->lines[linen++];
 
@@ -1208,10 +1254,8 @@ static void guess_sfv_playlist (_lf_t *lf) {
                   crc = 0;
               }
               if (crc > 0) {
-                mrl_buf_set (&mrl1, &lf->base, ln);
-                mrl_buf_merge (&mrl2, &lf->base, &mrl1);
-                m.mrl = mrl2.start;
-                m.ident = _mrl_buf_title (&mrl2, NULL);
+                m.mrl = ln;
+                m.ident = NULL;
                 _lf_add (lf, entries_sfv, &m);
                 lf->num_entries = ++entries_sfv;
               }
@@ -1243,19 +1287,14 @@ static void guess_raw_playlist (_lf_t *lf) {
   if (_lf_split_lines (lf)) {
     int   entries_raw = 0;
     uint32_t linen = 0;
-    mrl_buf_t mrl1, mrl2;
-    mediamark_t m = { .end = -1 };
+    mediamark_t m = { .end = -1, .from = MMK_FROM_PLAYLIST };
 
-    mrl_buf_init (&mrl1);
-    mrl_buf_init (&mrl2);
     while (linen < lf->num_lines) {
-      const char *ln = lf->lines[linen++];
+      char *ln = lf->lines[linen++];
 
       if ((strncmp (ln, ";", 1)) && (strncmp (ln, "#", 1))) {
-        mrl_buf_set (&mrl1, &lf->base, ln);
-        mrl_buf_merge (&mrl2, &lf->base, &mrl2);
-        m.mrl = mrl2.start;
-        m.ident = _mrl_buf_title (&mrl2, NULL);
+        m.mrl = ln;
+        m.ident = NULL;
         _lf_add (lf, entries_raw, &m);
         lf->num_entries = ++entries_raw;
       }
@@ -1268,130 +1307,93 @@ static void guess_raw_playlist (_lf_t *lf) {
 }
 
 static void guess_toxine_playlist (_lf_t *lf) {
-  mediamark_t **mmk = NULL;
-  int entries_tox = 0;
+  char *text = _lf_dup (lf);
+  xitk_cfg_parse_t *tree = xitk_cfg_parse (text, XITK_CFG_PARSE_DEBUG);
+  xitk_cfg_parse_t *entry;
+  int num_entries;
 
-  {
-    char *text = _lf_dup (lf);
-    xitk_cfg_parse_t *tree = xitk_cfg_parse (text, XITK_CFG_PARSE_DEBUG);
+  if (!tree)
+    return;
 
-    if (tree) {
-      xitk_cfg_parse_t *entry;
-      int num_entries = 0;
-      mrl_buf_t mrl1, mrl2;
-      mediamark_t m = { .end = -1 };
+  /* just avoid reallocations. */
+  num_entries = 0;
+  for (entry = tree + tree->first_child; entry != tree; entry = tree + entry->next)
+    if ((entry->klen == 5) && !memcmp (text + entry->key, "entry", 5))
+      num_entries += 1;
+  _lf_add (lf, num_entries, NULL);
 
-      mrl_buf_init (&mrl1);
-      mrl_buf_init (&mrl2);
-      for (entry = tree->first_child ? tree + tree->first_child : NULL;
-        entry; entry = entry->next ? tree + entry->next : NULL)
-        if ((entry->key >= 0) && !strcmp (text + entry->key, "entry"))
-          num_entries += 1;
-      mmk = malloc (sizeof (*mmk) * (num_entries + 2));
+  num_entries = 0;
+  for (entry = tree + tree->first_child; entry != tree; entry = tree + entry->next) {
+    if ((entry->klen == 5) && !memcmp (text + entry->key, "entry", 5)) {
+      mediamark_t m = { .end = -1, .from = MMK_FROM_PLAYLIST };
+      xitk_cfg_parse_t *elem;
+      uint32_t mmkf_members = 0;
 
-      for (entry = tree->first_child ? tree + tree->first_child : NULL;
-        entry; entry = entry->next ? tree + entry->next : NULL) {
-        if ((entry->key >= 0) && !strcmp (text + entry->key, "entry")) {
-          xitk_cfg_parse_t *elem;
-          char path[_PATH_MAX + _NAME_MAX + 2];
-          mediamark_t   mmkf;
-          int           mmkf_members;
+      for (elem = tree + entry->first_child; elem != tree; elem = tree + elem->next) {
+        const char *key = text + elem->key;
+        const char *val = text + elem->value;
 
-          mmkf.ident      = NULL;
-          mmkf.sub        = NULL;
-          mmkf.start      = 0;
-          mmkf.end        = -1;
-          mmkf.av_offset  = 0;
-          mmkf.spu_offset = 0;
-          mmkf.mrl        = NULL;
-          mmkf_members    = 0;  /* ident, mrl, start, end, av offset, spu offset, sub */
-
-          for (elem = entry->first_child ? tree + entry->first_child : NULL;
-            elem; elem = elem->next ? tree + elem->next : NULL) {
-            const char *key = elem->key >= 0 ? text + elem->key : "";
-            const char *val = elem->value >= 0 ? text + elem->value : path;
-
-            path[0] = 0;
-            if (!strcmp (key, "identifier")) {
-              if (!(mmkf_members & 0x01)) {
-                mmkf_members |= 0x01;
-                mmkf.ident = strdup (val);
-              }
-            } else if (!strcmp (key, "subtitle")) {
-              if (!(mmkf_members & 0x40)) {
-                /* Workaround old toxine playlist version bug */
-                if (strcmp (val, "(null)")) {
-                  mmkf_members |= 0x40;
-                  mrl_buf_set (&mrl1, &lf->base, val);
-                  mrl_buf_merge (&mrl2, &lf->base, &mrl2);
-                  mmkf.sub = strdup (mrl2.start);
-                }
-              }
-            } else if (!strcmp (key, "spu_offset")) {
-              if (!(mmkf_members & 0x20)) {
-                mmkf_members |= 0x20;
-                mmkf.spu_offset = xitk_str2int32 (&val);
-              }
-            } else if (!strcmp (key, "av_offset")) {
-              if (!(mmkf_members & 0x10)) {
-                mmkf_members |= 0x10;
-                mmkf.av_offset = xitk_str2int32 (&val);
-              }
-            } else if (!strcmp (key, "start")) {
-              if (!(mmkf_members & 0x04)) {
-                mmkf_members |= 0x04;
-                mmkf.start = xitk_str2int32 (&val);
-              }
-            } else if (!strcmp (key, "end")) {
-              if (!(mmkf_members & 0x08)) {
-                mmkf_members |= 0x08;
-                mmkf.end = xitk_str2int32 (&val);
-              }
-            } else if (!strcmp (key, "mrl")) {
-              if (!(mmkf_members & 0x02)) {
-                mmkf_members |= 0x02;
-                mrl_buf_set (&mrl1, &lf->base, val);
-                mrl_buf_merge (&mrl2, &lf->base, &mrl2);
-                mmkf.mrl = strdup (mrl2.start);
-              }
+        switch (elem->klen) {
+          case 3:
+            if (!memcmp (key, "end", 3)) {
+              if (mmkf_members & 1)
+                break;
+              mmkf_members |= 1;
+              m.end = xitk_str2int32 (&val);
+            } else if (!memcmp (key, "mrl", 3)) {
+              if (m.mrl)
+                break;
+              m.mrl = (char *)val;
             }
-          }
-#if 0
-          printf ("DUMP mediamark entry:\n");
-          printf ("ident:     '%s'\n", mmkf.ident);
-          printf ("mrl:       '%s'\n", mmkf.mrl);
-          printf ("sub:       '%s'\n", mmkf.sub);
-          printf ("start:      %d\n", mmkf.start);
-          printf ("end:        %d\n", mmkf.end);
-          printf ("av_offset:  %d\n", mmkf.av_offset);
-          printf ("spu_offset: %d\n", mmkf.spu_offset);
-#endif
-          if ((mmkf_members & 0x02) && mmk) {
-            if (!(mmkf_members & 0x01))
-              mmkf.ident = mmkf.mrl;
-            mmk[entries_tox] = NULL;
-            m.mrl = mmkf.mrl;
-            m.ident = mmkf.ident;
-            m.sub = mmkf.sub;
-            m.start = mmkf.start;
-            m.end = mmkf.end;
-            m.av_offset = mmkf.av_offset;
-            m.spu_offset = mmkf.spu_offset;
-            _lf_add (lf, entries_tox, &m);
-            lf->num_entries = ++entries_tox;
-          }
-          if (mmkf_members & 0x01)
-            free (mmkf.ident);
-          free (mmkf.sub);
-          free (mmkf.mrl);
+            break;
+          case 5:
+            if (!memcmp (key, "start", 5)) {
+              if (mmkf_members & 2)
+                break;
+              mmkf_members |= 2;
+              m.start = xitk_str2int32 (&val);
+            }
+            break;
+          case 8:
+            if (!memcmp (key, "subtitle", 8)) {
+              /* Workaround old toxine playlist version bug */
+              if (m.sub || !strcmp (val, "(null)"))
+                break;
+              m.sub = (char *)val;
+            }
+            break;
+          case 9:
+            if (!memcmp (key, "av_offset", 9)) {
+              if (mmkf_members & 4)
+                break;
+              mmkf_members |= 4;
+              m.av_offset = xitk_str2int32 (&val);
+            }
+            break;
+          case 10:
+            if (!memcmp (key, "identifier", 10)) {
+              if (m.ident)
+                break;
+              m.ident = (char *)val; /** << will not be written to. */
+            } else if (!memcmp (key, "spu_offset", 10)) {
+              if (mmkf_members & 8)
+                break;
+              mmkf_members |= 8;
+              m.spu_offset = xitk_str2int32 (&val);
+            }
+            break;
+          default: ;
         }
       }
+      if (!m.mrl)
+        continue;
+      _lf_add (lf, num_entries, &m);
+      lf->num_entries = ++num_entries;
     }
-    xitk_cfg_unparse (tree);
   }
-  if (lf->mmk && entries_tox) {
+  xitk_cfg_unparse (tree);
+  if (num_entries)
     lf->type = "TOX";
-  }
 }
 
 /*
@@ -1401,7 +1403,7 @@ static void xml_asx_playlist (_lf_t *lf, xml_node_t *xml_tree) {
   int entries_asx = 0;
 
   if (!strcasecmp (xml_tree->name, "ASX")) {
-    mediamark_t m = { .end = -1 };
+    mediamark_t m = { .end = -1, .from = MMK_FROM_PLAYLIST };
     xml_property_t  *asx_prop;
     int version_ok = 0;
 
@@ -1443,16 +1445,15 @@ static void xml_asx_playlist (_lf_t *lf, xml_node_t *xml_tree) {
             } else if (!strcasecmp (asx_ref->name, "REF")) {
               for (asx_prop = asx_ref->props; asx_prop; asx_prop = asx_prop->next) {
                 if (!strcasecmp (asx_prop->name, "HREF")) {
-                  if (!href) {
+                  if (!href)
                     href = asx_prop->value;
-                  } else if (!strcasecmp (asx_prop->name, "SUBTITLE")) {
-                    /* This is not part of the ASX specs */
-                    if (!sub)
-                      sub = asx_prop->value;
-                  }
-                  if (href && sub)
-                    break;
+                } else if (!strcasecmp (asx_prop->name, "SUBTITLE")) {
+                  /* This is not part of the ASX specs */
+                  if (!sub)
+                    sub = asx_prop->value;
                 }
+                if (href && sub)
+                  break;
               }
             }
           }
@@ -1497,18 +1498,19 @@ static void xml_asx_playlist (_lf_t *lf, xml_node_t *xml_tree) {
   if (entries_asx == 0) {
     if (_lf_split_lines (lf)) {
       uint32_t linen = 0;
-      mediamark_t m = { .end = -1 };
+      mediamark_t m = { .end = -1, .from = MMK_FROM_PLAYLIST };
 
       while (linen < lf->num_lines) {
-        const char *ln = lf->lines[linen++];
+        char *ln = lf->lines[linen++];
 
         if (!strncasecmp ("ASF", ln, 3)) {
-          const char *p = ln + 3;
+          char *p = ln + 3;
 
           while ((*p == ' ') || (*p == '\t'))
             p++;
           if (p[0]) {
-            m.mrl = (char *)p; /** << will not be written to. */
+            m.mrl = p;
+            m.ident = NULL;
             _lf_add (lf, entries_asx, &m);
             lf->num_entries = ++entries_asx;
           }
@@ -1521,76 +1523,59 @@ static void xml_asx_playlist (_lf_t *lf, xml_node_t *xml_tree) {
 }
 
 static void __gx_get_entries (_lf_t *lf, int *entries, xml_node_t *entry) {
-  xml_property_t  *prop;
-  xml_node_t      *ref;
-  xml_node_t      *node = entry;
-  mediamark_t m = { .end = -1 };
+  xml_node_t      *node;
+  mediamark_t m = { .end = -1, .from = MMK_FROM_PLAYLIST };
 
-  while(node) {
-    if(!strcasecmp(node->name, "SUB"))
+  for (node = entry; node; node = node->next) {
+    if (!strcasecmp (node->name, "SUB")) {
       __gx_get_entries (lf, entries, node->child);
-    else if(!strcasecmp(node->name, "ENTRY")) {
-      char *title  = NULL;
-      char *href   = NULL;
-      int   start  = 0;
+    } else if (!strcasecmp (node->name, "ENTRY")) {
+      xml_node_t *ref;
 
-      ref = node->child;
-      while(ref) {
+      m.ident = NULL;
+      m.mrl = NULL;
+      m.start = 0;
 
-	if(!strcasecmp(ref->name, "TITLE")) {
+      for (ref = node->child; ref; ref = ref->next) {
+        if (!strcasecmp (ref->name, "TITLE")) {
+          if (!m.ident)
+            m.ident = ref->data;
+        } else if (!strcasecmp (ref->name, "REF")) {
+          xml_property_t *prop;
 
-	  if(!title)
-	    title = ref->data;
+          for (prop = ref->props; prop; prop = prop->next) {
+            if (!strcasecmp (prop->name, "HREF")) {
+              if (!m.mrl) {
+                m.mrl = prop->value;
+                if (m.mrl)
+                  break;
+              }
+            }
+          }
+        } else if (!strcasecmp (ref->name, "TIME")) {
+          xml_property_t *prop;
 
-	}
-	else if(!strcasecmp(ref->name, "REF")) {
-
-	  for(prop = ref->props; prop; prop = prop->next) {
-	    if(!strcasecmp(prop->name, "HREF")) {
-
-	      if(!href)
-		href = prop->value;
-	    }
-
-	    if(href)
-	      break;
-	  }
-	}
-	else if(!strcasecmp(ref->name, "TIME")) {
-
-	  for(prop = ref->props; prop; prop = prop->next) {
-	    if(!strcasecmp(prop->name, "START")) {
+          for (prop = ref->props; prop; prop = prop->next) {
+            if (!strcasecmp (prop->name, "START")) {
               if (prop->value && prop->value[0])
-                start = atoi (prop->value);
-	    }
-	  }
-	}
-
-	ref = ref->next;
+                m.start = atoi (prop->value);
+            }
+          }
+        }
       }
 
-      if (href && href[0]) {
-	char *atitle = NULL;
-
-        if (title && title[0]) {
-	  atitle = strdup(title);
-          str_unquote (atitle);
-	}
-
-        m.mrl = href;
-        m.ident = atitle;
-        m.start = start;
+      if (m.mrl && m.mrl[0]) {
+        if (m.ident && m.ident[0]) {
+          m.ident = strdup (m.ident);
+          str_unquote (m.ident);
+        } else {
+          m.ident = NULL;
+        }
         _lf_add (lf, *entries, &m);
 	lf->num_entries = ++(*entries);
-
-	free(atitle);
+        SAFE_FREE (m.ident);
       }
-
-      href = title = NULL;
-      start = 0;
     }
-
-    node = node->next;
   }
 }
 static void xml_gx_playlist (_lf_t *lf, xml_node_t *xml_tree) {
@@ -1632,7 +1617,7 @@ static void xml_noatun_playlist (_lf_t *lf, xml_node_t *xml_tree) {
   int              entries_noa = 0;
 
   if (!strcasecmp (xml_tree->name, "PLAYLIST")) {
-    mediamark_t m = { .end = -1 };
+    mediamark_t m = { .end = -1, .from = MMK_FROM_PLAYLIST };
     xml_property_t *noa_prop;
     int found = 0;
 
@@ -1766,10 +1751,13 @@ static smil_node_t *smil_new_node(void) {
 
   return node;
 }
-static mediamark_t *smil_new_mediamark(void) {
-  mediamark_t *mmk;
+static mediamark_t *smil_new_mediamark (void) {
+  mediamark_t *mmk = calloc (1, sizeof (*mmk));
 
-  mmk             = (mediamark_t *) calloc(1, sizeof(mediamark_t));
+  if (mmk) {
+    mmk->end = -1;
+    mmk->from = MMK_FROM_PLAYLIST;
+  }
   return mmk;
 }
 static mediamark_t *smil_duplicate_mmk(mediamark_t *ommk) {
@@ -2601,13 +2589,8 @@ static void xml_freevo_playlist (_lf_t *lf, xml_node_t *xml_tree) {
   int entries_fvo = 0;
 
   if (!strcasecmp (xml_tree->name, "FREEVO")) {
-    mrl_buf_t mrl1, mrl2, mrls;
-    mediamark_t m = { .end = -1 };
+    mediamark_t m = { .end = -1, .from = MMK_FROM_PLAYLIST };
     xml_node_t *fvo_entry;
-
-    mrl_buf_init (&mrl1);
-    mrl_buf_init (&mrl2);
-    mrl_buf_init (&mrls);
 
     for (fvo_entry = xml_tree->child; fvo_entry; fvo_entry = fvo_entry->next) {
       if (!strcasecmp (fvo_entry->name, "MOVIE")) {
@@ -2625,19 +2608,15 @@ static void xml_freevo_playlist (_lf_t *lf, xml_node_t *xml_tree) {
 
             for (ssentry = sentry->child; ssentry; ssentry = ssentry->next) {
               if (!strcasecmp (ssentry->name, "SUBTITLE")) {
-                mrl_buf_set (&mrl1, &lf->base, ssentry->data);
-                mrl_buf_merge (&mrls, &lf->base, &mrl1);
-                sub = mrls.start;
+                sub = ssentry->data;
               } else if (!strcasecmp (ssentry->name, "URL") || !strcasecmp (ssentry->name, "DVD") ||
                 !strcasecmp (ssentry->name, "VCD") || !strcasecmp (ssentry->name, "FILE")) {
-                mrl_buf_set (&mrl1, &lf->base, ssentry->data);
-                mrl_buf_merge (&mrl2, &lf->base, &mrl1);
-                url = mrl2.start;
+                url = ssentry->data;
               }
             }
             if (url) {
               m.mrl = url;
-              m.ident = _mrl_buf_title (&mrl2, title);
+              m.ident = title;
               m.sub = sub;
               _lf_add (lf, entries_fvo, &m);
               lf->num_entries = ++entries_fvo;
@@ -3146,79 +3125,100 @@ void gui_playlist_load (gGui_t *gui, const char *filename) {
   _lf_delete (lf);
 }
 
-void gui_playlist_save (gGui_t *gui, const char *filename) {
-  char *fullfn;
-  char *pn;
-  char *fn;
-  int   status = 1;
+static char *_int2str (char *buf, int value) {
+  unsigned int minus, u;
 
-  if(!gui->playlist.num)
+  if (value >= 0)
+    minus = 0, u = value;
+  else
+    minus = 1, u = -value;
+  do {
+    *--buf = (u % 10u) + '0';
+    u /= 10u;
+  } while (u);
+  if (minus)
+    *--buf = '-';
+  return buf;
+}
+
+void gui_playlist_save (gGui_t *gui, const char *filename) {
+  mrl_buf_t base, item, full;
+  FILE *fd;
+  int i;
+
+  gui_playlist_lock (gui);
+  i = gui->playlist.num;
+  gui_playlist_unlock (gui);
+  if (i <= 0)
     return;
 
-  fullfn = strdup(filename);
+  mrl_buf_init (&base);
+  mrl_buf_init (&item);
+  mrl_buf_init (&full);
+  _mrl_buf_working_dir (&base);
 
-  pn = fullfn;
+  mrl_buf_set (&item, &base, filename);
+  mrl_buf_merge (&full, &base, &item);
+  if (!_mrl_buf_mkdir_p (&full))
+    return;
 
-  fn = strrchr(fullfn, '/');
-
-  if(fn) {
-    *fn = '\0';
-    fn++;
-    status = mkdir_safe(pn);
+  fd = fopen (full.root, "wb");
+  if (!fd) {
+    fprintf (stderr, _("Unable to save playlist (%s): %s.\n"), filename, strerror (errno));
+    return;
   }
-  else
-    fn = pn;
 
-  if(status && fn) {
-    int   i;
-    FILE *fd;
-    const char *store_item;
-    char buffer[_PATH_MAX + _NAME_MAX + 2], current_dir[_PATH_MAX + 1];
+  fwrite ("# toxine playlist\n", 1, 18, fd);
 
-    if (getcwd (current_dir, sizeof (current_dir))) {
-      size_t dl = _find_byte (current_dir, 0);
-      if (dl && (current_dir[dl - 1] != '/'))
-        strcpy (current_dir + dl, "/");
-    } else
-      strcpy(current_dir, "");
+  gui_playlist_lock (gui);
+  for (i = 0; i < gui->playlist.num; i++) {
+    char buf[4 * 32], *p;
 
-    if((fd = fopen(filename, "w")) != NULL) {
-
-      fprintf(fd, "# toxine playlist\n");
-
-      for(i = 0; i < gui->playlist.num; i++) {
-	fprintf(fd, "\nentry {\n");
-	fprintf(fd, "\tidentifier = %s;\n", gui->playlist.mmk[i]->ident);
-	store_item = concat_basedir(buffer, sizeof(buffer), current_dir, gui->playlist.mmk[i]->mrl);
-	fprintf(fd, "\tmrl = %s;\n", store_item);
-	if(gui->playlist.mmk[i]->sub) {
-	  store_item = concat_basedir(buffer, sizeof(buffer), current_dir, gui->playlist.mmk[i]->sub);
-	  fprintf(fd, "\tsubtitle = %s;\n", store_item);
-	}
-	if(gui->playlist.mmk[i]->start > 0)
-	  fprintf(fd, "\tstart = %d;\n", gui->playlist.mmk[i]->start);
-	if(gui->playlist.mmk[i]->end != -1)
-	  fprintf(fd, "\tend = %d;\n", gui->playlist.mmk[i]->end);
-	if(gui->playlist.mmk[i]->av_offset != 0)
-	  fprintf(fd, "\tav_offset = %d;\n", gui->playlist.mmk[i]->av_offset);
-	if(gui->playlist.mmk[i]->spu_offset != 0)
-	  fprintf(fd, "\tspu_offset = %d;\n", gui->playlist.mmk[i]->spu_offset);
-	fprintf(fd,"};\n");
-      }
-
-      fprintf(fd, "# END\n");
-
-      fclose(fd);
-#ifdef DEBUG
-      printf("Playlist '%s' saved.\n", filename);
-#endif
+    fwrite ("\nentry {\n\tidentifier = ", 1, 23, fd);
+    fwrite (gui->playlist.mmk[i]->ident, 1, _find_byte (gui->playlist.mmk[i]->ident, 0), fd);
+    mrl_buf_set (&item, &base, gui->playlist.mmk[i]->mrl);
+    mrl_buf_merge (&full, &base, &item);
+    fwrite (";\n\tmrl = ", 1, 9, fd);
+    fwrite (full.start, 1, full.end - full.start, fd);
+    if (gui->playlist.mmk[i]->sub) {
+      mrl_buf_set (&item, &base, gui->playlist.mmk[i]->sub);
+      mrl_buf_merge (&full, &base, &item);
+      fwrite (";\n\tsubtitle = ", 1, 14, fd);
+      fwrite (full.start, 1, full.end - full.start, fd);
     }
-    else
-      fprintf(stderr, _("Unable to save playlist (%s): %s.\n"), filename, strerror(errno));
-
+    p = buf + sizeof (buf);
+    p -= 3; memcpy (p, "};\n", 3);
+    if (gui->playlist.mmk[i]->spu_offset != 0) {
+      p -= 2; memcpy (p, ";\n", 2);
+      p = _int2str (p, gui->playlist.mmk[i]->spu_offset);
+      p -= 14; memcpy (p, "\tspu_offset = ", 14);
+    }
+    if (gui->playlist.mmk[i]->av_offset != 0) {
+      p -= 2; memcpy (p, ";\n", 2);
+      p = _int2str (p, gui->playlist.mmk[i]->av_offset);
+      p -= 13; memcpy (p, "\tav_offset = ", 13);
+    }
+    if (gui->playlist.mmk[i]->end != -1) {
+      p -= 2; memcpy (p, ";\n", 2);
+      p = _int2str (p, gui->playlist.mmk[i]->end);
+      p -= 7; memcpy (p, "\tend = ", 7);
+    }
+    if (gui->playlist.mmk[i]->start > 0) {
+      p -= 2; memcpy (p, ";\n", 2);
+      p = _int2str (p, gui->playlist.mmk[i]->start);
+      p -= 9; memcpy (p, "\tstart = ", 9);
+    }
+    p -= 2; memcpy (p, ";\n", 2);
+    fwrite (p, 1, buf + sizeof (buf) - p, fd);
   }
+  gui_playlist_unlock (gui);
 
-  free(fullfn);
+  fwrite ("# END\n", 1, 6, fd);
+
+  fclose (fd);
+#ifdef DEBUG
+  printf ("Playlist '%s' saved.\n", filename);
+#endif
 }
 
 size_t mrl_get_lowercase_prot (char *buf, size_t bsize, const char *mrl) {
@@ -3915,4 +3915,3 @@ void mmk_edit_mediamark (gGui_t *gui, mediamark_t **mmk, apply_callback_t callba
   raise_window (mmkedit->gui, mmkedit->xwin, 1, 1);
   xitk_window_set_input_focus (mmkedit->xwin);
 }
-
