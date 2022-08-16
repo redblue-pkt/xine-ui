@@ -511,8 +511,8 @@ int gui_xine_open_and_play (gGui_t *gui, char *_mrl, char *_sub, int start_pos,
 
   }
 
-  if(mrl_look_like_playlist(mrl)) {
-    if (gui_playlist_add_file (gui, mrl)) {
+  if (mrl_look_like_playlist (gui, mrl)) {
+    if (gui_playlist_add_item (gui, mrl, 1, GUI_ITEM_TYPE_AUTO, 0)) {
       gui_current_set_index (gui, GUI_MMK_CURRENT);
       mrl        = gui->mmk.mrl;
       start_pos  = 0;
@@ -1288,11 +1288,7 @@ void gui_dndcallback (void *_gui, const char *filename) {
   if (!filename)
     return;
 
-  if (mrl_look_like_file (filename)) {
-    n = gui_playlist_add_dir (gui, filename, GUI_MAX_DIR_LEVELS);
-  } else {
-    n = gui_playlist_append (gui, filename, NULL, NULL, 0, -1, 0, 0);
-  }
+  n = gui_playlist_add_item (gui, filename, GUI_MAX_DIR_LEVELS, GUI_ITEM_TYPE_AUTO, 0);
   if (!n)
     return;
 
@@ -1813,7 +1809,7 @@ static void fileselector_callback (filebrowser_t *fb, void *userdata) {
 
     /* If the file has an extension which could be a playlist, attempt to append
        it to the current list as a list; otherwise, append it as an ordinary file. */
-    gui_playlist_add_dir (gui, file, 1);
+    gui_playlist_add_item (gui, file, 1, GUI_ITEM_TYPE_AUTO, 0);
 
     playlist_update_playlist (gui);
 
@@ -1865,7 +1861,7 @@ static void fileselector_all_callback (filebrowser_t *fb, void *userdata) {
         free (files[i]);
         /* If the file has an extension which could be a playlist, attempt to append
            it to the current list as a list; otherwise, append it as an ordinary file. */
-        gui_playlist_add_dir (gui, buf, 1);
+        gui_playlist_add_item (gui, buf, 1, GUI_ITEM_TYPE_AUTO, 0);
       }
 
       playlist_update_playlist (gui);

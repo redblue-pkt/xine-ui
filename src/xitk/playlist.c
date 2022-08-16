@@ -370,7 +370,7 @@ static void _playlist_load_callback (filebrowser_t *fb, void *data) {
   mmk_editor_end (gui);
 
   if ((file = filebrowser_get_full_filename(fb)) != NULL) {
-    gui_playlist_load (gui, file);
+    gui_playlist_add_item (gui, file, 1, GUI_ITEM_TYPE_PLAYLIST, 1);
     gui_current_set_index (gui, GUI_MMK_CURRENT);
     playlist_update_playlist (gui);
 

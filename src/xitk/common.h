@@ -247,12 +247,16 @@ struct gGui_st {
   struct {
     mediamark_t           **mmk;
 
-    int                     max;
-    int                     num;                   /* number of entries in playlist */
-    int                     cur;                   /* current entry in playlist */
-    int                     ref_append;            /* append mrl reference entry to this position */
-    int                     loop;                  /* current loop mode (see PLAYLIST_LOOP_* */
-    int                     control;               /* see PLAYLIST_CONTROL_* */
+    int                     max;        /** << number of entries that fit .mmk */
+    int                     num;        /** << number of entries set in .mmk */
+    int                     cur;        /** << current entry in playlist */
+    int                     ref_append; /** << append mrl reference entry to this position */
+    int                     loop;       /** << see PLAYLIST_LOOP_* */
+    int                     control;    /** << see PLAYLIST_CONTROL_* */
+
+    xine_sarray_t          *known_playlist_exts; /** << internal use by playlist_add_* () */
+    xine_sarray_t          *known_media_exts;
+    xine_sarray_t          *known_spu_exts;
   } playlist;
 
 
@@ -410,10 +414,12 @@ void reparent_window(gGui_t *gui, xitk_window_t *xwin);
 void gui_load_window_pos (gGui_t *gui, const char *name, int *x, int *y);
 void gui_save_window_pos (gGui_t *gui, const char *name, xitk_register_key_t key);
 
+void gui_playlist_init (gGui_t *gui);
 void gui_playlist_lock (gGui_t *gui);
 #define gui_playlist_lock(_gui) pthread_mutex_lock (&(_gui)->mmk_mutex)
 void gui_playlist_unlock (gGui_t *gui);
 #define gui_playlist_unlock(_gui) pthread_mutex_unlock (&(_gui)->mmk_mutex)
+void gui_playlist_deinit (gGui_t *gui);
 
 #ifdef HAVE_XML_PARSER_REENTRANT
 # define xml_parser_init_R(X,D,L,M) X = xml_parser_init_r ((D), (L), (M))

@@ -348,7 +348,7 @@ static void mrl_add_noautoplay(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
   if (mrlb && mrl) {
     int idx;
 
-    gui_playlist_add_dir (mrlb->gui, mrl->mrl, 1);
+    gui_playlist_add_item (mrlb->gui, mrl->mrl, 1, GUI_ITEM_TYPE_AUTO, 0);
     idx = mrlb->gui->playlist.num - 1;
 
     if (!mrlb->gui->plwin) {
@@ -408,8 +408,8 @@ static void mrl_play(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
     if (!is_playback_widgets_enabled (mrlb->gui->panel))
       enable_playback_controls (mrlb->gui->panel, 1);
 
-    if(mrl_look_like_playlist(_mrl)) {
-      if (gui_playlist_add_file (mrlb->gui, _mrl)) {
+    if (mrl_look_like_playlist (mrlb->gui, _mrl)) {
+      if (gui_playlist_add_item (mrlb->gui, _mrl, 1, GUI_ITEM_TYPE_PLAYLIST, 1)) {
         gui_current_set_index (mrlb->gui, GUI_MMK_CURRENT);
         _mrl = (char *) mediamark_get_current_mrl (mrlb->gui);
         playlist_update_playlist (mrlb->gui);

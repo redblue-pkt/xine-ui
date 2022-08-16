@@ -91,14 +91,19 @@ void gui_current_free (gGui_t *gui);
 
 
 /** gui playlist stuff. */
-void gui_playlist_load (gGui_t *gui, const char *filename);
+#define gui_playlist_load(_gui,_filename) gui_playlist_add_file (_gui, _filename, 1)
 #define GUI_MAX_DIR_LEVELS 8
+typedef enum {
+  GUI_ITEM_TYPE_AUTO = 0,
+  GUI_ITEM_TYPE_AV,
+  GUI_ITEM_TYPE_SPU,
+  GUI_ITEM_TYPE_PLAYLIST
+} gui_item_type_t;
 /** recursively scan this dir for playable files or add this file. return found count.
  *  a negative max_levels will add _all_ files, even hidden and unknown ext ones.
- *  a zero max_levels forbids scanning dirs and playlist files. */
-int gui_playlist_add_dir (gGui_t *gui, const char *filepathname, int max_levels);
-/** add refs from this playlist file. */
-int gui_playlist_add_file (gGui_t *gui, const char *filename);
+ *  a zero max_levels forbids scanning dirs and playlist files.
+ *  if replace is set, previous playlist items will be dropped first. */
+int gui_playlist_add_item (gGui_t *gui, const char *path, int max_levels, gui_item_type_t type, int replace);
 /** add 1 entry manually. */
 #define gui_playlist_append(_gui,_mrl,_ident,_sub,_start,_end,_av_offset,_spu_offset) \
   gui_playlist_insert (_gui, -1, _mrl, _ident, _sub, _start, _end, _av_offset, _spu_offset)
@@ -159,7 +164,7 @@ void mrl_buf_merge (mrl_buf_t *to, mrl_buf_t *base, mrl_buf_t *name);
 int mrl_buf_is_file (mrl_buf_t *mrlb);
 
 size_t mrl_get_lowercase_prot (char *buf, size_t bsize, const char *mrl);
-int mrl_look_like_playlist (const char *mrl);
+int mrl_look_like_playlist (gGui_t *gui, const char *mrl);
 int mrl_look_like_file (const char *mrl);
 
 

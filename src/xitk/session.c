@@ -325,7 +325,7 @@ static __attribute__((noreturn)) void *ctrlsocket_func(void *data) {
       break;
 
     case CMD_PLAYLIST_LOAD:
-        gui_playlist_load (gui, (const char *)shdr->data);
+      gui_playlist_add_item (gui, (const char *)shdr->data, 1, GUI_ITEM_TYPE_PLAYLIST, 1);
       gui_current_set_index (gui, GUI_MMK_CURRENT);
       playlist_update_playlist (gui);
       if ((!is_playback_widgets_enabled (gui->panel)) && gui->playlist.num)

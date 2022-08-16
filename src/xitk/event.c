@@ -1156,7 +1156,7 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
 
   case ACTID_PLAYLIST_OPEN:
     if (sarg) {
-        gui_playlist_load (gui, sarg);
+        gui_playlist_add_item (gui, sarg, 1, GUI_ITEM_TYPE_PLAYLIST, 1);
         gui_current_set_index (gui, GUI_MMK_CURRENT);
         playlist_update_playlist (gui);
         if ((!is_playback_widgets_enabled (gui->panel)) && gui->playlist.num)
@@ -1363,11 +1363,7 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
   for (i = 0; i < p->num_files; i++) {
     const char *file = p->filenames[i];
 
-    if (mrl_look_like_file (file)) {
-      gui_playlist_add_dir (gui, file, GUI_MAX_DIR_LEVELS);
-    } else {
-      gui_playlist_append (gui, file, NULL, NULL, 0, -1, 0, 0);
-    }
+    gui_playlist_add_item (gui, file, GUI_MAX_DIR_LEVELS, GUI_ITEM_TYPE_AUTO, 0);
   }
 
   gui->playlist.cur = gui->playlist.num ? 0 : -1;
