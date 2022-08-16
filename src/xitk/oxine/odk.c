@@ -464,7 +464,7 @@ void odk_free(odk_t *odk) {
 
 void odk_enqueue(odk_t *odk, const char *mrl)
 {
-  gui_playlist_add_dir (odk->gui, mrl, 1);
+  gui_playlist_add_item (odk->gui, mrl, 1, GUI_ITEM_TYPE_AUTO, 0);
 }
 
 int odk_open_and_play(odk_t *odk, const char *mrl) {

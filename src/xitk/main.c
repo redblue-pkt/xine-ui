@@ -1270,9 +1270,6 @@ int main(int argc, char *argv[]) {
   gui->network_port           = 0;
   gui->use_root_window        = 0;
   gui->actions_on_start[aos]  = ACTID_NOKEY;
-  gui->playlist.mmk           = NULL;
-  gui->playlist.loop          = PLAYLIST_LOOP_NO_LOOP;
-  gui->playlist.control       = 0;
   gui->skin_server_url        = NULL;
   gui->verbosity              = 0;
   gui->broadcast_port         = 0;
@@ -1331,6 +1328,8 @@ int main(int argc, char *argv[]) {
   }
 
   visual_anim_init (gui);
+
+  gui_playlist_init (gui);
 
   /*
    * parse command line
@@ -1546,12 +1545,7 @@ int main(int argc, char *argv[]) {
       if((!actions_on_start(gui->actions_on_start, ACTID_PLAYLIST) && (aos < MAX_ACTIONS_ON_START)))
 	gui->actions_on_start[aos++] = ACTID_PLAYLIST;
 
-      gui_playlist_lock (gui);
-      if(!gui->playlist.mmk)
-        gui_playlist_load (gui, optarg);
-      else
-        gui_playlist_add_file (gui, optarg);
-      gui_playlist_unlock (gui);
+      gui_playlist_add_item (gui, optarg, 1, GUI_ITEM_TYPE_PLAYLIST, 0);
 
       /* don't load original playlist when loading this one */
       no_old_playlist = 1;
@@ -1863,7 +1857,7 @@ int main(int argc, char *argv[]) {
     char buffer[XITK_PATH_MAX + XITK_NAME_MAX + 2];
 
     snprintf(buffer, sizeof(buffer), "%s/.xine/xine-ui_old_playlist.tox", xine_get_homedir());
-    gui_playlist_load (gui, buffer);
+    gui_playlist_add_item (gui, buffer, 1, GUI_ITEM_TYPE_PLAYLIST, 0);
   }
 
   gui->subtitle_autoload =
@@ -2142,6 +2136,8 @@ int main(int argc, char *argv[]) {
   free (gui->cfg_file);
 
   free(gui->keymap_file);
+
+  gui_playlist_deinit (gui);
 
   free (gui);
   return retval;
