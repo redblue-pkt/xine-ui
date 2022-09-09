@@ -655,7 +655,7 @@ void odk_user_color(odk_t *odk, const char *name, uint32_t *color, uint8_t *tran
 				"color spec. format: [YUV color]-[opacity 0-f]",
 				10, NULL, NULL);
   if (sscanf(v, "%06x-%01x", &c, &t) != 2) {
-    printf("odk: bad formated color spec in entry '%s'\n", id);
+    printf("odk: bad formatted color spec in entry '%s'\n", id);
     printf("odk: using standard color\n");
     return;
   }

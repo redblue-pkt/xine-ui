@@ -7,14 +7,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.21\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2021-12-11 19:35+0200\n"
+"POT-Creation-Date: 2022-09-09 19:24+0200\n"
 "PO-Revision-Date: 2021-10-14 12:59+0200\n"
 "Last-Translator: Xavier Bachelot <xavier@bachelot.org>\n"
 "Language-Team: French <fr@li.org>\n"
-"Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: fr\n"
 "X-Generator: Lokalize 21.04.3\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
@@ -84,7 +84,7 @@ msgid "xine audio control Window"
 msgstr ""
 
 msgid "Audio amplification"
-msgstr ""
+msgstr "Niveau d'Amplification"
 
 msgid "Neutral sound"
 msgstr ""
@@ -94,11 +94,6 @@ msgstr "Annuler"
 
 msgid "Close control window"
 msgstr "Ferme la fenêtre de contrôle"
-
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "There is no MRL."
-msgstr "Il n'y a aucune MRL."
 
 #, c-format
 msgid ""
@@ -476,6 +471,18 @@ msgstr "Arrêt"
 msgid "Continue"
 msgstr "Continue"
 
+msgid "Video upright"
+msgstr ""
+
+msgid "Video mirrored"
+msgstr ""
+
+msgid "Video upside down"
+msgstr ""
+
+msgid "Video upside down and mirrored"
+msgstr ""
+
 msgid "Enable extra XLib thread safety."
 msgstr ""
 
@@ -586,7 +593,7 @@ msgid "Enable OSD support"
 msgstr "Utilisation de l'OSD"
 
 msgid ""
-"Enabling OSD permit to display some status/informations in output window."
+"Enabling OSD permit one to display some status/informations in output window."
 msgstr ""
 "L'utilisation de l'OSD permet d'afficher quelques status/informations dans "
 "la fenêtre de sortie vidéo."
@@ -713,7 +720,7 @@ msgid "Menu 7"
 msgstr "Menu 7"
 
 msgid "Menu"
-msgstr ""
+msgstr "Menu"
 
 msgid "Red"
 msgstr ""
@@ -761,10 +768,6 @@ msgstr "Impossible d'ouvrir le répertoire '%s': %s."
 #, c-format
 msgid "Unable to delete file '%s': %s."
 msgstr "Impossible de supprimer le fichier '%s': '%s'."
-
-#, c-format
-msgid "Do you really want to delete the file '%s%s%s' ?"
-msgstr "Voulez-vous réellement supprimer le fichier: '%s%s%s' ?"
 
 msgid "Confirm deletion ?"
 msgstr "Suppression confirmée ?"
@@ -816,11 +819,11 @@ msgstr "Ctrl"
 msgid "Alt"
 msgstr "Alt"
 
-msgid "Nothing selected"
-msgstr "Aucune entrée sélectionnée"
-
 msgid "None"
 msgstr "Aucune"
+
+msgid "Nothing selected"
+msgstr "Aucune entrée sélectionnée"
 
 msgid "Grab"
 msgstr "Capture"
@@ -837,10 +840,10 @@ msgstr ""
 "\"%s\".\n"
 
 msgid "Store new key binding"
-msgstr ""
+msgstr "Enregistre %s comme raccourci"
 
 msgid "Press keyboard keys to bind..."
-msgstr ""
+msgstr "Appuyez sur les touches du clavier..."
 
 msgid "Key Binding Editor"
 msgstr "Editeur de raccourcis clavier"
@@ -882,22 +885,22 @@ msgid "mod5"
 msgstr "mod5"
 
 msgid "start playback"
-msgstr ""
+msgstr "Lancez la Lecture ?"
 
 msgid "playback pause toggle"
-msgstr ""
+msgstr "Lecture/Pause"
 
 msgid "stop playback"
-msgstr ""
+msgstr "Stoppe la lecture"
 
 msgid "close stream"
 msgstr ""
 
 msgid "take a snapshot"
-msgstr ""
+msgstr "Capture une image"
 
 msgid "eject the current medium"
-msgstr ""
+msgstr "Éjecte le medium courant"
 
 msgid "select and play next MRL in the playlist"
 msgstr ""
@@ -921,7 +924,7 @@ msgid "add a mediamark from current playback"
 msgstr ""
 
 msgid "edit selected mediamark"
-msgstr ""
+msgstr "Ajoute Mediamark"
 
 msgid "set position to -60 seconds in current stream"
 msgstr ""
@@ -1005,13 +1008,13 @@ msgid "reset amplification to default value"
 msgstr ""
 
 msgid "audio muting toggle"
-msgstr ""
+msgstr "Muet"
 
 msgid "select next audio channel"
-msgstr ""
+msgstr "Canal audio suivant"
 
 msgid "select previous audio channel"
-msgstr ""
+msgstr "Canal audio précédent"
 
 msgid "visibility toggle of audio post effect window"
 msgstr ""
@@ -1029,7 +1032,7 @@ msgid "interlaced mode toggle"
 msgstr ""
 
 msgid "cycle aspect ratio values"
-msgstr ""
+msgstr "Ratio d'aspect"
 
 msgid "reduce the output window size by factor 1.2"
 msgstr ""
@@ -1070,8 +1073,14 @@ msgstr ""
 msgid "resize output window to stream size"
 msgstr ""
 
-msgid "fullscreen toggle"
+msgid "flip video sideways"
 msgstr ""
+
+msgid "flip video upside down"
+msgstr ""
+
+msgid "fullscreen toggle"
+msgstr "Plein écran"
 
 msgid "Xinerama fullscreen toggle"
 msgstr ""
@@ -1167,7 +1176,7 @@ msgid "visibility toggle of stream info window"
 msgstr ""
 
 msgid "display stream information using OSD"
-msgstr ""
+msgstr "Flux/Information (OSD)"
 
 msgid "display information using OSD"
 msgstr ""
@@ -1176,7 +1185,7 @@ msgid "show OSD menu"
 msgstr ""
 
 msgid "enter key binding editor"
-msgstr ""
+msgstr "Editeur de raccourcis clavier"
 
 msgid "enable key bindings (not useful to bind a key to it!)"
 msgstr ""
@@ -1185,7 +1194,7 @@ msgid "open file selector"
 msgstr ""
 
 msgid "select a subtitle file"
-msgstr ""
+msgstr "Choisissez un fichier de sous-titre"
 
 msgid "download a skin from the skin server"
 msgstr ""
@@ -2181,6 +2190,11 @@ msgstr ""
 msgid "Logo MRL"
 msgstr "MRL du logo"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
+msgid "There is no MRL."
+msgstr "Il n'y a aucune MRL."
+
 msgid "!!Invalid entry!!"
 msgstr "!!Entrée invalide!!"
 
@@ -2396,6 +2410,12 @@ msgstr "Vidéo/100%"
 msgid "Video/50%"
 msgstr "Vidéo/50%"
 
+msgid "Video/mirrored"
+msgstr ""
+
+msgid "Video/upside down"
+msgstr ""
+
 msgid "Video/Postprocess"
 msgstr "Vidéo/Post-traitement"
 
@@ -2454,7 +2474,7 @@ msgid "Settings/Video..."
 msgstr "Réglages/Vidéo..."
 
 msgid "Settings/Audio..."
-msgstr ""
+msgstr "Réglages/Audio..."
 
 msgid "Settings/TV Analog..."
 msgstr "Réglages/TV analogique..."
@@ -2813,7 +2833,7 @@ msgid "(*)  you need to restart xine for this setting to take effect"
 msgstr "(*) vous devez relancer xine pour que ces réglages prennent effet"
 
 msgid "Skin theme"
-msgstr ""
+msgstr "Thème visuel"
 
 #, c-format
 msgid "Failed to load %s/%s. Load fallback skin %s\n"
@@ -2826,8 +2846,8 @@ msgstr "Échec au chargement de %s/%s. Recharge l'ancienne apparence '%s'.\n"
 #, c-format
 msgid "Failed to load %s, wrong version. Load fallback skin '%s'.\n"
 msgstr ""
-"Échec au chargement de %s, mauvaise version. Charge l'apparence de secours "
-"'%s'.\n"
+"Échec au chargement de %s, mauvaise version. Charge l'apparence de secours '%"
+"s'.\n"
 
 #, c-format
 msgid "No available skin found. Say goodbye.\n"
@@ -3191,7 +3211,9 @@ msgstr "Visualiseur des journaux de xine"
 msgid "Refresh"
 msgstr "Rafraîchir"
 
-#, c-format
+#~ msgid "Do you really want to delete the file '%s%s%s' ?"
+#~ msgstr "Voulez-vous réellement supprimer le fichier: '%s%s%s' ?"
+
 #~ msgid "XSendEvent(display, 0x%x ...) failed.\n"
 #~ msgstr "XSendEvent(display, 0x%x ...) a échoué.\n"
 
@@ -3201,18 +3223,15 @@ msgstr "Rafraîchir"
 #~ msgid "Warning"
 #~ msgstr "Attention"
 
-#, c-format
 #~ msgid ""
 #~ "gui_main: selected visual %#lx does not exist, trying default visual\n"
 #~ msgstr ""
 #~ "gui_main: visuel sélectionné %#lx inexistant, utilisation du visuel par "
 #~ "défaut\n"
 
-#, c-format
 #~ msgid "gui_main: couldn't find true color visual.\n"
 #~ msgstr "gui_main: ne trouve pas de visuel en vraies couleurs.\n"
 
-#, c-format
 #~ msgid ""
 #~ "\n"
 #~ "XInitThreads failed - looks like you don't have a thread-safe xlib.\n"
@@ -3221,12 +3240,10 @@ msgstr "Rafraîchir"
 #~ "XInitThreads a échoué - il semble que vous ne possédiez pas une xlib "
 #~ "sûre.\n"
 
-#, c-format
 #~ msgid "Warning! Synchronized X activated - this is very slow...\n"
 #~ msgstr ""
 #~ "Attention ! Synchronisation X activée - cela ralenti l'exécution...\n"
 
-#, c-format
 #~ msgid "Unable to initialize Imlib\n"
 #~ msgstr "Impossible d'initialiser Imlib\n"
 
@@ -3240,15 +3257,12 @@ msgstr "Rafraîchir"
 #~ msgid "Accept?"
 #~ msgstr "Accepter ?"
 
-#, c-format
 #~ msgid "Bad visual '%s'\n"
 #~ msgstr "Mauvais visuel '%s'\n"
 
-#, c-format
 #~ msgid "Bad geometry '%s', see xine --help\n"
 #~ msgstr "Mauvaise géométrie '%s', voir xine --help\n"
 
-#, c-format
 #~ msgid "Ooch, skin not found, use fallback '%s'.\n"
 #~ msgstr ""
 #~ "Ouille, apparence non trouvée, utilise l'apparence de secours '%s'.\n"
@@ -3256,23 +3270,18 @@ msgstr "Rafraîchir"
 #~ msgid "XF86VidMode Extension: modeline switching failed.\n"
 #~ msgstr "Extension XF86VidMode: le changement de modeline a échoué.\n"
 
-#, c-format
 #~ msgid "XAllocWMHints() failed\n"
 #~ msgstr "XAllocWMHints() a échoué\n"
 
-#, c-format
 #~ msgid "XF86VidMode Extension (%d.%d) detected, trying to use it.\n"
 #~ msgstr "Extension XF86VidMode (%d.%d) détecté, tentative pour l'utiliser.\n"
 
-#, c-format
 #~ msgid "XF86VidMode Extension: %d modelines found.\n"
 #~ msgstr "Extension XF86VidMode: %d modeline(s) trouvé(s).\n"
 
-#, c-format
 #~ msgid "XF86VidModeModeLine %dx%d isn't valid: discarded.\n"
 #~ msgstr "XF86VidModeModeLine %dx%d n'est pas valide: ignoré.\n"
 
-#, c-format
 #~ msgid ""
 #~ "XF86VidMode Extension: could not get list of available modelines. "
 #~ "Failed.\n"
@@ -3280,7 +3289,6 @@ msgstr "Rafraîchir"
 #~ "Extension XF86VidMode: ne peux pas avoir la liste des modelines "
 #~ "disponibles. Échec.\n"
 
-#, c-format
 #~ msgid "XF86VidMode Extension: initialization failed, not using it.\n"
 #~ msgstr ""
 #~ "Extension XF86VidMode: échec à l'initialisation, ne l'utilise pas.\n"

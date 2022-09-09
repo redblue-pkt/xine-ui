@@ -11,14 +11,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: it\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2021-12-11 19:35+0200\n"
+"POT-Creation-Date: 2022-09-09 19:24+0200\n"
 "PO-Revision-Date: 2007-12-31 01:35+0100\n"
 "Last-Translator: Diego 'Flameeyes' Pettenò <flameeyes@gmail.com>\n"
 "Language-Team: Italian\n"
-"Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: it\n"
 "X-Generator: KBabel 1.11.4\n"
 "Plural-Forms:  nplurals=2; plural=(n != 1);\n"
 
@@ -88,7 +88,7 @@ msgid "xine audio control Window"
 msgstr ""
 
 msgid "Audio amplification"
-msgstr ""
+msgstr "Livello di amplificazione"
 
 msgid "Neutral sound"
 msgstr ""
@@ -98,11 +98,6 @@ msgstr "Annulla"
 
 msgid "Close control window"
 msgstr "Chiudi finestra di controllo"
-
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "There is no MRL."
-msgstr "Non c'e alcun MRL."
 
 #, c-format
 msgid ""
@@ -122,14 +117,14 @@ msgstr ""
 
 #, c-format
 msgid "Video Codec: %s (%s)\n"
-msgstr ""
+msgstr "Codec Video: %s (%s)\n"
 
 msgid "Unavailable"
 msgstr "Non disponibile"
 
 #, c-format
 msgid "Audio Codec: %s (%s)\n"
-msgstr ""
+msgstr "Codec Audio: %s (%s)\n"
 
 msgid "Start Playback ?"
 msgstr "Avviare la riproduzione?"
@@ -138,6 +133,8 @@ msgid ""
 "\n"
 "Start playback anyway ?\n"
 msgstr ""
+"\n"
+"Avviare riproduzione comunque?\n"
 
 msgid "No MRL (input stream) specified"
 msgstr "Nesun MRL (flusso di ingresso) specificato"
@@ -224,7 +221,7 @@ msgid "Control CONTRAST value"
 msgstr "Valore di controllo di CONTRASTO"
 
 msgid "Control GAMMA value"
-msgstr ""
+msgstr "Valore di controllo GAMMA"
 
 msgid "Control SHARPNESS value"
 msgstr ""
@@ -280,7 +277,7 @@ msgid "contrast value"
 msgstr "valore di contrasto"
 
 msgid "gamma value"
-msgstr ""
+msgstr "valore GAMMA"
 
 msgid "sharpness value"
 msgstr ""
@@ -301,7 +298,7 @@ msgid "Contrast value."
 msgstr "Valore di contrasto."
 
 msgid "Gamma value."
-msgstr ""
+msgstr "Valore GAMMA."
 
 msgid "Sharpness value."
 msgstr ""
@@ -482,6 +479,18 @@ msgstr "Ferma"
 msgid "Continue"
 msgstr "Continua"
 
+msgid "Video upright"
+msgstr ""
+
+msgid "Video mirrored"
+msgstr ""
+
+msgid "Video upside down"
+msgstr ""
+
+msgid "Video upside down and mirrored"
+msgstr ""
+
 msgid "Enable extra XLib thread safety."
 msgstr ""
 
@@ -592,7 +601,7 @@ msgid "Enable OSD support"
 msgstr "Abilita supporto OSD"
 
 msgid ""
-"Enabling OSD permit to display some status/informations in output window."
+"Enabling OSD permit one to display some status/informations in output window."
 msgstr ""
 "Abilitando OSD si possono visualizzare alcune stati/informazioni nella "
 "finestra di output."
@@ -719,7 +728,7 @@ msgid "Menu 7"
 msgstr "Menu 7"
 
 msgid "Menu"
-msgstr ""
+msgstr "Menu"
 
 msgid "Red"
 msgstr ""
@@ -767,10 +776,6 @@ msgstr "Impossibile aprire directory '%s': %s."
 #, c-format
 msgid "Unable to delete file '%s': %s."
 msgstr "Impossibile cancellare file '%s': %s."
-
-#, c-format
-msgid "Do you really want to delete the file '%s%s%s' ?"
-msgstr "Vuoi veramente cancellare il file: '%s%s%s' ?"
 
 msgid "Confirm deletion ?"
 msgstr "Confermi cancellazione?"
@@ -822,11 +827,11 @@ msgstr "Ctrl"
 msgid "Alt"
 msgstr "Alt"
 
-msgid "Nothing selected"
-msgstr "Selezione vuota"
-
 msgid "None"
 msgstr "Nulla"
+
+msgid "Nothing selected"
+msgstr "Selezione vuota"
 
 msgid "Grab"
 msgstr "Presa"
@@ -844,9 +849,11 @@ msgstr ""
 
 msgid "Store new key binding"
 msgstr ""
+"Memorizzare %s come tasto\n"
+"corrispondente?"
 
 msgid "Press keyboard keys to bind..."
-msgstr ""
+msgstr "Premi un tasto..."
 
 msgid "Key Binding Editor"
 msgstr "Editor delle scorciatoie"
@@ -888,28 +895,28 @@ msgid "mod5"
 msgstr "mod5"
 
 msgid "start playback"
-msgstr ""
+msgstr "Avviare la riproduzione?"
 
 msgid "playback pause toggle"
-msgstr ""
+msgstr "Riproduzione/Pausa"
 
 msgid "stop playback"
-msgstr ""
+msgstr "Ferma riproduzione"
 
 msgid "close stream"
 msgstr ""
 
 msgid "take a snapshot"
-msgstr ""
+msgstr "Fai una foto"
 
 msgid "eject the current medium"
-msgstr ""
+msgstr "Espelli media corrente"
 
 msgid "select and play next MRL in the playlist"
 msgstr ""
 
 msgid "select and play previous MRL in the playlist"
-msgstr ""
+msgstr "Riproduci precedente elemento della playlist"
 
 msgid "select and play MRL in the playlist"
 msgstr ""
@@ -1011,13 +1018,13 @@ msgid "reset amplification to default value"
 msgstr ""
 
 msgid "audio muting toggle"
-msgstr ""
+msgstr "Abilita/Disabilita muto"
 
 msgid "select next audio channel"
-msgstr ""
+msgstr "Prossimo canale audio"
 
 msgid "select previous audio channel"
-msgstr ""
+msgstr "Precedente canale audio"
 
 msgid "visibility toggle of audio post effect window"
 msgstr ""
@@ -1074,6 +1081,12 @@ msgid "reset zooming"
 msgstr ""
 
 msgid "resize output window to stream size"
+msgstr ""
+
+msgid "flip video sideways"
+msgstr ""
+
+msgid "flip video upside down"
 msgstr ""
 
 msgid "fullscreen toggle"
@@ -1173,7 +1186,7 @@ msgid "visibility toggle of stream info window"
 msgstr ""
 
 msgid "display stream information using OSD"
-msgstr ""
+msgstr "Stream/Informazioni (OSD)"
 
 msgid "display information using OSD"
 msgstr ""
@@ -1182,7 +1195,7 @@ msgid "show OSD menu"
 msgstr ""
 
 msgid "enter key binding editor"
-msgstr ""
+msgstr "Editor delle scorciatoie"
 
 msgid "enable key bindings (not useful to bind a key to it!)"
 msgstr ""
@@ -1191,7 +1204,7 @@ msgid "open file selector"
 msgstr ""
 
 msgid "select a subtitle file"
-msgstr ""
+msgstr "Utililzza un file di sottotitoli"
 
 msgid "download a skin from the skin server"
 msgstr ""
@@ -2084,7 +2097,7 @@ msgid "The following stream has finished recording:"
 msgstr ""
 
 msgid "*sight*, unknown error."
-msgstr ""
+msgstr "*sigh*, errore sconosciuto."
 
 msgid "No information available."
 msgstr "Nessuna informazione disponibile."
@@ -2164,6 +2177,11 @@ msgstr ""
 
 msgid "Logo MRL"
 msgstr "MRL del Logo"
+
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
+msgid "There is no MRL."
+msgstr "Non c'e alcun MRL."
 
 msgid "!!Invalid entry!!"
 msgstr "!!Elemento non valido!!"
@@ -2380,6 +2398,12 @@ msgstr "Video/100%"
 msgid "Video/50%"
 msgstr "Video/50%"
 
+msgid "Video/mirrored"
+msgstr ""
+
+msgid "Video/upside down"
+msgstr ""
+
 msgid "Video/Postprocess"
 msgstr "Video/Post elaborazione"
 
@@ -2438,7 +2462,7 @@ msgid "Settings/Video..."
 msgstr "Impostazioni/Video..."
 
 msgid "Settings/Audio..."
-msgstr ""
+msgstr "Impostazioni/Audio..."
 
 msgid "Settings/TV Analog..."
 msgstr "Impostazioni/TV Analogica..."
@@ -2792,7 +2816,7 @@ msgid "(*)  you need to restart xine for this setting to take effect"
 msgstr "(*)  devi riavviare xine affinché queste opzioni abbiano effetto"
 
 msgid "Skin theme"
-msgstr ""
+msgstr "tema della skin GUI"
 
 #, c-format
 msgid "Failed to load %s/%s. Load fallback skin %s\n"
@@ -2805,8 +2829,8 @@ msgstr "Non è riuscito a caricare %s/%s. Caricata vecchia skin %s\n"
 #, c-format
 msgid "Failed to load %s, wrong version. Load fallback skin '%s'.\n"
 msgstr ""
-"Non è riuscito a caricare %s, versione errata. Caricata skin di riserva "
-"'%s'.\n"
+"Non è riuscito a caricare %s, versione errata. Caricata skin di riserva '%"
+"s'.\n"
 
 #, c-format
 msgid "No available skin found. Say goodbye.\n"
@@ -2842,8 +2866,8 @@ msgstr "Non è riuscito a caricare %s/%s. Sta terminando.\n"
 #, c-format
 msgid "Failed to load %s skin, wrong version. Load fallback skin '%s'.\n"
 msgstr ""
-"Non è riuscito a caricare skin %s, versione errata. Carica skin di riserva "
-"'%s'.\n"
+"Non è riuscito a caricare skin %s, versione errata. Carica skin di riserva '%"
+"s'.\n"
 
 #, c-format
 msgid "Unable to retrieve skin list from %s: %s"
@@ -2882,10 +2906,10 @@ msgid "PNG Parsing failed\n"
 msgstr "Parsing PNG non riuscito\n"
 
 msgid "xine_grab_video_frame.grab () failed\n"
-msgstr ""
+msgstr "xine_grab_video_frame.grab () non riuscito\n"
 
 msgid "xine_new_grab_video_frame () failed\n"
-msgstr ""
+msgstr "xine_new_grab_video_frame () non riuscito\n"
 
 msgid "Wrong image size: "
 msgstr "Dimensione immagine errata: "
@@ -3167,28 +3191,61 @@ msgstr "visualizzatore log di xine"
 msgid "Refresh"
 msgstr "Aggiorna"
 
-#, c-format
-#~ msgid "XSendEvent(display, 0x%x ...) failed.\n"
-#~ msgstr "XSendEvent(display, 0x%x ...) non riuscito.\n"
+#~ msgid "Do you really want to delete the file '%s%s%s' ?"
+#~ msgstr "Vuoi veramente cancellare il file: '%s%s%s' ?"
+
+#~ msgid "XF86VidMode Extension (%d.%d) detected, trying to use it.\n"
+#~ msgstr "Estensione XF86VidMode (%d.%d) rilevata, provo ad usarla.\n"
+
+#~ msgid "XF86VidMode Extension: %d modelines found.\n"
+#~ msgstr "Estensione XF86VidMode: modeline %d trovata.\n"
+
+#~ msgid "XF86VidModeModeLine %dx%d isn't valid: discarded.\n"
+#~ msgstr "XF86VidModeModeLine %dx%d non è valida: scartata.\n"
+
+#~ msgid ""
+#~ "XF86VidMode Extension: could not get list of available modelines. "
+#~ "Failed.\n"
+#~ msgstr ""
+#~ "Estensione XF86VidMode: impossibile ottenere la lista di modeline "
+#~ "disponibili. Non è riuscita.\n"
+
+#~ msgid "XF86VidMode Extension: initialization failed, not using it.\n"
+#~ msgstr ""
+#~ "Estensione XF86VidMode: inizializzazione non riuscita, non la si usa.\n"
+
+#~ msgid "XF86VidMode Extension: modeline switching failed.\n"
+#~ msgstr ""
+#~ "Estensione XF86VidMode: non è riuscito il passaggio alla modeline.\n"
 
 #~ msgid "Error"
 #~ msgstr "Errore"
 
+#~ msgid "You can only delete alias entries."
+#~ msgstr "Puoi solo cancellare gli alias degli elementi."
+
+#~ msgid "XAllocWMHints() failed\n"
+#~ msgstr "XAllocWMHints() non riuscito\n"
+
+#~ msgid "Event Receiver Window:  Press keyboard keys to bind..."
+#~ msgstr ""
+#~ "Finestra di ricezione degli eventi: premere il tasto da utilizzare..."
+
+#~ msgid "XSendEvent(display, 0x%x ...) failed.\n"
+#~ msgstr "XSendEvent(display, 0x%x ...) non riuscito.\n"
+
 #~ msgid "Warning"
 #~ msgstr "Attenzione"
 
-#, c-format
 #~ msgid ""
 #~ "gui_main: selected visual %#lx does not exist, trying default visual\n"
 #~ msgstr ""
 #~ "gui_main: visuale selezionata %#lx non esiste, sto provando la "
 #~ "predefinita\n"
 
-#, c-format
 #~ msgid "gui_main: couldn't find true color visual.\n"
 #~ msgstr "gui_main: non posso trovare visuale a colori reali.\n"
 
-#, c-format
 #~ msgid ""
 #~ "\n"
 #~ "XInitThreads failed - looks like you don't have a thread-safe xlib.\n"
@@ -3197,68 +3254,23 @@ msgstr "Aggiorna"
 #~ "XInitThreads non riuscito - sembra che non abbia un thread-sicuro in "
 #~ "xlib.\n"
 
-#, c-format
 #~ msgid "Warning! Synchronized X activated - this is very slow...\n"
 #~ msgstr "Attenzione! X sicronizzazione attivata - modalità molto lenta...\n"
 
-#, c-format
 #~ msgid "Unable to initialize Imlib\n"
 #~ msgstr "Impossibile inizializzare imlib\n"
-
-#~ msgid "You can only delete alias entries."
-#~ msgstr "Puoi solo cancellare gli alias degli elementi."
-
-#~ msgid "Event Receiver Window:  Press keyboard keys to bind..."
-#~ msgstr ""
-#~ "Finestra di ricezione degli eventi: premere il tasto da utilizzare..."
 
 #~ msgid "Accept?"
 #~ msgstr "Accetti?"
 
-#, c-format
 #~ msgid "Bad visual '%s'\n"
 #~ msgstr "Cattiva visuale '%s'\n"
 
-#, c-format
 #~ msgid "Bad geometry '%s', see xine --help\n"
 #~ msgstr "Geomentria '%s' errata, vedi xine --help\n"
 
-#, c-format
 #~ msgid "Ooch, skin not found, use fallback '%s'.\n"
 #~ msgstr "Ohi, skin non trovata, uso la riserva '%s'.\n"
-
-#~ msgid "XF86VidMode Extension: modeline switching failed.\n"
-#~ msgstr ""
-#~ "Estensione XF86VidMode: non è riuscito il passaggio alla modeline.\n"
-
-#, c-format
-#~ msgid "XAllocWMHints() failed\n"
-#~ msgstr "XAllocWMHints() non riuscito\n"
-
-#, c-format
-#~ msgid "XF86VidMode Extension (%d.%d) detected, trying to use it.\n"
-#~ msgstr "Estensione XF86VidMode (%d.%d) rilevata, provo ad usarla.\n"
-
-#, c-format
-#~ msgid "XF86VidMode Extension: %d modelines found.\n"
-#~ msgstr "Estensione XF86VidMode: modeline %d trovata.\n"
-
-#, c-format
-#~ msgid "XF86VidModeModeLine %dx%d isn't valid: discarded.\n"
-#~ msgstr "XF86VidModeModeLine %dx%d non è valida: scartata.\n"
-
-#, c-format
-#~ msgid ""
-#~ "XF86VidMode Extension: could not get list of available modelines. "
-#~ "Failed.\n"
-#~ msgstr ""
-#~ "Estensione XF86VidMode: impossibile ottenere la lista di modeline "
-#~ "disponibili. Non è riuscita.\n"
-
-#, c-format
-#~ msgid "XF86VidMode Extension: initialization failed, not using it.\n"
-#~ msgstr ""
-#~ "Estensione XF86VidMode: inizializzazione non riuscita, non la si usa.\n"
 
 #~ msgid "..."
 #~ msgstr "Altro..."

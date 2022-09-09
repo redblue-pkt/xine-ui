@@ -13,14 +13,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eo\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2021-12-11 19:35+0200\n"
+"POT-Creation-Date: 2022-09-09 19:24+0200\n"
 "PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Antonio Codazzi <f_sophia@libero.it>\n"
 "Language-Team: Esperanto\n"
-"Language: eo\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: eo\n"
 "Plural-Forms:  nplurals=2; plural=(n != 1);\n"
 
 #, c-format
@@ -88,7 +88,7 @@ msgid "xine audio control Window"
 msgstr ""
 
 msgid "Audio amplification"
-msgstr ""
+msgstr "Nivelo de amplifo"
 
 msgid "Neutral sound"
 msgstr ""
@@ -98,11 +98,6 @@ msgstr "Rezignu"
 
 msgid "Close control window"
 msgstr "Fermu fenestron de regiloj"
-
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "There is no MRL."
-msgstr "Neniu MRL estas."
 
 #, c-format
 msgid ""
@@ -122,14 +117,14 @@ msgstr ""
 
 #, c-format
 msgid "Video Codec: %s (%s)\n"
-msgstr ""
+msgstr "Videokodaĵo: %s (%s)\n"
 
 msgid "Unavailable"
 msgstr "Nedisponebla"
 
 #, c-format
 msgid "Audio Codec: %s (%s)\n"
-msgstr ""
+msgstr "Aŭdokodaĵo: %s (%s)\n"
 
 msgid "Start Playback ?"
 msgstr "Ĉu mi devas startigi legon?"
@@ -138,6 +133,8 @@ msgid ""
 "\n"
 "Start playback anyway ?\n"
 msgstr ""
+"\n"
+"Ĉu mi devas startigi legon ĉiukaze?\n"
 
 msgid "No MRL (input stream) specified"
 msgstr "Neniu MRL (eniga datumstrio) estis specifita"
@@ -224,7 +221,7 @@ msgid "Control CONTRAST value"
 msgstr "Regilo por valoro de KONTRASTO"
 
 msgid "Control GAMMA value"
-msgstr ""
+msgstr "Regilo por valoro de GAMMA"
 
 msgid "Control SHARPNESS value"
 msgstr ""
@@ -280,7 +277,7 @@ msgid "contrast value"
 msgstr "valoro de kontrasto"
 
 msgid "gamma value"
-msgstr ""
+msgstr "valoro de gamma"
 
 msgid "sharpness value"
 msgstr ""
@@ -301,7 +298,7 @@ msgid "Contrast value."
 msgstr "Valoro de kontrasto"
 
 msgid "Gamma value."
-msgstr ""
+msgstr "Valoro de gamma."
 
 msgid "Sharpness value."
 msgstr ""
@@ -483,6 +480,18 @@ msgstr "Halto"
 msgid "Continue"
 msgstr "Daŭro"
 
+msgid "Video upright"
+msgstr ""
+
+msgid "Video mirrored"
+msgstr ""
+
+msgid "Video upside down"
+msgstr ""
+
+msgid "Video upside down and mirrored"
+msgstr ""
+
 msgid "Enable extra XLib thread safety."
 msgstr ""
 
@@ -593,7 +602,7 @@ msgid "Enable OSD support"
 msgstr "Ebligu subtenon por OSD"
 
 msgid ""
-"Enabling OSD permit to display some status/informations in output window."
+"Enabling OSD permit one to display some status/informations in output window."
 msgstr "Ebligante OSD, ĝi permitas montri staton/informojn en eliga fenestro."
 
 msgid "Use unscaled OSD"
@@ -718,7 +727,7 @@ msgid "Menu 7"
 msgstr "Menuo 7"
 
 msgid "Menu"
-msgstr ""
+msgstr "Menuo"
 
 msgid "Red"
 msgstr ""
@@ -766,10 +775,6 @@ msgstr "Estas neeble malfermi dosierujon '%s': %s."
 #, c-format
 msgid "Unable to delete file '%s': %s."
 msgstr "Estas neeble forigi dosieron '%s': %s."
-
-#, c-format
-msgid "Do you really want to delete the file '%s%s%s' ?"
-msgstr "Ĉu vi volas ja forigi la dosieron: '%s%s%s'"
 
 msgid "Confirm deletion ?"
 msgstr "Ĉu vi konfirmas forigon?"
@@ -821,11 +826,11 @@ msgstr "Strkl"
 msgid "Alt"
 msgstr "Alt"
 
-msgid "Nothing selected"
-msgstr "Nenio elektita"
-
 msgid "None"
 msgstr "Nenio"
+
+msgid "Nothing selected"
+msgstr "Nenio elektita"
 
 msgid "Grab"
 msgstr "Prenu"
@@ -843,9 +848,11 @@ msgstr ""
 
 msgid "Store new key binding"
 msgstr ""
+"Ĉu %s memoriĝas kiel\n"
+"'%s' klavorespondo?"
 
 msgid "Press keyboard keys to bind..."
-msgstr ""
+msgstr "Premu Klavoj de Klavaro..."
 
 msgid "Key Binding Editor"
 msgstr "Redaktilo de klavorespondo"
@@ -887,22 +894,22 @@ msgid "mod5"
 msgstr "mod5"
 
 msgid "start playback"
-msgstr ""
+msgstr "Ĉu mi devas startigi legon?"
 
 msgid "playback pause toggle"
-msgstr ""
+msgstr "Legado/Paŭzu"
 
 msgid "stop playback"
-msgstr ""
+msgstr "Haltu legon"
 
 msgid "close stream"
 msgstr ""
 
 msgid "take a snapshot"
-msgstr ""
+msgstr "Ekfoto"
 
 msgid "eject the current medium"
-msgstr ""
+msgstr "Elĵetu nunan plurmediaĵon"
 
 msgid "select and play next MRL in the playlist"
 msgstr ""
@@ -926,7 +933,7 @@ msgid "add a mediamark from current playback"
 msgstr ""
 
 msgid "edit selected mediamark"
-msgstr ""
+msgstr "Aldonu Plurmedian markon"
 
 msgid "set position to -60 seconds in current stream"
 msgstr ""
@@ -1010,13 +1017,13 @@ msgid "reset amplification to default value"
 msgstr ""
 
 msgid "audio muting toggle"
-msgstr ""
+msgstr "Ŝanĝu en mutigita"
 
 msgid "select next audio channel"
-msgstr ""
+msgstr "Sekva aŭdokanalo"
 
 msgid "select previous audio channel"
-msgstr ""
+msgstr "Antaŭa aŭdokanalo"
 
 msgid "visibility toggle of audio post effect window"
 msgstr ""
@@ -1034,7 +1041,7 @@ msgid "interlaced mode toggle"
 msgstr ""
 
 msgid "cycle aspect ratio values"
-msgstr ""
+msgstr "Proporcio"
 
 msgid "reduce the output window size by factor 1.2"
 msgstr ""
@@ -1075,8 +1082,14 @@ msgstr ""
 msgid "resize output window to stream size"
 msgstr ""
 
-msgid "fullscreen toggle"
+msgid "flip video sideways"
 msgstr ""
+
+msgid "flip video upside down"
+msgstr ""
+
+msgid "fullscreen toggle"
+msgstr "Tutekrane"
 
 msgid "Xinerama fullscreen toggle"
 msgstr ""
@@ -1172,7 +1185,7 @@ msgid "visibility toggle of stream info window"
 msgstr ""
 
 msgid "display stream information using OSD"
-msgstr ""
+msgstr "Datumstrio/Informoj (OSD)"
 
 msgid "display information using OSD"
 msgstr ""
@@ -1181,7 +1194,7 @@ msgid "show OSD menu"
 msgstr ""
 
 msgid "enter key binding editor"
-msgstr ""
+msgstr "Redaktilo de klavorespondo"
 
 msgid "enable key bindings (not useful to bind a key to it!)"
 msgstr ""
@@ -1190,7 +1203,7 @@ msgid "open file selector"
 msgstr ""
 
 msgid "select a subtitle file"
-msgstr ""
+msgstr "Prenu dosieron de surskribaĵoj"
 
 msgid "download a skin from the skin server"
 msgstr ""
@@ -1871,8 +1884,8 @@ msgid ""
 "                               This option can be used more than one time.\n"
 msgstr ""
 "      --post <kromaĵo>[:parametro=valoro][,...][;...]\n"
-"                               Ŝargu unu aŭ pluraj postprocezada(j)n "
-"kromaĵo(j)n.\n"
+"                               Ŝargu unu aŭ pluraj postprocezada(j)n kromaĵo"
+"(j)n.\n"
 "                               Parametroj estas apartitaj per komo.\n"
 "                               Ĉi opcio estas uzebla plurfoje.\n"
 
@@ -2066,7 +2079,7 @@ msgid "The following stream has finished recording:"
 msgstr ""
 
 msgid "*sight*, unknown error."
-msgstr ""
+msgstr "*vido*, nekonata eraro."
 
 msgid "No information available."
 msgstr "Neniu informo disponebla."
@@ -2146,6 +2159,11 @@ msgstr ""
 
 msgid "Logo MRL"
 msgstr "Logoo MRL"
+
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
+msgid "There is no MRL."
+msgstr "Neniu MRL estas."
 
 msgid "!!Invalid entry!!"
 msgstr "!!!Nevalida ero!!!"
@@ -2362,6 +2380,12 @@ msgstr "Video/100%"
 msgid "Video/50%"
 msgstr "Video/50%"
 
+msgid "Video/mirrored"
+msgstr ""
+
+msgid "Video/upside down"
+msgstr ""
+
 msgid "Video/Postprocess"
 msgstr "Video/Postprocezado"
 
@@ -2420,7 +2444,7 @@ msgid "Settings/Video..."
 msgstr "Agordoj/Video..."
 
 msgid "Settings/Audio..."
-msgstr ""
+msgstr "Agordoj/Audio..."
 
 msgid "Settings/TV Analog..."
 msgstr "Agordoj/Analoga TV..."
@@ -2773,7 +2797,7 @@ msgid "(*)  you need to restart xine for this setting to take effect"
 msgstr "(*)  vi necesas restarton de xine por igi agordojn efikaj"
 
 msgid "Skin theme"
-msgstr ""
+msgstr "temo por etoso de GUI"
 
 #, c-format
 msgid "Failed to load %s/%s. Load fallback skin %s\n"
@@ -2822,8 +2846,8 @@ msgstr "Ŝargo de %s/%s malsukcesis. Elirante\n"
 #, c-format
 msgid "Failed to load %s skin, wrong version. Load fallback skin '%s'.\n"
 msgstr ""
-"Ŝargo de etoso %s malsukcesis, malĝusta versio. Ŝargo de anstataŭa etoso "
-"'%s'.\n"
+"Ŝargo de etoso %s malsukcesis, malĝusta versio. Ŝargo de anstataŭa etoso '%"
+"s'.\n"
 
 #, c-format
 msgid "Unable to retrieve skin list from %s: %s"
@@ -2862,10 +2886,10 @@ msgid "PNG Parsing failed\n"
 msgstr "Sintaksa analizado de PNG malsukcesis\n"
 
 msgid "xine_grab_video_frame.grab () failed\n"
-msgstr ""
+msgstr "xine_grab_video_frame.grab () malsukcesis\n"
 
 msgid "xine_new_grab_video_frame () failed\n"
-msgstr ""
+msgstr "xine_new_grab_video_frame () malsukcesis\n"
 
 msgid "Wrong image size: "
 msgstr "Malĝusta bildgrando: "
@@ -3140,83 +3164,18 @@ msgstr "Vidigilo de protokolo de xine"
 msgid "Refresh"
 msgstr "Ĝisdatigu"
 
-#, c-format
-#~ msgid "XSendEvent(display, 0x%x ...) failed.\n"
-#~ msgstr "XSendEvent(ekranbloko, 0x%x ...) malsukcesis.\n"
+#~ msgid "Do you really want to delete the file '%s%s%s' ?"
+#~ msgstr "Ĉu vi volas ja forigi la dosieron: '%s%s%s'"
 
-#~ msgid "Error"
-#~ msgstr "Eraro"
-
-#~ msgid "Warning"
-#~ msgstr "Averto"
-
-#, c-format
-#~ msgid ""
-#~ "gui_main: selected visual %#lx does not exist, trying default visual\n"
-#~ msgstr ""
-#~ "gui_ĉefo: elektita vido %#lx ne ekzistas, do mi provas defaŭltan vidon\n"
-
-#, c-format
-#~ msgid "gui_main: couldn't find true color visual.\n"
-#~ msgstr "gui_ĉefo: estas neeble trovi verkoloran vidon.\n"
-
-#, c-format
-#~ msgid ""
-#~ "\n"
-#~ "XInitThreads failed - looks like you don't have a thread-safe xlib.\n"
-#~ msgstr ""
-#~ "\n"
-#~ "XInitThreads malsukcesis - ŝajnas ke vi ne havas fadensekuran en xlib.\n"
-
-#, c-format
-#~ msgid "Warning! Synchronized X activated - this is very slow...\n"
-#~ msgstr "Atentu! Sinkronigita X estas aktiva - ĝi estas tre malrapida...\n"
-
-#, c-format
-#~ msgid "Unable to initialize Imlib\n"
-#~ msgstr "Estas neeble pravalorizi Imlib\n"
-
-#~ msgid "You can only delete alias entries."
-#~ msgstr "Vi povas nur forigi enigojn de kromnomoj"
-
-#~ msgid "Event Receiver Window:  Press keyboard keys to bind..."
-#~ msgstr "Fenestro por Ricevo de Eventoj:  Premu Klavoj de Klavaro..."
-
-#~ msgid "Accept?"
-#~ msgstr "Ĉu vi konsentas?"
-
-#, c-format
-#~ msgid "Bad visual '%s'\n"
-#~ msgstr "Malbona vido '%s'\n"
-
-#, c-format
-#~ msgid "Bad geometry '%s', see xine --help\n"
-#~ msgstr "Malbona geometrio '%s', vidu xine --help\n"
-
-#, c-format
-#~ msgid "Ooch, skin not found, use fallback '%s'.\n"
-#~ msgstr "Huj, la etoso ne estis trovita, do uzu anstataŭan '%s'.\n"
-
-#~ msgid "XF86VidMode Extension: modeline switching failed.\n"
-#~ msgstr "XF86VidMode Etendilo: ŝanĝo de reĝimlinio malsukcesis.\n"
-
-#, c-format
-#~ msgid "XAllocWMHints() failed\n"
-#~ msgstr "XAllocWMHints() malsukcesis\n"
-
-#, c-format
 #~ msgid "XF86VidMode Extension (%d.%d) detected, trying to use it.\n"
 #~ msgstr "XF86VidMode Etendilo (%d.%d) estis rekonita, provu uzi ĝin.\n"
 
-#, c-format
 #~ msgid "XF86VidMode Extension: %d modelines found.\n"
 #~ msgstr "XF86VidMode Etendilo: %d reĝimlinioj estis trovitaj.\n"
 
-#, c-format
 #~ msgid "XF86VidModeModeLine %dx%d isn't valid: discarded.\n"
 #~ msgstr "XF86VidModeModeLine %dx%d estas nevalida: ago rezignita.\n"
 
-#, c-format
 #~ msgid ""
 #~ "XF86VidMode Extension: could not get list of available modelines. "
 #~ "Failed.\n"
@@ -3224,9 +3183,62 @@ msgstr "Ĝisdatigu"
 #~ "XF86VidMode Etendilo: estas neeble havi liston de disponeblaj "
 #~ "reĝimlinioj. Ago malsukcesinta\n"
 
-#, c-format
 #~ msgid "XF86VidMode Extension: initialization failed, not using it.\n"
 #~ msgstr "XF86VidMode Etendilo: preparado malsukcesis; ne uzu ĝin.\n"
+
+#~ msgid "XF86VidMode Extension: modeline switching failed.\n"
+#~ msgstr "XF86VidMode Etendilo: ŝanĝo de reĝimlinio malsukcesis.\n"
+
+#~ msgid "Error"
+#~ msgstr "Eraro"
+
+#~ msgid "You can only delete alias entries."
+#~ msgstr "Vi povas nur forigi enigojn de kromnomoj"
+
+#~ msgid "XAllocWMHints() failed\n"
+#~ msgstr "XAllocWMHints() malsukcesis\n"
+
+#~ msgid "Event Receiver Window:  Press keyboard keys to bind..."
+#~ msgstr "Fenestro por Ricevo de Eventoj:  Premu Klavoj de Klavaro..."
+
+#~ msgid "XSendEvent(display, 0x%x ...) failed.\n"
+#~ msgstr "XSendEvent(ekranbloko, 0x%x ...) malsukcesis.\n"
+
+#~ msgid "Warning"
+#~ msgstr "Averto"
+
+#~ msgid ""
+#~ "gui_main: selected visual %#lx does not exist, trying default visual\n"
+#~ msgstr ""
+#~ "gui_ĉefo: elektita vido %#lx ne ekzistas, do mi provas defaŭltan vidon\n"
+
+#~ msgid "gui_main: couldn't find true color visual.\n"
+#~ msgstr "gui_ĉefo: estas neeble trovi verkoloran vidon.\n"
+
+#~ msgid ""
+#~ "\n"
+#~ "XInitThreads failed - looks like you don't have a thread-safe xlib.\n"
+#~ msgstr ""
+#~ "\n"
+#~ "XInitThreads malsukcesis - ŝajnas ke vi ne havas fadensekuran en xlib.\n"
+
+#~ msgid "Warning! Synchronized X activated - this is very slow...\n"
+#~ msgstr "Atentu! Sinkronigita X estas aktiva - ĝi estas tre malrapida...\n"
+
+#~ msgid "Unable to initialize Imlib\n"
+#~ msgstr "Estas neeble pravalorizi Imlib\n"
+
+#~ msgid "Accept?"
+#~ msgstr "Ĉu vi konsentas?"
+
+#~ msgid "Bad visual '%s'\n"
+#~ msgstr "Malbona vido '%s'\n"
+
+#~ msgid "Bad geometry '%s', see xine --help\n"
+#~ msgstr "Malbona geometrio '%s', vidu xine --help\n"
+
+#~ msgid "Ooch, skin not found, use fallback '%s'.\n"
+#~ msgstr "Huj, la etoso ne estis trovita, do uzu anstataŭan '%s'.\n"
 
 #~ msgid "..."
 #~ msgstr "Pli..."

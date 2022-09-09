@@ -8,14 +8,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui-eu\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2021-12-11 19:35+0200\n"
+"POT-Creation-Date: 2022-09-09 19:24+0200\n"
 "PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Piarres Beobide  <pi@beobide.net>\n"
 "Language-Team: Librezale.org <librezale@librezale.org>\n"
-"Language: eu\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: eu\n"
 "X-Generator: KBabel 1.9.1\n"
 
 #, c-format
@@ -84,7 +84,7 @@ msgid "xine audio control Window"
 msgstr ""
 
 msgid "Audio amplification"
-msgstr ""
+msgstr "Anplifikazio-maila"
 
 msgid "Neutral sound"
 msgstr ""
@@ -94,11 +94,6 @@ msgstr "Itxi"
 
 msgid "Close control window"
 msgstr "Itxi kontrol leihoa"
-
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "There is no MRL."
-msgstr ""
 
 #, c-format
 msgid ""
@@ -118,14 +113,14 @@ msgstr ""
 
 #, c-format
 msgid "Video Codec: %s (%s)\n"
-msgstr ""
+msgstr "Bideo-kodeka: %s (%s)\n"
 
 msgid "Unavailable"
 msgstr "Ez dago erabilgarri"
 
 #, c-format
 msgid "Audio Codec: %s (%s)\n"
-msgstr ""
+msgstr "Audio-kodeka: %s (%s)\n"
 
 msgid "Start Playback ?"
 msgstr "Erreproduzitzen hasi ?"
@@ -134,6 +129,8 @@ msgid ""
 "\n"
 "Start playback anyway ?\n"
 msgstr ""
+"\n"
+"Erreproduzitzen hasi nahi duzu hala ere?\n"
 
 msgid "No MRL (input stream) specified"
 msgstr "Ez da MRLrik (sarrera-korronterik) zehaztu"
@@ -208,7 +205,7 @@ msgid "Noise"
 msgstr ""
 
 msgid "Control HUE value"
-msgstr "Kontrolen �BARDURAREN balioa"
+msgstr "Kontrolen BARDURAREN balioa"
 
 msgid "Control SATURATION value"
 msgstr "Kontrolen SATURAZIOAREN balioa"
@@ -220,7 +217,7 @@ msgid "Control CONTRAST value"
 msgstr "Kontrolen KONTRASTEAREN balioa"
 
 msgid "Control GAMMA value"
-msgstr ""
+msgstr "Kontrolen GAMMA balioa"
 
 msgid "Control SHARPNESS value"
 msgstr ""
@@ -246,7 +243,7 @@ msgstr ""
 #. TRANSLATORS: only ASCII characters (skin).
 msgctxt "skin"
 msgid "Ctr"
-msgstr ""
+msgstr "Ktr"
 
 #. TRANSLATORS: only ASCII characters (skin).
 msgctxt "skin"
@@ -276,10 +273,10 @@ msgid "contrast value"
 msgstr "kontrastearen balioa"
 
 msgid "gamma value"
-msgstr ""
+msgstr "GAMMA balioa"
 
 msgid "sharpness value"
-msgstr ""
+msgstr "distiraren balioa"
 
 msgid "noise reduction value"
 msgstr ""
@@ -297,7 +294,7 @@ msgid "Contrast value."
 msgstr "Kontrastearen balioa."
 
 msgid "Gamma value."
-msgstr ""
+msgstr "GAMMA balioa."
 
 msgid "Sharpness value."
 msgstr ""
@@ -327,7 +324,7 @@ msgstr "Deskargatzen"
 #, c-format
 msgctxt "skin"
 msgid "Download progress: %d%%."
-msgstr ""
+msgstr "Deskargatzen: %d%%."
 
 msgid "Done"
 msgstr "Eginda"
@@ -479,6 +476,18 @@ msgstr "Gelditu"
 msgid "Continue"
 msgstr "Jarraitu"
 
+msgid "Video upright"
+msgstr ""
+
+msgid "Video mirrored"
+msgstr ""
+
+msgid "Video upside down"
+msgstr ""
+
+msgid "Video upside down and mirrored"
+msgstr ""
+
 msgid "Enable extra XLib thread safety."
 msgstr ""
 
@@ -581,7 +590,7 @@ msgid "Enable OSD support"
 msgstr "Gaitu OSD euskarria"
 
 msgid ""
-"Enabling OSD permit to display some status/informations in output window."
+"Enabling OSD permit one to display some status/informations in output window."
 msgstr "OSD gaitzean, egoera/informazioa bistara daiteke irteerako leihoan."
 
 msgid "Use unscaled OSD"
@@ -706,7 +715,7 @@ msgid "Menu 7"
 msgstr "7. menua"
 
 msgid "Menu"
-msgstr ""
+msgstr "Menuak"
 
 msgid "Red"
 msgstr ""
@@ -754,10 +763,6 @@ msgstr "Ezin da '%s' direktorioa ireki: %s."
 #, c-format
 msgid "Unable to delete file '%s': %s."
 msgstr "Ezin da '%s' fitxategia ezabatu: %s."
-
-#, c-format
-msgid "Do you really want to delete the file '%s%s%s' ?"
-msgstr "Benetan fitxategi hau ezabatu nahi duzula: '%s%s%s'"
 
 msgid "Confirm deletion ?"
 msgstr "Ezabatzea berretsi nahi duzu ?"
@@ -809,11 +814,11 @@ msgstr "Ktrl"
 msgid "Alt"
 msgstr "Alt"
 
-msgid "Nothing selected"
-msgstr "Ez dago ezer hautatuta"
-
 msgid "None"
 msgstr "Bat ere ez"
+
+msgid "Nothing selected"
+msgstr "Ez dago ezer hautatuta"
 
 msgid "Grab"
 msgstr "Hartu"
@@ -831,9 +836,11 @@ msgstr ""
 
 msgid "Store new key binding"
 msgstr ""
+"%s gorde \n"
+"'%s' laster-tekla gisa?"
 
 msgid "Press keyboard keys to bind..."
-msgstr ""
+msgstr "Sakatu teklatuko teklak..."
 
 msgid "Key Binding Editor"
 msgstr "Laster-teklen editorea"
@@ -875,22 +882,22 @@ msgid "mod5"
 msgstr "mod5"
 
 msgid "start playback"
-msgstr ""
+msgstr "Erreproduzitzen hasi ?"
 
 msgid "playback pause toggle"
-msgstr ""
+msgstr "Erreproduzitu/Pausarazi"
 
 msgid "stop playback"
-msgstr ""
+msgstr "Utzi erreproduzitzeari"
 
 msgid "close stream"
 msgstr ""
 
 msgid "take a snapshot"
-msgstr ""
+msgstr "Egin argazki bat"
 
 msgid "eject the current medium"
-msgstr ""
+msgstr "Egotzi uneko euskarria"
 
 msgid "select and play next MRL in the playlist"
 msgstr ""
@@ -998,13 +1005,13 @@ msgid "reset amplification to default value"
 msgstr ""
 
 msgid "audio muting toggle"
-msgstr ""
+msgstr "Mututu bai/ez"
 
 msgid "select next audio channel"
-msgstr ""
+msgstr "Hurrengo audio-kanala"
 
 msgid "select previous audio channel"
-msgstr ""
+msgstr "Aurreko audio-kanala"
 
 msgid "visibility toggle of audio post effect window"
 msgstr ""
@@ -1022,7 +1029,7 @@ msgid "interlaced mode toggle"
 msgstr ""
 
 msgid "cycle aspect ratio values"
-msgstr ""
+msgstr "Aspektu-erlazioa"
 
 msgid "reduce the output window size by factor 1.2"
 msgstr ""
@@ -1063,8 +1070,14 @@ msgstr ""
 msgid "resize output window to stream size"
 msgstr ""
 
-msgid "fullscreen toggle"
+msgid "flip video sideways"
 msgstr ""
+
+msgid "flip video upside down"
+msgstr ""
+
+msgid "fullscreen toggle"
+msgstr "Pantaila Osoa"
 
 msgid "Xinerama fullscreen toggle"
 msgstr ""
@@ -1160,7 +1173,7 @@ msgid "visibility toggle of stream info window"
 msgstr ""
 
 msgid "display stream information using OSD"
-msgstr ""
+msgstr "Korrontea/informazioa (OSD)"
 
 msgid "display information using OSD"
 msgstr ""
@@ -1169,7 +1182,7 @@ msgid "show OSD menu"
 msgstr ""
 
 msgid "enter key binding editor"
-msgstr ""
+msgstr "Laster-teklen editorea"
 
 msgid "enable key bindings (not useful to bind a key to it!)"
 msgstr ""
@@ -1178,7 +1191,7 @@ msgid "open file selector"
 msgstr ""
 
 msgid "select a subtitle file"
-msgstr ""
+msgstr "Aukeratu azpitituluen fitxategi bat"
 
 msgid "download a skin from the skin server"
 msgstr ""
@@ -1424,7 +1437,7 @@ msgid "VDR Command info"
 msgstr ""
 
 msgid "VDR Previous channel"
-msgstr ""
+msgstr "Hurregno SPU kanala"
 
 msgid "VDR Subtiles menu"
 msgstr ""
@@ -1685,6 +1698,7 @@ msgstr ""
 #, c-format
 msgid "  -W, --wid                    Use a window id.\n"
 msgstr ""
+"  -W, --wid                    Erabili erroko leihoa bideoaren leiho gisa.\n"
 
 #, c-format
 msgid "  -G, --geometry <WxH[+X+Y]>   Set output window geometry (X style).\n"
@@ -2047,7 +2061,7 @@ msgid "The following stream has finished recording:"
 msgstr ""
 
 msgid "*sight*, unknown error."
-msgstr ""
+msgstr "*aiba*, errore ezezaguna."
 
 msgid "No information available."
 msgstr "Ez dago informaziorik erabilgarri."
@@ -2127,6 +2141,11 @@ msgstr ""
 
 msgid "Logo MRL"
 msgstr "MRL logotipoa"
+
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
+msgid "There is no MRL."
+msgstr "Ez dago mrl-rik."
 
 msgid "!!Invalid entry!!"
 msgstr "Sarrera baliogabea!!"
@@ -2343,6 +2362,12 @@ msgstr "Bideoa/100%"
 msgid "Video/50%"
 msgstr "Bideoa/50%"
 
+msgid "Video/mirrored"
+msgstr ""
+
+msgid "Video/upside down"
+msgstr ""
+
 msgid "Video/Postprocess"
 msgstr "Bideo/Postprozesua"
 
@@ -2401,7 +2426,7 @@ msgid "Settings/Video..."
 msgstr "Ezarpenak/bideoa..."
 
 msgid "Settings/Audio..."
-msgstr ""
+msgstr "Ezarpenak/Audio..."
 
 msgid "Settings/TV Analog..."
 msgstr "Ezarpenak/Telebista Analogikoa..."
@@ -2622,7 +2647,7 @@ msgid "Tips timeout (ms)"
 msgstr "Iradokizunen denbora-muga (ms)"
 
 msgid "Persistence time of tooltips, in milliseconds."
-msgstr ""
+msgstr "OSD bisualaren iraunkortasun-denbora, millisegundotan."
 
 msgid "Load"
 msgstr "Kargatu"
@@ -2669,7 +2694,7 @@ msgstr "Itxi erreprodukzio-zerrendaren leihoa"
 #. TRANSLATORS: only ASCII characters (skin)
 msgctxt "skin"
 msgid "Scan for:"
-msgstr ""
+msgstr "Bilatu hau:"
 
 msgid "Direct MRL entry"
 msgstr "MRL sarrera zuzena"
@@ -2755,7 +2780,7 @@ msgid "(*)  you need to restart xine for this setting to take effect"
 msgstr "(*)  xine berrabiarazi behar duzu ezarpen hauek abiarazteko"
 
 msgid "Skin theme"
-msgstr ""
+msgstr "gui azalaren gaia"
 
 #, c-format
 msgid "Failed to load %s/%s. Load fallback skin %s\n"
@@ -2844,10 +2869,10 @@ msgid "PNG Parsing failed\n"
 msgstr "Ezin izan da PNG analizatu\n"
 
 msgid "xine_grab_video_frame.grab () failed\n"
-msgstr ""
+msgstr "xine_grab_video_frame.grab ()-k huts egin du\n"
 
 msgid "xine_new_grab_video_frame () failed\n"
-msgstr ""
+msgstr "xine_new_grab_video_frame ()-k huts egin du\n"
 
 msgid "Wrong image size: "
 msgstr "Okerrerko irudi tamaina: "
@@ -3129,85 +3154,19 @@ msgstr "xine erregistro-ikustailea"
 msgid "Refresh"
 msgstr "Freskatu"
 
-#, c-format
-#~ msgid "XSendEvent(display, 0x%x ...) failed.\n"
-#~ msgstr "XsendEvent-ek (bistaratzea, 0x%x ...) huts egin du.\n"
+#~ msgid "Do you really want to delete the file '%s%s%s' ?"
+#~ msgstr "Benetan fitxategi hau ezabatu nahi duzula: '%s%s%s'"
 
-#~ msgid "Error"
-#~ msgstr "Errorea"
-
-#~ msgid "Warning"
-#~ msgstr "Kontuz"
-
-#, c-format
-#~ msgid ""
-#~ "gui_main: selected visual %#lx does not exist, trying default visual\n"
-#~ msgstr ""
-#~ "gui_main: hautatutako %#lx bisuala ez dago, lehenetsitako bisualarekin "
-#~ "saiatzen\n"
-
-#, c-format
-#~ msgid "gui_main: couldn't find true color visual.\n"
-#~ msgstr "gui_main: ezin izan da benetako kolore bisuala aurkitu.\n"
-
-#, c-format
-#~ msgid ""
-#~ "\n"
-#~ "XInitThreads failed - looks like you don't have a thread-safe xlib.\n"
-#~ msgstr ""
-#~ "\n"
-#~ "XinitThreads-ek huts egin du - hari seguruko xlib-ik ez duzula dirudi.\n"
-
-#, c-format
-#~ msgid "Warning! Synchronized X activated - this is very slow...\n"
-#~ msgstr "Abisua! X sinkronizazioa gaiturik - hau oso geldoa da...\n"
-
-#, c-format
-#~ msgid "Unable to initialize Imlib\n"
-#~ msgstr "Ezin izan da Imlib abiarazi\n"
-
-#~ msgid "You can only delete alias entries."
-#~ msgstr "Aliasen sarrerak bakarrik ezaba ditzakezu."
-
-#~ msgid "Event Receiver Window:  Press keyboard keys to bind..."
-#~ msgstr "Gertaera-hartzailearen leihoa:  Sakatu teklatuko teklak..."
-
-#~ msgid "Accept?"
-#~ msgstr "Onartu?"
-
-#, c-format
-#~ msgid "Bad visual '%s'\n"
-#~ msgstr "'%s' irudi okerra\n"
-
-#, c-format
-#~ msgid "Bad geometry '%s', see xine --help\n"
-#~ msgstr "'%s' geometria okerra, ikus xine --laguntza\n"
-
-#, c-format
-#~ msgid "Ooch, skin not found, use fallback '%s'.\n"
-#~ msgstr "Azala ez da aurkitu, erabili segurtasuneko '%s'.\n"
-
-#~ msgid "XF86VidMode Extension: modeline switching failed.\n"
-#~ msgstr "XF86VidMode Extension: ezin izan da modeline aldatu.\n"
-
-#, c-format
-#~ msgid "XAllocWMHints() failed\n"
-#~ msgstr "XAllocWMHints()-ek huts egin du\n"
-
-#, c-format
 #~ msgid "XF86VidMode Extension (%d.%d) detected, trying to use it.\n"
 #~ msgstr ""
 #~ "XF86VidMode Extension (%d.%d) detektatuta, erabiltzen saiatuko naiz.\n"
 
-#, c-format
 #~ msgid "XF86VidMode Extension: %d modelines found.\n"
 #~ msgstr "XF86VidMode Extension: %d modeline aurkitu dira.\n"
 
-#, c-format
 #~ msgid "XF86VidModeModeLine %dx%d isn't valid: discarded.\n"
 #~ msgstr "XF86VidModeModeLine %dx%d ez da baliozkoa: baztertuta.\n"
 
-#, c-format
 #~ msgid ""
 #~ "XF86VidMode Extension: could not get list of available modelines. "
 #~ "Failed.\n"
@@ -3215,10 +3174,64 @@ msgstr "Freskatu"
 #~ "XF86VidMode Extension: ezin izan da modeline erabilgarrien zerrenda "
 #~ "lortu. Huts egin du.\n"
 
-#, c-format
 #~ msgid "XF86VidMode Extension: initialization failed, not using it.\n"
 #~ msgstr ""
 #~ "XF86VidMode Extension: ezin izan da abiarazi, ez da hori erabiltzen ari.\n"
+
+#~ msgid "XF86VidMode Extension: modeline switching failed.\n"
+#~ msgstr "XF86VidMode Extension: ezin izan da modeline aldatu.\n"
+
+#~ msgid "Error"
+#~ msgstr "Errorea"
+
+#~ msgid "You can only delete alias entries."
+#~ msgstr "Aliasen sarrerak bakarrik ezaba ditzakezu."
+
+#~ msgid "XAllocWMHints() failed\n"
+#~ msgstr "XAllocWMHints()-ek huts egin du\n"
+
+#~ msgid "Event Receiver Window:  Press keyboard keys to bind..."
+#~ msgstr "Gertaera-hartzailearen leihoa:  Sakatu teklatuko teklak..."
+
+#~ msgid "XSendEvent(display, 0x%x ...) failed.\n"
+#~ msgstr "XsendEvent-ek (bistaratzea, 0x%x ...) huts egin du.\n"
+
+#~ msgid "Warning"
+#~ msgstr "Kontuz"
+
+#~ msgid ""
+#~ "gui_main: selected visual %#lx does not exist, trying default visual\n"
+#~ msgstr ""
+#~ "gui_main: hautatutako %#lx bisuala ez dago, lehenetsitako bisualarekin "
+#~ "saiatzen\n"
+
+#~ msgid "gui_main: couldn't find true color visual.\n"
+#~ msgstr "gui_main: ezin izan da benetako kolore bisuala aurkitu.\n"
+
+#~ msgid ""
+#~ "\n"
+#~ "XInitThreads failed - looks like you don't have a thread-safe xlib.\n"
+#~ msgstr ""
+#~ "\n"
+#~ "XinitThreads-ek huts egin du - hari seguruko xlib-ik ez duzula dirudi.\n"
+
+#~ msgid "Warning! Synchronized X activated - this is very slow...\n"
+#~ msgstr "Abisua! X sinkronizazioa gaiturik - hau oso geldoa da...\n"
+
+#~ msgid "Unable to initialize Imlib\n"
+#~ msgstr "Ezin izan da Imlib abiarazi\n"
+
+#~ msgid "Accept?"
+#~ msgstr "Onartu?"
+
+#~ msgid "Bad visual '%s'\n"
+#~ msgstr "'%s' irudi okerra\n"
+
+#~ msgid "Bad geometry '%s', see xine --help\n"
+#~ msgstr "'%s' geometria okerra, ikus xine --laguntza\n"
+
+#~ msgid "Ooch, skin not found, use fallback '%s'.\n"
+#~ msgstr "Azala ez da aurkitu, erabili segurtasuneko '%s'.\n"
 
 #~ msgid "..."
 #~ msgstr "Gehiago..."

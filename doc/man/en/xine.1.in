@@ -83,7 +83,7 @@ It is also possible to request the playlist from DVD `\fId\fP', or VCD `\fIv\fP'
 There is now a more generic option, \fI\-\-auto\-scan\fP, for that (see below).
 .TP
 .BI \-s,\ \-\-auto\-scan\  <plugin>
-Auto-scan playlist from named input plugin. Many plugins allow to read a
+Auto-scan playlist from named input plugin. Many plugins allow one to read a
 default playlist, in order to play \fBeverything\fP. This works fine for DVDs
 or VCDs, for example. Giving this option has the same effect as pressing
 the according button on xine's main panel.
@@ -335,7 +335,7 @@ the syntax as follows:
 .TP 
 .BI <mrl>::<subtitlefile>
 This is the xine-ui specific way to define the subtitle file to use. The filename will be
-extracted by the frontend, that permit to change it, save it in a playlist, etc...
+extracted by the frontend, that permit one to change it, save it in a playlist, etc...
 .br
 .SH STREAM OPTIONS
 .br

@@ -9,14 +9,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine 0.99.6+hg\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2021-12-11 19:35+0200\n"
+"POT-Creation-Date: 2022-09-09 19:24+0200\n"
 "PO-Revision-Date: 2010-07-31 00:32+0700\n"
 "Last-Translator: Takeshi Hamasaki <hmatrjp@users.sourceforge.jp>\n"
 "Language-Team: Japanese <translation-team-ja@lists.sourceforge.net>\n"
-"Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: ja\n"
 
 #, c-format
 msgid ""
@@ -92,11 +92,6 @@ msgstr "破棄"
 
 msgid "Close control window"
 msgstr "制御ウィンドウを閉じる"
-
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "There is no MRL."
-msgstr ""
 
 #, c-format
 msgid ""
@@ -478,6 +473,18 @@ msgstr "停止"
 msgid "Continue"
 msgstr "継続"
 
+msgid "Video upright"
+msgstr ""
+
+msgid "Video mirrored"
+msgstr ""
+
+msgid "Video upside down"
+msgstr ""
+
+msgid "Video upside down and mirrored"
+msgstr ""
+
 msgid "Enable extra XLib thread safety."
 msgstr ""
 
@@ -580,7 +587,7 @@ msgid "Enable OSD support"
 msgstr "OSD サポートを有効にする"
 
 msgid ""
-"Enabling OSD permit to display some status/informations in output window."
+"Enabling OSD permit one to display some status/informations in output window."
 msgstr "出力ウィンドウ内にステータス/情報を表示できるように OSD を有効にする"
 
 msgid "Use unscaled OSD"
@@ -750,10 +757,6 @@ msgstr "ディレクトリ '%s' を開けませんでした: %s"
 msgid "Unable to delete file '%s': %s."
 msgstr "ファイル '%s' の削除に失敗しました: %s"
 
-#, c-format
-msgid "Do you really want to delete the file '%s%s%s' ?"
-msgstr "本当にこのファイルを削除しますか: '%s%s%s'"
-
 msgid "Confirm deletion ?"
 msgstr "削除時に確認しますか?"
 
@@ -804,11 +807,11 @@ msgstr "Ctrl"
 msgid "Alt"
 msgstr "Alt"
 
-msgid "Nothing selected"
-msgstr "選択されていません"
-
 msgid "None"
 msgstr "なし"
+
+msgid "Nothing selected"
+msgstr "選択されていません"
 
 msgid "Grab"
 msgstr "取り込む"
@@ -828,7 +831,7 @@ msgid "Store new key binding"
 msgstr ""
 
 msgid "Press keyboard keys to bind..."
-msgstr ""
+msgstr "キーボードのキーを押してください..."
 
 msgid "Key Binding Editor"
 msgstr "キーバインドエディタ"
@@ -870,13 +873,13 @@ msgid "mod5"
 msgstr "mod5"
 
 msgid "start playback"
-msgstr ""
+msgstr "再生開始しますか?"
 
 msgid "playback pause toggle"
-msgstr ""
+msgstr "再生/一時停止"
 
 msgid "stop playback"
-msgstr ""
+msgstr "再生停止"
 
 msgid "close stream"
 msgstr ""
@@ -1058,8 +1061,14 @@ msgstr ""
 msgid "resize output window to stream size"
 msgstr ""
 
-msgid "fullscreen toggle"
+msgid "flip video sideways"
 msgstr ""
+
+msgid "flip video upside down"
+msgstr ""
+
+msgid "fullscreen toggle"
+msgstr "全画面"
 
 msgid "Xinerama fullscreen toggle"
 msgstr ""
@@ -1155,7 +1164,7 @@ msgid "visibility toggle of stream info window"
 msgstr ""
 
 msgid "display stream information using OSD"
-msgstr ""
+msgstr "ストリーム/情報 (OSD)"
 
 msgid "display information using OSD"
 msgstr ""
@@ -2123,6 +2132,11 @@ msgstr ""
 msgid "Logo MRL"
 msgstr "ロゴ MRL"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
+msgid "There is no MRL."
+msgstr ""
+
 msgid "!!Invalid entry!!"
 msgstr "!!無効な 入力!!"
 
@@ -2338,6 +2352,12 @@ msgstr "動画/100%"
 msgid "Video/50%"
 msgstr "動画/50%"
 
+msgid "Video/mirrored"
+msgstr ""
+
+msgid "Video/upside down"
+msgstr ""
+
 msgid "Video/Postprocess"
 msgstr "動画/後処理"
 
@@ -2396,7 +2416,7 @@ msgid "Settings/Video..."
 msgstr "設定/動画..."
 
 msgid "Settings/Audio..."
-msgstr ""
+msgstr "設定/Audio..."
 
 msgid "Settings/TV Analog..."
 msgstr "設定/TV アナログ..."
@@ -2749,7 +2769,7 @@ msgid "(*)  you need to restart xine for this setting to take effect"
 msgstr "(*) この設定の効果を反映するために xine を再起動する必要があります"
 
 msgid "Skin theme"
-msgstr ""
+msgstr "GUI スキンテーマ"
 
 #, c-format
 msgid "Failed to load %s/%s. Load fallback skin %s\n"
@@ -2839,10 +2859,10 @@ msgid "PNG Parsing failed\n"
 msgstr "PNG の解析に失敗\n"
 
 msgid "xine_grab_video_frame.grab () failed\n"
-msgstr ""
+msgstr "xine_grab_video_frame.grab () 失敗\n"
 
 msgid "xine_new_grab_video_frame () failed\n"
-msgstr ""
+msgstr "xine_new_grab_video_frame () 失敗\n"
 
 msgid "Wrong image size: "
 msgstr "間違った画像サイズ: "
@@ -3114,82 +3134,18 @@ msgstr "xine ログビュアー"
 msgid "Refresh"
 msgstr "再描画"
 
-#, c-format
-#~ msgid "XSendEvent(display, 0x%x ...) failed.\n"
-#~ msgstr "XSendEvent(display, 0x%x ...) 失敗\n"
+#~ msgid "Do you really want to delete the file '%s%s%s' ?"
+#~ msgstr "本当にこのファイルを削除しますか: '%s%s%s'"
 
-#~ msgid "Error"
-#~ msgstr "エラー"
-
-#~ msgid "Warning"
-#~ msgstr "警告"
-
-#, c-format
-#~ msgid ""
-#~ "gui_main: selected visual %#lx does not exist, trying default visual\n"
-#~ msgstr "gui_main: 選択した %#lx は存在しません. デフォルトを試しています\n"
-
-#, c-format
-#~ msgid "gui_main: couldn't find true color visual.\n"
-#~ msgstr "gui_main: true カラービジュアルをみつけることができませんでした\n"
-
-#, c-format
-#~ msgid ""
-#~ "\n"
-#~ "XInitThreads failed - looks like you don't have a thread-safe xlib.\n"
-#~ msgstr ""
-#~ "\n"
-#~ "XInitThreads 失敗 - スレッドセーフな xlib がないようです\n"
-
-#, c-format
-#~ msgid "Warning! Synchronized X activated - this is very slow...\n"
-#~ msgstr "警告! X 同期プロトコルが有効です - 非常に遅いです...\n"
-
-#, c-format
-#~ msgid "Unable to initialize Imlib\n"
-#~ msgstr "Imlib を初期化できません\n"
-
-#~ msgid "You can only delete alias entries."
-#~ msgstr "削除できるのは別名エントリだけです"
-
-#~ msgid "Event Receiver Window:  Press keyboard keys to bind..."
-#~ msgstr "イベント受信ウィンドウ:  キーボードのキーを押してください..."
-
-#~ msgid "Accept?"
-#~ msgstr "受理しますか?"
-
-#, c-format
-#~ msgid "Bad visual '%s'\n"
-#~ msgstr "不正なビジュアル '%s'\n"
-
-#, c-format
-#~ msgid "Bad geometry '%s', see xine --help\n"
-#~ msgstr "不適切なジオメトリ '%s'. xine --help を参照のこと\n"
-
-#, c-format
-#~ msgid "Ooch, skin not found, use fallback '%s'.\n"
-#~ msgstr "スキンがみつかりません。前の '%s' を使います\n"
-
-#~ msgid "XF86VidMode Extension: modeline switching failed.\n"
-#~ msgstr "XF86VidMode 拡張: モードラインの切り替えに失敗しました\n"
-
-#, c-format
-#~ msgid "XAllocWMHints() failed\n"
-#~ msgstr "XAllocWMHints() 失敗\n"
-
-#, c-format
 #~ msgid "XF86VidMode Extension (%d.%d) detected, trying to use it.\n"
 #~ msgstr "XF86VidMode 拡張 (%d.%d) を検出しましたので使おうとしています\n"
 
-#, c-format
 #~ msgid "XF86VidMode Extension: %d modelines found.\n"
 #~ msgstr "XF86VidMode 拡張:  %d 個のモードラインをみつけました\n"
 
-#, c-format
 #~ msgid "XF86VidModeModeLine %dx%d isn't valid: discarded.\n"
 #~ msgstr "XF86VidModeModeLine %dx%d は有効ではありません: 破棄\n"
 
-#, c-format
 #~ msgid ""
 #~ "XF86VidMode Extension: could not get list of available modelines. "
 #~ "Failed.\n"
@@ -3197,9 +3153,61 @@ msgstr "再描画"
 #~ "XF86VidMode 拡張: 利用可能なモードラインの一覧を取得できませんでした. 失"
 #~ "敗\n"
 
-#, c-format
 #~ msgid "XF86VidMode Extension: initialization failed, not using it.\n"
 #~ msgstr "XF86VidMode 拡張: 初期化に失敗. 使用しません\n"
+
+#~ msgid "XF86VidMode Extension: modeline switching failed.\n"
+#~ msgstr "XF86VidMode 拡張: モードラインの切り替えに失敗しました\n"
+
+#~ msgid "Error"
+#~ msgstr "エラー"
+
+#~ msgid "You can only delete alias entries."
+#~ msgstr "削除できるのは別名エントリだけです"
+
+#~ msgid "XAllocWMHints() failed\n"
+#~ msgstr "XAllocWMHints() 失敗\n"
+
+#~ msgid "Event Receiver Window:  Press keyboard keys to bind..."
+#~ msgstr "イベント受信ウィンドウ:  キーボードのキーを押してください..."
+
+#~ msgid "XSendEvent(display, 0x%x ...) failed.\n"
+#~ msgstr "XSendEvent(display, 0x%x ...) 失敗\n"
+
+#~ msgid "Warning"
+#~ msgstr "警告"
+
+#~ msgid ""
+#~ "gui_main: selected visual %#lx does not exist, trying default visual\n"
+#~ msgstr "gui_main: 選択した %#lx は存在しません. デフォルトを試しています\n"
+
+#~ msgid "gui_main: couldn't find true color visual.\n"
+#~ msgstr "gui_main: true カラービジュアルをみつけることができませんでした\n"
+
+#~ msgid ""
+#~ "\n"
+#~ "XInitThreads failed - looks like you don't have a thread-safe xlib.\n"
+#~ msgstr ""
+#~ "\n"
+#~ "XInitThreads 失敗 - スレッドセーフな xlib がないようです\n"
+
+#~ msgid "Warning! Synchronized X activated - this is very slow...\n"
+#~ msgstr "警告! X 同期プロトコルが有効です - 非常に遅いです...\n"
+
+#~ msgid "Unable to initialize Imlib\n"
+#~ msgstr "Imlib を初期化できません\n"
+
+#~ msgid "Accept?"
+#~ msgstr "受理しますか?"
+
+#~ msgid "Bad visual '%s'\n"
+#~ msgstr "不正なビジュアル '%s'\n"
+
+#~ msgid "Bad geometry '%s', see xine --help\n"
+#~ msgstr "不適切なジオメトリ '%s'. xine --help を参照のこと\n"
+
+#~ msgid "Ooch, skin not found, use fallback '%s'.\n"
+#~ msgstr "スキンがみつかりません。前の '%s' を使います\n"
 
 #~ msgid "Noise reduction"
 #~ msgstr "ノイズ低減度"
