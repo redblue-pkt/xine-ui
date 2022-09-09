@@ -1509,7 +1509,7 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
     xine_config_register_bool (gui->xine, "gui.osd_enabled",
 			      1,
 			      _("Enable OSD support"),
-			      _("Enabling OSD permit to display some status/informations "
+			      _("Enabling OSD permit one to display some status/informations "
 				"in output window."),
 			      CONFIG_LEVEL_BEG,
 			      osd_enabled_cb,

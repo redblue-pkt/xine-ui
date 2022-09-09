@@ -6,14 +6,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2021-12-11 19:35+0200\n"
+"POT-Creation-Date: 2022-09-09 19:24+0200\n"
 "PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Alexander Nicolaysen Sørnes <alex@thehandofagony.com>\n"
 "Language-Team:  <nb@li.org>\n"
-"Language: nb\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: nb\n"
 "X-Generator: KBabel 1.10.1\n"
 
 #, c-format
@@ -23,8 +23,8 @@ msgid ""
 "after reading and understanding its help text."
 msgstr ""
 "Du prøvde å endre oppsettet ved å bruke en «cfg:»-MRL.\n"
-"Dette er bare tillat hvis du aktiverer «misc.implicit_config» etter at du "
-"har lest og forstått hjelpeteksten for denne innstillingen."
+"Dette er bare tillat hvis du aktiverer «misc.implicit_config» etter at du har "
+"lest og forstått hjelpeteksten for denne innstillingen."
 
 #, c-format
 msgid ""
@@ -93,11 +93,6 @@ msgstr "Vekk"
 msgid "Close control window"
 msgstr "Lukk kontrollervindu"
 
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "There is no MRL."
-msgstr "Det er ingen MRL."
-
 #, c-format
 msgid ""
 "The stream '%s' isn't supported by xine:\n"
@@ -116,14 +111,14 @@ msgstr ""
 
 #, c-format
 msgid "Video Codec: %s (%s)\n"
-msgstr ""
+msgstr "Videokodek: %s (%s)\n"
 
 msgid "Unavailable"
 msgstr "Ikke tilgjengelig"
 
 #, c-format
 msgid "Audio Codec: %s (%s)\n"
-msgstr ""
+msgstr "Lydkodek: %s (%s)\n"
 
 msgid "Start Playback ?"
 msgstr "Sarte avspilling?"
@@ -132,6 +127,8 @@ msgid ""
 "\n"
 "Start playback anyway ?\n"
 msgstr ""
+"\n"
+"Starte avspilling likevel?\n"
 
 msgid "No MRL (input stream) specified"
 msgstr "Ingen MRL (inndatastrøm) er oppgitt"
@@ -476,6 +473,18 @@ msgstr "Stopp"
 msgid "Continue"
 msgstr "Fortsett"
 
+msgid "Video upright"
+msgstr ""
+
+msgid "Video mirrored"
+msgstr ""
+
+msgid "Video upside down"
+msgstr ""
+
+msgid "Video upside down and mirrored"
+msgstr ""
+
 msgid "Enable extra XLib thread safety."
 msgstr ""
 
@@ -575,7 +584,7 @@ msgid "Enable OSD support"
 msgstr "Aktiver støtte for tekst på skjermen"
 
 msgid ""
-"Enabling OSD permit to display some status/informations in output window."
+"Enabling OSD permit one to display some status/informations in output window."
 msgstr ""
 "Å aktivere visning av tekst på skjermen tillater at noen meldinger om status/"
 "informasjon vises i visningsvinduet."
@@ -699,7 +708,7 @@ msgid "Menu 7"
 msgstr "Meny 7"
 
 msgid "Menu"
-msgstr ""
+msgstr "Menyer"
 
 msgid "Red"
 msgstr ""
@@ -747,10 +756,6 @@ msgstr "Klarte ikke åpne katalogen «%s»: %s."
 #, c-format
 msgid "Unable to delete file '%s': %s."
 msgstr "Klarte ikke slette filen «%s»: %s."
-
-#, c-format
-msgid "Do you really want to delete the file '%s%s%s' ?"
-msgstr "Virkelig slette filen «%s%s%s»?"
 
 msgid "Confirm deletion ?"
 msgstr "Bekreft sletting."
@@ -802,11 +807,11 @@ msgstr "Ctrl"
 msgid "Alt"
 msgstr "Alt"
 
-msgid "Nothing selected"
-msgstr "Ingenting er valgt"
-
 msgid "None"
 msgstr "Ingen"
+
+msgid "Nothing selected"
+msgstr "Ingenting er valgt"
 
 msgid "Grab"
 msgstr "Ta"
@@ -822,9 +827,11 @@ msgstr "Denne tastebindingen er overføldig med handlingen «%s».\n"
 
 msgid "Store new key binding"
 msgstr ""
+"Lagre «%s» som\n"
+"tastebinding?"
 
 msgid "Press keyboard keys to bind..."
-msgstr ""
+msgstr "Trykk på tastene . . ."
 
 msgid "Key Binding Editor"
 msgstr "Tastebindingsredigerer"
@@ -866,22 +873,22 @@ msgid "mod5"
 msgstr "mod5"
 
 msgid "start playback"
-msgstr ""
+msgstr "Sarte avspilling?"
 
 msgid "playback pause toggle"
-msgstr ""
+msgstr "Avspilling/Pause"
 
 msgid "stop playback"
-msgstr ""
+msgstr "Stopp avspilling"
 
 msgid "close stream"
 msgstr ""
 
 msgid "take a snapshot"
-msgstr ""
+msgstr "Ta et bilde"
 
 msgid "eject the current medium"
-msgstr ""
+msgstr "Løs ut gjeldende medium"
 
 msgid "select and play next MRL in the playlist"
 msgstr ""
@@ -992,10 +999,10 @@ msgid "audio muting toggle"
 msgstr ""
 
 msgid "select next audio channel"
-msgstr ""
+msgstr "Neste lydkanal"
 
 msgid "select previous audio channel"
-msgstr ""
+msgstr "Forrige lydkanal"
 
 msgid "visibility toggle of audio post effect window"
 msgstr ""
@@ -1054,8 +1061,14 @@ msgstr ""
 msgid "resize output window to stream size"
 msgstr ""
 
-msgid "fullscreen toggle"
+msgid "flip video sideways"
 msgstr ""
+
+msgid "flip video upside down"
+msgstr ""
+
+msgid "fullscreen toggle"
+msgstr "Fullskjerm"
 
 msgid "Xinerama fullscreen toggle"
 msgstr ""
@@ -1169,7 +1182,7 @@ msgid "open file selector"
 msgstr ""
 
 msgid "select a subtitle file"
-msgstr ""
+msgstr "Velg en tekstingsfil"
 
 msgid "download a skin from the skin server"
 msgstr ""
@@ -1415,7 +1428,7 @@ msgid "VDR Command info"
 msgstr ""
 
 msgid "VDR Previous channel"
-msgstr ""
+msgstr "Forrige VDR-kanal"
 
 msgid "VDR Subtiles menu"
 msgstr ""
@@ -1570,8 +1583,7 @@ msgstr ""
 "                    «h»: skjul grensesnitt (panel etc.).\n"
 "                    «w»: skjul videovindu.\n"
 "                    «q»: avslutt når avspillingen er ferdig.\n"
-"                    zd»: hent spilleliste fra DVD. (Foreldet; bruk «-s "
-"DVD».\n"
+"                    zd»: hent spilleliste fra DVD. (Foreldet; bruk «-s DVD».\n"
 "                    «v»: hent spilleliste fra VCD. (Foreldet; bruk z-s "
 "VCD».)\n"
 
@@ -1761,12 +1773,11 @@ msgstr ""
 "                    session=n   velg øktnummer «<n>»,\n"
 "                    mrl=m       legg MRL'en «<mrl>» til i spillelisten,\n"
 "                    audio=c     velg lydkanal («<c>»: «next» eller «prev»),\n"
-"                    spu=c       velg «spu»-kanal («<c>»: «next» eller "
-"«prev»),\n"
+"                    spu=c       velg «spu»-kanal («<c>»: «next» eller «prev»),\n"
 "                    volume=v    oppgi lydvolum,\n"
 "                    amp=v       oppgi forsterkingsnivå,\n"
-"                    loop=m      oppgi gjentakelsesmodus («<m>»: «none», "
-"«loop», «repeat», «shuffle» eller «shuffle+»),\n"
+"                    loop=m      oppgi gjentakelsesmodus («<m>»: «none», «loop», "
+"«repeat», «shuffle» eller «shuffle+»),\n"
 "                    get_speed   hent fartverdien (se «man»-siden for den "
 "returnerte verdien.\n"
 "                    (playlist|pl)=p\n"
@@ -1781,8 +1792,8 @@ msgstr ""
 "                                   «last»   spill siste oppføring i "
 "spillelisten,\n"
 "                                   «load:s» last spillelistefilen «s»,\n"
-"                                   «stop»   stopp avspillingen ved slutten "
-"av gjeldende element.\n"
+"                                   «stop»   stopp avspillingen ved slutten av "
+"gjeldende element.\n"
 "                                   «cont»   fortset avspillingen ved slutten "
 "av gjeldende element.\n"
 "                    play, slow2, slow4, pause, fast2,\n"
@@ -1816,8 +1827,7 @@ msgid ""
 msgstr ""
 "  -r, --aspect-ratio <modus>   Velger aspektforholdet for video. Formater "
 "er\n"
-"                                 «auto», «square», «4:3», «anamorphic» og "
-"«dvb».\n"
+"                                 «auto», «square», «4:3», «anamorphic» og «dvb».\n"
 
 #, c-format
 msgid ""
@@ -2121,6 +2131,11 @@ msgstr ""
 msgid "Logo MRL"
 msgstr "MRL til logo"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
+msgid "There is no MRL."
+msgstr "Det er ingen MRL."
+
 msgid "!!Invalid entry!!"
 msgstr "Ugyldig oppføring"
 
@@ -2336,6 +2351,12 @@ msgstr "Video/100%"
 msgid "Video/50%"
 msgstr "Video/50%"
 
+msgid "Video/mirrored"
+msgstr ""
+
+msgid "Video/upside down"
+msgstr ""
+
 msgid "Video/Postprocess"
 msgstr "Video/Etterbehandle"
 
@@ -2367,13 +2388,13 @@ msgid "Audio/SEP"
 msgstr "Lyd/SEP"
 
 msgid "Audio/Postprocess"
-msgstr ""
+msgstr "Audio/Etterbehandle"
 
 msgid "Audio/Postprocess/Chain Reaction..."
-msgstr ""
+msgstr "Audio/Etterbehandle/Kjedereaksjon . . ."
 
 msgid "Audio/Postprocess/Enable Postprocessing"
-msgstr ""
+msgstr "Audio/Etterbehandle/Aktiver etterbehandling"
 
 msgid "Subtitle/Channel"
 msgstr "Teksting/Kanal"
@@ -2394,7 +2415,7 @@ msgid "Settings/Video..."
 msgstr "Innstillinger/Video . . ."
 
 msgid "Settings/Audio..."
-msgstr ""
+msgstr "Innstillinger/Audio . . ."
 
 msgid "Settings/TV Analog..."
 msgstr "Innstillinger/Analog TV . . ."
@@ -2464,7 +2485,7 @@ msgid "Reset video settings"
 msgstr ""
 
 msgid "Video Control"
-msgstr ""
+msgstr "Kontroller Video"
 
 msgid "All extensions"
 msgstr "Alle utvidelser"
@@ -2585,7 +2606,7 @@ msgid "Control"
 msgstr "Kontroller"
 
 msgid "Audio control"
-msgstr ""
+msgstr "Audio kontrollere"
 
 msgid "Open Location"
 msgstr "Åpne plassering"
@@ -2833,10 +2854,10 @@ msgid "PNG Parsing failed\n"
 msgstr "Klarte ikke lese PNG\n"
 
 msgid "xine_grab_video_frame.grab () failed\n"
-msgstr ""
+msgstr "«xine_grab_video_frame()» feilet\n"
 
 msgid "xine_new_grab_video_frame () failed\n"
-msgstr ""
+msgstr "«xine_new_grab_video_frame()» feilet\n"
 
 msgid "Wrong image size: "
 msgstr "Feil bildestørrelse: "
@@ -3044,12 +3065,10 @@ msgstr ""
 "skriver du inn «0 2 3»"
 
 msgid "x coordinate for xinerama fullscreen (-8192 = autodetect)"
-msgstr ""
-"x-koordinat for «xinerama»-fullskjerm («-8192» for å oppdage automatisk)"
+msgstr "x-koordinat for «xinerama»-fullskjerm («-8192» for å oppdage automatisk)"
 
 msgid "y coordinate for xinerama fullscreen (-8192 = autodetect)"
-msgstr ""
-"y-koordinat for «xinerama»-fullskjerm («-8192» for å oppdage automatisk)"
+msgstr "y-koordinat for «xinerama»-fullskjerm («-8192» for å oppdage automatisk)"
 
 msgid "width for xinerama fullscreen (-8192 = autodetect)"
 msgstr "Bredde for «xinerama»-fullskjerm («-8192» for å oppdage automatisk)"
@@ -3115,85 +3134,18 @@ msgstr "Loggviser for xine"
 msgid "Refresh"
 msgstr "Oppdater"
 
-#, c-format
-#~ msgid "XSendEvent(display, 0x%x ...) failed.\n"
-#~ msgstr "«XSendEvent(display, 0x%x ...)» feilet.\n"
+#~ msgid "Do you really want to delete the file '%s%s%s' ?"
+#~ msgstr "Virkelig slette filen «%s%s%s»?"
 
-#~ msgid "Error"
-#~ msgstr "Feil"
-
-#~ msgid "Warning"
-#~ msgstr "Advarsel"
-
-#, c-format
-#~ msgid ""
-#~ "gui_main: selected visual %#lx does not exist, trying default visual\n"
-#~ msgstr ""
-#~ "«gui_main»: valgte visuell  %#lx finnes ikke, prøver standardvisuell\n"
-
-#, c-format
-#~ msgid "gui_main: couldn't find true color visual.\n"
-#~ msgstr "«gui_main»: klarte ikke finne sannfarge-visuell.\n"
-
-#, c-format
-#~ msgid ""
-#~ "\n"
-#~ "XInitThreads failed - looks like you don't have a thread-safe xlib.\n"
-#~ msgstr ""
-#~ "\n"
-#~ "«XInitThreads» feilet; det ser ut som du ikke har en trådsikker versjon "
-#~ "av «xlib».\n"
-
-#, c-format
-#~ msgid "Warning! Synchronized X activated - this is very slow...\n"
-#~ msgstr ""
-#~ "Advarsel! Synkronisert X er aktivert; dette er veldig treigt . . .\n"
-
-#, c-format
-#~ msgid "Unable to initialize Imlib\n"
-#~ msgstr "Klarte ikke initalisere «Imlib»\n"
-
-#~ msgid "You can only delete alias entries."
-#~ msgstr "Du kan kun slette alias-oppføringer."
-
-#~ msgid "Event Receiver Window:  Press keyboard keys to bind..."
-#~ msgstr "Hendelsesmottakervindu:  Trykk på tastene..."
-
-#~ msgid "Accept?"
-#~ msgstr "Godta?"
-
-#, c-format
-#~ msgid "Bad visual '%s'\n"
-#~ msgstr "Dårlig visuell «%s»\n"
-
-#, c-format
-#~ msgid "Bad geometry '%s', see xine --help\n"
-#~ msgstr "«%s» er ikke en gyldig geometri; see «xine --help»\n"
-
-#, c-format
-#~ msgid "Ooch, skin not found, use fallback '%s'.\n"
-#~ msgstr "Den huden ble ikke funnet, nei; faller tilbake på «%s».\n"
-
-#~ msgid "XF86VidMode Extension: modeline switching failed.\n"
-#~ msgstr "«XF86VidMode»-utvidelse: moduslinjebytting feilet.\n"
-
-#, c-format
-#~ msgid "XAllocWMHints() failed\n"
-#~ msgstr "«XAllocWMHints()» feilet\n"
-
-#, c-format
 #~ msgid "XF86VidMode Extension (%d.%d) detected, trying to use it.\n"
 #~ msgstr "Fant utvidelsen «XF86VidMode» (%d.%d), prøver å bruke den.\n"
 
-#, c-format
 #~ msgid "XF86VidMode Extension: %d modelines found.\n"
 #~ msgstr "Fant %d moduslinjer for «XF86VidMode»-utvidelsen.\n"
 
-#, c-format
 #~ msgid "XF86VidModeModeLine %dx%d isn't valid: discarded.\n"
 #~ msgstr "«XF86VidModeModeLine %dx%d» er ugyldig, og blir oversett.\n"
 
-#, c-format
 #~ msgid ""
 #~ "XF86VidMode Extension: could not get list of available modelines. "
 #~ "Failed.\n"
@@ -3201,10 +3153,65 @@ msgstr "Oppdater"
 #~ "«XF86VidMode»-utvidelse: klarte ikke hente liste over tilgjengelige "
 #~ "moduslinjer. Feilet.\n"
 
-#, c-format
 #~ msgid "XF86VidMode Extension: initialization failed, not using it.\n"
 #~ msgstr ""
 #~ "«XF86VidMode»-utvidelse: initaliseringen feilet, så den brukes ikke.\n"
+
+#~ msgid "XF86VidMode Extension: modeline switching failed.\n"
+#~ msgstr "«XF86VidMode»-utvidelse: moduslinjebytting feilet.\n"
+
+#~ msgid "Error"
+#~ msgstr "Feil"
+
+#~ msgid "You can only delete alias entries."
+#~ msgstr "Du kan kun slette alias-oppføringer."
+
+#~ msgid "XAllocWMHints() failed\n"
+#~ msgstr "«XAllocWMHints()» feilet\n"
+
+#~ msgid "Event Receiver Window:  Press keyboard keys to bind..."
+#~ msgstr "Hendelsesmottakervindu:  Trykk på tastene..."
+
+#~ msgid "XSendEvent(display, 0x%x ...) failed.\n"
+#~ msgstr "«XSendEvent(display, 0x%x ...)» feilet.\n"
+
+#~ msgid "Warning"
+#~ msgstr "Advarsel"
+
+#~ msgid ""
+#~ "gui_main: selected visual %#lx does not exist, trying default visual\n"
+#~ msgstr ""
+#~ "«gui_main»: valgte visuell  %#lx finnes ikke, prøver standardvisuell\n"
+
+#~ msgid "gui_main: couldn't find true color visual.\n"
+#~ msgstr "«gui_main»: klarte ikke finne sannfarge-visuell.\n"
+
+#~ msgid ""
+#~ "\n"
+#~ "XInitThreads failed - looks like you don't have a thread-safe xlib.\n"
+#~ msgstr ""
+#~ "\n"
+#~ "«XInitThreads» feilet; det ser ut som du ikke har en trådsikker versjon av "
+#~ "«xlib».\n"
+
+#~ msgid "Warning! Synchronized X activated - this is very slow...\n"
+#~ msgstr ""
+#~ "Advarsel! Synkronisert X er aktivert; dette er veldig treigt . . .\n"
+
+#~ msgid "Unable to initialize Imlib\n"
+#~ msgstr "Klarte ikke initalisere «Imlib»\n"
+
+#~ msgid "Accept?"
+#~ msgstr "Godta?"
+
+#~ msgid "Bad visual '%s'\n"
+#~ msgstr "Dårlig visuell «%s»\n"
+
+#~ msgid "Bad geometry '%s', see xine --help\n"
+#~ msgstr "«%s» er ikke en gyldig geometri; see «xine --help»\n"
+
+#~ msgid "Ooch, skin not found, use fallback '%s'.\n"
+#~ msgstr "Den huden ble ikke funnet, nei; faller tilbake på «%s».\n"
 
 #~ msgid "..."
 #~ msgstr "Mer . . ."
