@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2021 the xine project
+ * Copyright (C) 2019-2022 the xine project
  *
  * This file is part of xine, a free video player.
  *
@@ -32,5 +32,8 @@ xitk_widget_t *xitk_button_list_new (
   const char * const *names,
   const char * const *tips, int tips_timeout, uint32_t widget_type_flags);
 xitk_widget_t *xitk_button_list_find (xitk_widget_t *w, const char *name);
+
+/* NOTE: the tips you set with xitk_set_widget_tips (bl, text);
+ * will be used for the automatic "..." cycle widget. */
 
 #endif

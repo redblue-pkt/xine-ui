@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.99.5\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2022-09-09 19:24+0200\n"
+"POT-Creation-Date: 2022-09-10 12:40+0200\n"
 "PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Torsten Jager <t.jager@gmx.de>\n"
 "Language-Team: German <de@li.org>\n"
@@ -2574,6 +2574,9 @@ msgstr "N.Stumm"
 #, c-format
 msgid "Audio: %s"
 msgstr "Audio: %s"
+
+msgid "More sources..."
+msgstr "Weitere Quellen..."
 
 msgid "gui panel visibility"
 msgstr "gui Fenster sichtbar"

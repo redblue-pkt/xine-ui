@@ -1052,6 +1052,7 @@ void panel_add_autoplay_buttons (xui_panel_t *panel) {
       tips, XITK_TIPS_TIMEOUT_AUTO, 0);
     if (panel->autoplay_buttons)
       xitk_add_widget (panel->widget_list, panel->autoplay_buttons, XITK_WIDGET_STATE_KEEP);
+    xitk_set_widget_tips (panel->autoplay_buttons, _("More sources..."));
   }
 
   /* show panel (see panel_init ()) */

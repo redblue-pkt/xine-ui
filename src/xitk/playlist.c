@@ -1155,6 +1155,7 @@ void playlist_editor (gGui_t *gui) {
     pl->w[_W_autoplay_buttons] = xitk_button_list_new (pl->widget_list, pl->gui->skin_config, "AutoPlayBG",
       playlist_scan_input, pl->gui, autoplay_plugins, tips, 5000, 0);
     xitk_add_widget (pl->widget_list, pl->w[_W_autoplay_buttons], XITK_WIDGET_STATE_KEEP);
+    xitk_set_widget_tips (pl->w[_W_autoplay_buttons], _("More sources..."));
   } while (0);
 
   _playlist_update_browser_list (pl, 0);
