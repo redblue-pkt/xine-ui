@@ -1102,6 +1102,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_t *xitk, xitk_skin_config_t *skonfig,
     if (wp->autodir_buttons) {
       xitk_dlist_add_tail (&wp->widget_list->list, &wp->autodir_buttons->node);
       wp->autodir_buttons->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_MRLBROWSER;
+      xitk_set_widget_tips (wp->autodir_buttons, _("More sources..."));
     }
   } while (0);
 

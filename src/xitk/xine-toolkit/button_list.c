@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2021 the xine project
+ * Copyright (C) 2019-2022 the xine project
  *
  * This file is part of xine, a free video player.
  *
@@ -270,6 +270,10 @@ static void xitk_button_list_able (xitk_button_list_t *bl) {
     xitk_widgets_state (&bl->swap, 1, XITK_WIDGET_STATE_ENABLE, m);
 }
 
+static void xitk_button_list_tips_timeout (xitk_button_list_t *bl, int tips_timeout) {
+  xitk_set_widget_tips_and_timeout (bl->swap, bl->w.tips_string, tips_timeout);
+}
+
 static int xitk_button_list_event (xitk_widget_t *w, const widget_event_t *event) {
   xitk_button_list_t *bl = (xitk_button_list_t *)w;
 
@@ -283,6 +287,9 @@ static int xitk_button_list_event (xitk_widget_t *w, const widget_event_t *event
         return 0;
       case WIDGET_EVENT_ENABLE:
         xitk_button_list_able (bl);
+        break;
+      case WIDGET_EVENT_TIPS_TIMEOUT:
+        xitk_button_list_tips_timeout (bl, event->tips_timeout);
         break;
       default: ;
     }
@@ -430,7 +437,6 @@ xitk_widget_t *xitk_button_list_new (
     bl->swap->type |= bl->widget_type_flags;
     xitk_widget_set_parent (bl->swap, &bl->w);
     xitk_dnode_insert_after (&bl->add_here->node, &bl->swap->node);
-    xitk_set_widget_tips_and_timeout (bl->swap, _("More sources..."), tips_timeout);
     xitk_widgets_state (&bl->swap, 1, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE, 0);
     xitk_dnode_remove (&bl->swap->node);
   }
@@ -457,3 +463,4 @@ xitk_widget_t *xitk_button_list_find (xitk_widget_t *w, const char *name) {
   }
   return NULL;
 }
+
