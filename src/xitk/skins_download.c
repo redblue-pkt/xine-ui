@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2021 the xine project
+ * Copyright (C) 2000-2022 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -148,7 +148,7 @@ static slx_entry_t **skins_get_slx_entries(gGui_t *gui, char *url) {
                       slx.skin.version = atoi(skin_prop->value);
                     }
                     else if(!strcasecmp(skin_prop->name, "MAINTAINED")) {
-                      slx.skin.maintained = get_bool_value(skin_prop->value);
+                      slx.skin.maintained = xitk_get_bool_value (skin_prop->value);
                     }
                   }
                 }

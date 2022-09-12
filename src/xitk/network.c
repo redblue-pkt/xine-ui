@@ -2380,7 +2380,7 @@ static void do_set(const commands_t *cmd, client_info_t *client_info) {
 	}
 	else if (!strncmp (s2, "mute", l2)) {
 	  if(gui->mixer.caps & MIXER_CAP_MUTE) {
-	    gui->mixer.mute = get_bool_value((get_arg(client_info, 3)));
+            gui->mixer.mute = xitk_get_bool_value ((get_arg (client_info, 3)));
 	    xine_set_param(gui->stream, XINE_PARAM_AUDIO_MUTE, gui->mixer.mute);
 	  }
 	  else
