@@ -292,12 +292,25 @@ void osd_stream_infos (gGui_t *gui) {
     int         w, h, osdw;
     int         playedtime, playeddays, totaltime, pos;
     int         audiochannel, spuchannel;
+#ifdef XINE_QUERY_STREAM_INFO
+    char sbuf[512];
+    int strings[3] = {XINE_META_INFO_VIDEOCODEC, XINE_META_INFO_AUDIOCODEC, -1};
+    int ints[4] = { XINE_STREAM_INFO_VIDEO_WIDTH, XINE_STREAM_INFO_VIDEO_HEIGHT,
+      XINE_STREAM_INFO_AUDIO_SAMPLERATE, -1};
 
+    xine_query_stream_info (gui->stream, sbuf, sizeof (sbuf), strings, ints);
+    vcodec = strings[0] ? sbuf + strings[0] : NULL;
+    acodec = strings[1] ? sbuf + strings[1] : NULL;
+    vwidth  = ints[0];
+    vheight = ints[1];
+    asrate  = ints[2];
+#else
     vcodec       = xine_get_meta_info (gui->stream, XINE_META_INFO_VIDEOCODEC);
     acodec       = xine_get_meta_info (gui->stream, XINE_META_INFO_AUDIOCODEC);
     vwidth       = xine_get_stream_info (gui->stream, XINE_STREAM_INFO_VIDEO_WIDTH);
     vheight      = xine_get_stream_info (gui->stream, XINE_STREAM_INFO_VIDEO_HEIGHT);
     asrate       = xine_get_stream_info (gui->stream, XINE_STREAM_INFO_AUDIO_SAMPLERATE);
+#endif
     audiochannel = xine_get_param (gui->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL);
     spuchannel   = xine_get_param (gui->stream, XINE_PARAM_SPU_CHANNEL);
 
