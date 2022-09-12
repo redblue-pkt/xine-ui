@@ -490,14 +490,29 @@ static size_t _stream_infos_ident_make (char *buf, size_t bsize, const char *tit
 }
 
 int stream_infos_ident_get (stream_infos_ident_t *ident, xitk_vers_string_t *to, xine_stream_t *stream) {
+  const char *title, *artist, *album;
+#ifdef XINE_QUERY_STREAM_INFO
+  char sbuf[2048];
+  int strings[4] = {XINE_META_INFO_TITLE, XINE_META_INFO_ARTIST, XINE_META_INFO_ALBUM, -1};
+#endif
   int changed;
 
   if (!ident || !stream)
     return 0;
 
-  changed = xitk_vers_string_set (&ident->raw_title, xine_get_meta_info (stream, XINE_META_INFO_TITLE))
-          + xitk_vers_string_set (&ident->raw_artist, xine_get_meta_info (stream, XINE_META_INFO_ARTIST))
-          + xitk_vers_string_set (&ident->raw_album, xine_get_meta_info (stream, XINE_META_INFO_ALBUM));
+#ifdef XINE_QUERY_STREAM_INFO
+  xine_query_stream_info (stream, sbuf, sizeof (sbuf), strings, NULL);
+  title  = strings[0] ? sbuf + strings[0] : NULL;
+  artist = strings[1] ? sbuf + strings[1] : NULL;
+  album  = strings[2] ? sbuf + strings[2] : NULL;
+#else
+  title  = xine_get_meta_info (stream, XINE_META_INFO_TITLE);
+  artist = xine_get_meta_info (stream, XINE_META_INFO_ARTIST);
+  album  = xine_get_meta_info (stream, XINE_META_INFO_ALBUM);
+#endif
+  changed = xitk_vers_string_set (&ident->raw_title, title)
+          + xitk_vers_string_set (&ident->raw_artist, artist)
+          + xitk_vers_string_set (&ident->raw_album, album);
 
   if (changed) {
     ident->ident.version += 1;
@@ -522,12 +537,23 @@ void stream_infos_ident_delete (stream_infos_ident_t **ident) {
 }
 
 char *stream_infos_get_ident_from_stream(xine_stream_t *stream) {
+  const char *title, *artist, *album;
   char buf[2048], *ret;
-  size_t l = _stream_infos_ident_make (buf, sizeof (buf),
-    xine_get_meta_info (stream, XINE_META_INFO_TITLE),
-    xine_get_meta_info (stream, XINE_META_INFO_ARTIST),
-    xine_get_meta_info (stream, XINE_META_INFO_ALBUM)) + 1;
+  size_t l;
+#ifdef XINE_QUERY_STREAM_INFO
+  char sbuf[2048];
+  int strings[4] = {XINE_META_INFO_TITLE, XINE_META_INFO_ARTIST, XINE_META_INFO_ALBUM, -1};
 
+  xine_query_stream_info (stream, sbuf, sizeof (sbuf), strings, NULL);
+  title  = strings[0] ? sbuf + strings[0] : NULL;
+  artist = strings[1] ? sbuf + strings[1] : NULL;
+  album  = strings[2] ? sbuf + strings[2] : NULL;
+#else
+  title  = xine_get_meta_info (stream, XINE_META_INFO_TITLE);
+  artist = xine_get_meta_info (stream, XINE_META_INFO_ARTIST);
+  album  = xine_get_meta_info (stream, XINE_META_INFO_ALBUM);
+#endif
+  l = _stream_infos_ident_make (buf, sizeof (buf), title, artist, album) + 1;
   if (l < 2)
     return NULL;
   ret = malloc (l);
