@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2021 the xine project
+ * Copyright (C) 2000-2022 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -220,9 +220,42 @@ struct xui_sinfo_s {
   char                  temp[1024], buf[32];
 };
 
-static const char *sinf_get_string (xui_sinfo_t *sinfo, sinf_index_t type) {
+static void sinf_query (xui_sinfo_t *sinfo, char *sbuf, size_t sblen, int *values) {
+#ifdef XINE_QUERY_STREAM_INFO
+  int tabs[SINF_BOOL - SINF_STRING + 1], tabi[SINF_END - SINF_BOOL + 3];
+  sinf_index_t i;
+
+  for (i = SINF_STRING; i < SINF_BOOL; i++)
+    tabs[i] = sinf_xine_type[i];
+  tabs[i] = -1;
+  for (i = SINF_BOOL; i < SINF_END; i++)
+    tabi[i - SINF_BOOL] = sinf_xine_type[i];
+  tabi[i - SINF_BOOL]     = XINE_STREAM_INFO_VIDEO_WIDTH;
+  tabi[i - SINF_BOOL + 1] = XINE_STREAM_INFO_VIDEO_HEIGHT;
+  tabi[i - SINF_BOOL + 2] = -1;
+  xine_query_stream_info (sinfo->gui->stream, sbuf, sblen, tabs, tabi);
+  for (i = SINF_STRING; i < SINF_BOOL; i++)
+    values[i] = tabs[i];
+  for (i = SINF_BOOL; i < SINF_END + 2; i++)
+    values[i] = tabi[i - SINF_BOOL];
+#else
+  (void)sinfo;
+  (void)sbuf;
+  (void)sblen;
+  (void)values;
+#endif
+}
+
+static const char *sinf_get_string (xui_sinfo_t *sinfo, const char *sbuf, int *values, sinf_index_t type) {
   xitk_recode_string_t rs;
-  const char *s = xine_get_meta_info (sinfo->gui->stream, sinf_xine_type[type]);
+  const char *s;
+#ifdef XINE_QUERY_STREAM_INFO
+  s = values[type] ? sbuf + values[type] : NULL;
+#else
+  (void)sbuf;
+  (void)values;
+  s = xine_get_meta_info (sinfo->gui->stream, sinf_xine_type[type]);
+#endif
 
   if (!s)
     return sinfo->unavail;
@@ -237,10 +270,16 @@ static const char *sinf_get_string (xui_sinfo_t *sinfo, sinf_index_t type) {
   return rs.res;
 }
 
-static const char *sinf_get_int (xui_sinfo_t *sinfo, sinf_index_t type) {
-  int v = xine_get_stream_info (sinfo->gui->stream, sinf_xine_type[type]);
+static const char *sinf_get_int (xui_sinfo_t *sinfo, int *values, sinf_index_t type) {
+  int v;
   unsigned int u;
   char *q = sinfo->buf + sizeof (sinfo->buf);
+#ifdef XINE_QUERY_STREAM_INFO
+  v = values[type];
+#else
+  (void)values;
+  v = xine_get_stream_info (sinfo->gui->stream, sinf_xine_type[type]);
+#endif
 
   u = v < 0 ? -v : v;
   *--q = 0;
@@ -254,12 +293,16 @@ static const char *sinf_get_int (xui_sinfo_t *sinfo, sinf_index_t type) {
   return q;
 }
 
-static const char *sinf_get_res (xui_sinfo_t *sinfo) {
+static const char *sinf_get_res (xui_sinfo_t *sinfo, int *values) {
   int v;
   unsigned int u;
   char *q = sinfo->buf + sizeof (sinfo->buf);
-
+#ifdef XINE_QUERY_STREAM_INFO
+  v = values[SINF_END + 1];
+#else
+  (void)values;
   v = xine_get_stream_info (sinfo->gui->stream, XINE_STREAM_INFO_VIDEO_HEIGHT);
+#endif
   u = v < 0 ? -v : v;
   *--q = 0;
   do {
@@ -273,7 +316,11 @@ static const char *sinf_get_res (xui_sinfo_t *sinfo) {
   *--q = 'X';
   *--q = ' ';
 
+#ifdef XINE_QUERY_STREAM_INFO
+  v = values[SINF_END];
+#else
   v = xine_get_stream_info (sinfo->gui->stream, XINE_STREAM_INFO_VIDEO_WIDTH);
+#endif
   u = v < 0 ? -v : v;
   do {
     *--q = u % 10u + '0';
@@ -285,9 +332,14 @@ static const char *sinf_get_res (xui_sinfo_t *sinfo) {
   return q;
 }
 
-static const char *sinf_get_bool (xui_sinfo_t *sinfo, sinf_index_t type) {
-  int v = xine_get_stream_info (sinfo->gui->stream, sinf_xine_type[type]);
-
+static const char *sinf_get_bool (xui_sinfo_t *sinfo, int *values, sinf_index_t type) {
+  int v;
+#ifdef XINE_QUERY_STREAM_INFO
+  v = values[type];
+#else
+  (void)values;
+  v = xine_get_stream_info (sinfo->gui->stream, sinf_xine_type[type]);
+#endif
   return v ? sinfo->yes : sinfo->no;
 }
 
@@ -328,8 +380,15 @@ const char *get_fourcc_string (char *dst, size_t dst_size, uint32_t f) {
   return q;
 }
 
-static const char *sinf_get_4cc (xui_sinfo_t *sinfo, sinf_index_t type) {
-  return get_fourcc_string (sinfo->buf, sizeof (sinfo->buf), xine_get_stream_info (sinfo->gui->stream, sinf_xine_type[type]));
+static const char *sinf_get_4cc (xui_sinfo_t *sinfo, int *values, sinf_index_t type) {
+  int v;
+#ifdef XINE_QUERY_STREAM_INFO
+  v = values[type];
+#else
+  (void)values;
+  v = xine_get_stream_info (sinfo->gui->stream, sinf_xine_type[type]);
+#endif
+  return get_fourcc_string (sinfo->buf, sizeof (sinfo->buf), v);
 }
 
 static void stream_infos_update (xitk_widget_t *w, void *data, int state) {
@@ -555,17 +614,20 @@ void stream_infos_update_infos (xui_sinfo_t *sinfo) {
   if (!sinfo)
     return;
   if (!sinfo->gui->logo_mode) {
+    char sbuf[2048];
+    int values[SINF_END + 2];
     sinf_index_t i;
 
+    sinf_query (sinfo, sbuf, sizeof (sbuf), values);
     for (i = SINF_STRING; i < SINF_BOOL; i++)
-      xitk_label_change_label (sinfo->w[i], sinf_get_string (sinfo, i));
+      xitk_label_change_label (sinfo->w[i], sinf_get_string (sinfo, sbuf, values, i));
     for (; i < SINF_INT; i++)
-      xitk_label_change_label (sinfo->w[i], sinf_get_bool (sinfo, i));
+      xitk_label_change_label (sinfo->w[i], sinf_get_bool (sinfo, values, i));
     for (; i < SINF_FOURCC; i++)
-      xitk_label_change_label (sinfo->w[i], sinf_get_int (sinfo, i));
+      xitk_label_change_label (sinfo->w[i], sinf_get_int (sinfo, values, i));
     for (; i < SINF_END; i++)
-      xitk_label_change_label (sinfo->w[i], sinf_get_4cc (sinfo, i));
-    xitk_label_change_label (sinfo->video_resolution, sinf_get_res (sinfo));
+      xitk_label_change_label (sinfo->w[i], sinf_get_4cc (sinfo, values, i));
+    xitk_label_change_label (sinfo->video_resolution, sinf_get_res (sinfo, values));
   } else {
     sinf_index_t i;
 
@@ -626,6 +688,10 @@ void stream_infos_panel (gGui_t *gui) {
   {
     sinf_index_t i;
     xitk_label_widget_t lbl;
+    char sbuf[2048];
+    int values[SINF_END + 2];
+
+    sinf_query (sinfo, sbuf, sizeof (sbuf), values);
 
     XITK_WIDGET_INIT (&lbl);
     lbl.skin_element_name = NULL;
@@ -633,34 +699,34 @@ void stream_infos_panel (gGui_t *gui) {
     lbl.userdata          = NULL;
 
     for (i = SINF_STRING; i < SINF_BOOL; i++) {
-      lbl.label = sinf_get_string (sinfo, i);
+      lbl.label = sinf_get_string (sinfo, sbuf, values, i);
       sinfo->w[i] = xitk_noskin_label_create (sinfo->widget_list, &lbl,
         sinf_w_defs[i].x, sinf_w_defs[i].y, sinf_w_defs[i].w, sinf_w_defs[i].h, fontname);
       xitk_add_widget (sinfo->widget_list, sinfo->w[i], XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
     }
 
     for (; i < SINF_INT; i++) {
-      lbl.label = sinf_get_bool (sinfo, i);
+      lbl.label = sinf_get_bool (sinfo, values, i);
       sinfo->w[i] = xitk_noskin_label_create (sinfo->widget_list, &lbl,
         sinf_w_defs[i].x, sinf_w_defs[i].y, sinf_w_defs[i].w, sinf_w_defs[i].h, fontname);
       xitk_add_widget (sinfo->widget_list, sinfo->w[i], XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
     }
 
     for (; i < SINF_FOURCC; i++) {
-      lbl.label = sinf_get_int (sinfo, i);
+      lbl.label = sinf_get_int (sinfo, values, i);
       sinfo->w[i] = xitk_noskin_label_create (sinfo->widget_list, &lbl,
         sinf_w_defs[i].x, sinf_w_defs[i].y, sinf_w_defs[i].w, sinf_w_defs[i].h, fontname);
       xitk_add_widget (sinfo->widget_list, sinfo->w[i], XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
     }
 
     for (; i < SINF_END; i++) {
-      lbl.label = sinf_get_4cc (sinfo, i);
+      lbl.label = sinf_get_4cc (sinfo, values, i);
       sinfo->w[i] = xitk_noskin_label_create (sinfo->widget_list, &lbl,
         sinf_w_defs[i].x, sinf_w_defs[i].y, sinf_w_defs[i].w, sinf_w_defs[i].h, fontname);
       xitk_add_widget (sinfo->widget_list, sinfo->w[i], XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
     }
 
-    lbl.label = sinf_get_res (sinfo);
+    lbl.label = sinf_get_res (sinfo, values);
     sinfo->video_resolution = xitk_noskin_label_create (sinfo->widget_list, &lbl,
       sinf_w_defs[i].x, sinf_w_defs[i].y, sinf_w_defs[i].w, sinf_w_defs[i].h, fontname);
     xitk_add_widget (sinfo->widget_list, sinfo->video_resolution, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
