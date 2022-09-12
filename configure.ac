@@ -626,7 +626,7 @@ dnl
 AC_DEFINE([_GNU_SOURCE], [], [enable GNU libc extension])
 AC_CHECK_LIB(posix4, nanosleep)
 AC_CHECK_FUNCS([nanosleep])
-AC_REPLACE_FUNCS([getline getsubopt strlcat strlcpy strndup strsep])
+AC_REPLACE_FUNCS([getline getsubopt strlcpy strndup strsep])
 AC_CHECK_HEADERS(string.h strings.h linux/kd.h execinfo.h)
 AC_CHECK_HEADERS(sys/utsname.h)
 

@@ -366,7 +366,7 @@ static void download_skin_select (xitk_widget_t *w, void *data, int state) {
   do {
     char skindir[2048], *skinname, *skinend, *end = skindir + sizeof (skindir) - 8;
     char *filename;
-    struct stat  st;
+    int err;
 
     if (!network_download (skd->slxs[selected]->skin.href, &download)) {
       gui_msg (gui, XUI_MSG_ERROR, _("Unable to download '%s': %s"), skd->slxs[selected]->skin.href, download.error);
@@ -390,12 +390,12 @@ static void download_skin_select (xitk_widget_t *w, void *data, int state) {
     if (skinname >= end)
       skinname = end;
     /* Make sure to have the directory */
-    if (stat (skindir, &st) < 0) {
-      (void)mkdir_safe (skindir);
-      if (stat (skindir, &st) < 0) {
-        gui_msg (gui, XUI_MSG_ERROR, _("Unable to create '%s' directory: %s."), skindir, strerror(errno));
-        break;
-      }
+    err = mkdir_safe (skindir);
+    if (!err) {
+      /* xprintf (gui->xine, XINE_VERBOSITY_DEBUG, "skins_download: created dir %s.\n", skindir) */;
+    } else if (err != EEXIST) {
+      gui_msg (gui, XUI_MSG_ERROR, _("Unable to create '%s' directory: %s."), skindir, strerror (err));
+      break;
     }
 
     {

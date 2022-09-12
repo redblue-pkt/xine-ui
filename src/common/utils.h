@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2021 the xine project
+ * Copyright (C) 2000-2022 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -52,26 +52,23 @@ int xine_system(int dont_run_as_root, const char *command);
 size_t str_unquote (char *str);
 
 /*
- * Create directories recursively
+ * Create directories recursively, return 0 (created), EEXIST (found), or Exxx (failed).
  */
-int mkdir_safe(const char *path);
+int mkdir_safe (const char *path);
 
 /*
  * return 0/1 regarding to string (1/0, true/false, yes/no, on/off).
  */
 int get_bool_value(const char *val);
 
-
+#ifdef NEED_DOUBLE_SEMICOLON
 const char *get_last_double_semicolon(const char *str);
 int is_ipv6_last_double_semicolon(const char *str);
+#endif
 
 int is_downloadable(const char *filename);
 int is_a_dir(const char *filename);
 int is_a_file(const char *filename);
-
-#ifndef HAVE_STRLCAT
-size_t strlcat(char *dst, const char *src, size_t size);
-#endif
 
 #ifndef HAVE_STRLCPY
 size_t strlcpy (char *dst, const char *src, size_t size) ATTR_INLINE_ALL_STRINGOPS;

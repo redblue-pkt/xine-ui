@@ -161,56 +161,60 @@ size_t str_unquote (char *str) {
 /*
  *
  */
-static int _mkdir_safe(const char *path) {
-  struct stat  pstat;
-
-  if(path == NULL)
+int mkdir_safe (const char *path) {
+  char buf[2048], *b = buf + 4, *p, *e = buf + sizeof (buf) - 4;
+  size_t l;
+  struct stat st;
+  /* invalid path */
+  if (!path)
+    return EINVAL;
+  l = strlen (path);
+  if (!l)
     return 0;
-
-  if((stat(path, &pstat)) < 0) {
-    /* file or directory no exist, create it */
-    if(mkdir(path, 0755) < 0) {
-      fprintf(stderr, "mkdir(%s) failed: %s\n", path, strerror(errno));
-      return 0;
+  /* done already */
+  if (!stat (path, &st))
+    return S_ISDIR (st.st_mode) ? EEXIST : ENOTDIR;
+  if ((int)l > e - b)
+    return EOVERFLOW;
+  /* find existing part */
+  memset (buf, 0, 4);
+  memcpy (b, path, l + 1);
+  e = p = b + l;
+  memset (e, 0, 4);
+  while (1) {
+    b[-1] = 0;
+    while (p[-1] == '/')
+      p--;
+    b[-1] = '/';
+    while (*--p != '/') ;
+    if (p < b)
+      break;
+    *p = 0;
+    if (!stat (b, &st)) {
+      if (S_ISDIR (st.st_mode))
+        break;
+      return ENOTDIR;
     }
+    *p = '/';
   }
-  else {
-    /* Check of found file is a directory file */
-    if(!S_ISDIR(pstat.st_mode)) {
-      fprintf(stderr, "%s is not a directory.\n", path);
-      errno = EEXIST;
-      return 0;
-    }
+  *p = '/';
+  /* try creating the rest */
+  while (p < e) {
+    *e = 0;
+    while (p[1] == '/')
+      p++;
+    *e = '/';
+    while (*++p != '/') ;
+    *p = 0;
+    if ((p[-1] != '/') && mkdir (b, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH))
+      return errno;
+    *p = '/';
   }
-
-  return 1;
-}
-
-/*
- *
- */
-int mkdir_safe(const char *path) {
-  char *p, *pp;
-  char  buf[_PATH_MAX + _NAME_MAX + 1];
-  char  buf2[_PATH_MAX + _NAME_MAX + 1];
-
-  if(path == NULL)
-    return 0;
-
-  memset(&buf, 0, sizeof(buf));
-  memset(&buf2, 0, sizeof(buf2));
-
-  strlcpy(buf, path, sizeof(buf));
-  pp = buf;
-  while((p = xine_strsep(&pp, "/")) != NULL) {
-    if(p && strlen(p)) {
-      sprintf(buf2+strlen(buf2), "/%s", p);
-      if(!_mkdir_safe(buf2))
-	return 0;
-    }
-  }
-
-  return 1;
+  *p = 0;
+  /* final test */
+  if (stat (b, &st))
+    return errno;
+  return S_ISDIR (st.st_mode) ? 0 : ENOTDIR;
 }
 
 int get_bool_value(const char *val) {
@@ -233,6 +237,7 @@ int get_bool_value(const char *val) {
   return 0;
 }
 
+#ifdef NEED_DOUBLE_SEMICOLON
 const char *get_last_double_semicolon(const char *str) {
   int len;
 
@@ -334,6 +339,7 @@ int is_ipv6_last_double_semicolon(const char *str) {
 
   return 0;
 }
+#endif
 
 int is_downloadable(const char *filename) {
   if(filename &&

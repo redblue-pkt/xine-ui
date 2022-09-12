@@ -1008,12 +1008,14 @@ static void fb_rename_file (xitk_widget_t *w, void *data, int state) {
 
 static void fb_create_directory_cb(xitk_widget_t *w, void *data, const char *newdir) {
   filebrowser_t *fb = (filebrowser_t *) data;
+  int err;
 
   (void)w;
-  if(!mkdir_safe(newdir))
-    gui_msg (fb->gui, XUI_MSG_ERROR, _("Unable to create the directory '%s': %s."), newdir, strerror(errno));
+  err = mkdir_safe (newdir);
+  if (err)
+    gui_msg (fb->gui, XUI_MSG_ERROR, _("Unable to create the directory '%s': %s."), newdir, strerror (err));
   else
-    fb_getdir(fb);
+    fb_getdir (fb);
 }
 
 static void fb_create_directory(xitk_widget_t *w, void *data, int state) {
