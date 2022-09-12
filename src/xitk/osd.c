@@ -287,11 +287,11 @@ void osd_stream_infos (gGui_t *gui) {
     int         vwidth, vheight, asrate;
     int         wwidth, wheight;
     const char *vcodec, *acodec;
-    char        buffer[256], *p;
+    char        buffer[512], *p, *e = buffer + sizeof (buffer);
     int         x, y;
     int         w, h, osdw;
     int         playedtime, playeddays, totaltime, pos;
-    int         audiochannel, spuchannel, len;
+    int         audiochannel, spuchannel;
 
     vcodec       = xine_get_meta_info (gui->stream, XINE_META_INFO_VIDEOCODEC);
     acodec       = xine_get_meta_info (gui->stream, XINE_META_INFO_AUDIOCODEC);
@@ -366,38 +366,51 @@ void osd_stream_infos (gGui_t *gui) {
       y += h;
     }
 
-    strlcpy(buffer, _("Audio: "), sizeof(buffer));
-    len = strlen(buffer);
-    switch(audiochannel) {
-    case -2:
-      strlcat(buffer, "off", sizeof(buffer));
-      break;
-    case -1:
-      if(!xine_get_audio_lang (gui->stream, audiochannel, &buffer[len]))
-	strlcat(buffer, "auto", sizeof(buffer));
-      break;
-    default:
-      if(!xine_get_audio_lang (gui->stream, audiochannel, &buffer[len]))
-	snprintf(buffer+strlen(buffer), sizeof(buffer)-strlen(buffer), "%3d", audiochannel);
-      break;
+    p = buffer;
+    p += strlcpy (p, _("Audio: "), e - p);
+    if (p > e)
+      p = e;
+    switch (audiochannel) {
+      case -2:
+        p += strlcpy (p, "off", e - p);
+        break;
+      case -1:
+        if (xine_get_audio_lang (gui->stream, audiochannel, p))
+          p += strlen (p);
+        else
+          p += strlcpy (p, "auto", e - p);
+        break;
+      default:
+        if (xine_get_audio_lang (gui->stream, audiochannel, p))
+          p += strlen (p);
+        else
+          p += snprintf (p, e - p, "%3d", audiochannel);
     }
+    if (p > e)
+      p = e;
 
-    strlcat(buffer, ", Spu: ", sizeof(buffer));
-    len = strlen(buffer);
+    p += strlcpy (p, ", Spu: ", e - p);
+    if (p > e)
+      p = e;
     switch (spuchannel) {
-    case -2:
-      strlcat(buffer, "off", sizeof(buffer));
-      break;
-    case -1:
-      if (!xine_get_spu_lang (gui->stream, spuchannel, &buffer[len]))
-	strlcat(buffer, "auto", sizeof(buffer));
-      break;
-    default:
-      if(!xine_get_spu_lang (gui->stream, spuchannel, &buffer[len]))
-        snprintf(buffer+strlen(buffer), sizeof(buffer)-strlen(buffer), "%3d", spuchannel);
-      break;
+      case -2:
+        p += strlcpy (p, "off", e - p);
+        break;
+      case -1:
+        if (xine_get_spu_lang (gui->stream, spuchannel, p))
+          p += strlen (p);
+        else
+          p += strlcpy (p, "auto", e - p);
+        break;
+      default:
+        if (xine_get_spu_lang (gui->stream, spuchannel, p))
+          p += strlen (p);
+        else
+          p += snprintf (p, e - p, "%3d", spuchannel);
     }
-    strlcat(buffer, ".", sizeof(buffer));
+    if (p > e)
+      p = e;
+    /* p += */ strlcpy (p, ".", e - p);
     xine_osd_draw_text (gui->osd.sinfo.osd[0], x, y, buffer, XINE_OSD_TEXT1);
     xine_osd_get_text_size (gui->osd.sinfo.osd[0], buffer, &w, &h);
     if(w > osdw)

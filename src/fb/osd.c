@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2022 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -329,11 +329,11 @@ void osd_stream_infos(void) {
     uint32_t    width;
     uint32_t    vwidth, vheight, asrate;
     const char *vcodec, *acodec;
-    char        buffer[256];
+    char        buffer[512], *p, *e = buffer + sizeof (buffer);
     int         x, y;
     int         w, h, osdw;
     int         playedtime, totaltime, pos;
-    int         audiochannel, spuchannel, len;
+    int         audiochannel, spuchannel;
 
     vcodec       = xine_get_meta_info(fbxine.stream, XINE_META_INFO_VIDEOCODEC);
     acodec       = xine_get_meta_info(fbxine.stream, XINE_META_INFO_AUDIOCODEC);
@@ -373,38 +373,51 @@ void osd_stream_infos(void) {
       y += h;
     }
 
-    strlcpy(buffer, "Audio: ", sizeof(buffer));
-    len = strlen(buffer);
-    switch(audiochannel) {
-    case -2:
-      strlcat(buffer, "off", sizeof(buffer));
-      break;
-    case -1:
-      if(!xine_get_audio_lang (fbxine.stream, audiochannel, &buffer[len]))
-	strlcat(buffer, "auto", sizeof(buffer));
-      break;
-    default:
-      if(!xine_get_audio_lang (fbxine.stream, audiochannel, &buffer[len]))
-	snprintf(buffer+strlen(buffer), sizeof(buffer)-strlen(buffer), "%3d", audiochannel);
-      break;
+    p = buffer;
+    p += strlcpy (p, "Audio: ", e - p);
+    if (p > e)
+      p = e;
+    switch (audiochannel) {
+      case -2:
+        p += strlcpy (p, "off", e - p);
+        break;
+      case -1:
+        if (xine_get_audio_lang (fbxine.stream, audiochannel, p))
+          p += strlen (p);
+        else
+          p += strlcpy (p, "auto", e - p);
+        break;
+      default:
+        if (xine_get_audio_lang (fbxine.stream, audiochannel, p))
+          p += strlen (p);
+        else
+          p += snprintf (p, e -p, "%3d", audiochannel);
     }
+    if (p > e)
+      p = e;
 
-    strlcat(buffer, ", Spu: ", sizeof(buffer));
-    len = strlen(buffer);
+    p += strlcpy (p, ", Spu: ", e - p);
+    if (p > e)
+      p = e;
     switch (spuchannel) {
-    case -2:
-      strlcat(buffer, "off", sizeof(buffer));
-      break;
-    case -1:
-      if(!xine_get_spu_lang (fbxine.stream, spuchannel, &buffer[len]))
-	strlcat(buffer, "auto", sizeof(buffer));
-      break;
-    default:
-      if(!xine_get_spu_lang (fbxine.stream, spuchannel, &buffer[len]))
-        sprintf(buffer+strlen(buffer), "%3d", spuchannel);
-      break;
+      case -2:
+        p += strlcpy (p, "off", e - p);
+        break;
+      case -1:
+        if (xine_get_spu_lang (fbxine.stream, spuchannel, p))
+          p += strlen (p);
+        else
+          p += strlcpy (p, "auto", e - p);
+        break;
+      default:
+        if (xine_get_spu_lang (fbxine.stream, spuchannel, p))
+          p += strlen (p);
+        else
+          p += snprintf (p, e - p, "%3d", spuchannel);
     }
-    strlcat(buffer, ".", sizeof(buffer));
+    if (p > e)
+      p = e;
+    /* p += */ strlcpy (p, ".", e - p);
     xine_osd_draw_text(fbxine.osd.sinfo, x, y, buffer, XINE_OSD_TEXT1);
     xine_osd_get_text_size(fbxine.osd.sinfo, buffer, &w, &h);
     if(w > osdw)
