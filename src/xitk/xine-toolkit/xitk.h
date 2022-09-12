@@ -565,6 +565,8 @@ int xitk_is_dbl_click (xitk_t *xitk, const struct timeval *t1, const struct time
  *
  ****** */
 
+int xitk_get_bool_value (const char *val);
+
 /**
  * Allocate an clean memory of "size" bytes.
  */

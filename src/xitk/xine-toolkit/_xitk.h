@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2021 the xine project
+ * Copyright (C) 2000-2022 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -146,8 +146,6 @@ void xitk_set_current_menu(xitk_t *, xitk_widget_t *menu);
 void xitk_unset_current_menu(xitk_t *);
 void *labelbutton_get_user_data (xitk_widget_t *w);
 void xitk_menu_auto_pop (xitk_widget_t *w);
-
-int xitk_get_bool_value(const char *val);
 
 typedef struct {
   int                               width;
