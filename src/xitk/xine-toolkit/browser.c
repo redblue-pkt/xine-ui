@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2021 the xine project
+ * Copyright (C) 2000-2022 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -108,7 +108,7 @@ static void _browser_set_items (_browser_private_t *wp, const char * const *name
         int len;
         if (!names[i] || !shortcuts[i])
           break;
-        len = strlen (names[i]) + strlen (shortcuts[i]);
+        len = xitk_find_byte (names[i], 0) + xitk_find_byte (shortcuts[i], 0);
         if (len > max_len) {
           max_len = len;
           max_index = i;
@@ -120,7 +120,7 @@ static void _browser_set_items (_browser_private_t *wp, const char * const *name
       int len;
       if (!names[i])
         break;
-      len = strlen (names[i]);
+      len = xitk_find_byte (names[i], 0);
       if (len > max_len) {
         max_len = len;
         max_index = i;
@@ -627,7 +627,7 @@ static int _browser_warp_jump (_browser_private_t *wp, const char *key, int modi
   if ((modifier & ~(MODIFIER_NUML | MODIFIER_SHIFT)) != MODIFIER_NOMOD)
     return 0;
 
-  klen = strlen (key);
+  klen = xitk_find_byte (key, 0);
 
   if (!(modifier & MODIFIER_SHIFT)) {
     for (i = v + 1; i < wp->items.num; i++) {
