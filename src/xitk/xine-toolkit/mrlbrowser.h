@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2021 the xine project
+ * Copyright (C) 2000-2022 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -28,11 +28,6 @@
 #include "backend.h"
 
 typedef void (*xitk_mrl_callback_t)(xitk_widget_t *, void *, xine_mrl_t *);
-
-typedef struct {
-  char                             *name;
-  char                             *ending;
-} xitk_mrlbrowser_filter_t;
 
 typedef struct {
   int                               magic;
@@ -96,11 +91,15 @@ typedef struct {
 
   } ip_name;
 
+  struct {
+    const char * const             *names;
+    int                           (*match) (void *data, const char *name, uint32_t n);
+    void                           *data;
+  } filter;
+
   xine_t                           *xine;
 
   xitk_browser_widget_t             browser;
-
-  xitk_mrlbrowser_filter_t        **mrl_filters;
 
   struct {
     const char                     *skin_element_name;

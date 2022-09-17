@@ -75,57 +75,126 @@
 #define S_IXUGO        (S_IXUSR | S_IXGRP | S_IXOTH)
 #endif
 
+typedef union {
+  uint8_t n[4];
+  uint32_t v;
+} _fb_ext_t;
 
-typedef struct {
-  const char                *name;
-  const char                *ending;
-} filebrowser_filter_t;
-
-static const filebrowser_filter_t __fb_filters[] = {
-  { N_("All files"), "*"                                                           },
-  { N_("All known subtitles"), ".sub .srt .asc .smi .ssa .ass .txt "               },
-  { N_("All known playlists"), ".pls .m3u .sfv .tox .asx .smil .smi .xml .fxd "    },
-  /* media files */
-  { "*.4xm", ".4xm "                                                               },
-  { "*.ac3", ".ac3 "                                                               },
-  { "*.aif, *.aiff", ".aif .aiff "                                                 },
-  {"*.asf, *.wmv, *.wma, *.wvx, *.wax", ".asf .wmv .wma .wvx .wax "                },
-  { "*.aud", ".aud "                                                               },
-  { "*.avi", ".avi "                                                               },
-  { "*.cin", ".cin "                                                               },
-  { "*.cpk, *.cak, *.film", ".cpk .cak .film "                                     },
-  { "*.dv, *.dif", ".dv .dif "                                                     },
-  { "*.fli, *.flc", ".fli .flc "                                                   },
-  { "*.mp3, *.mp2, *.mpa, *.mpega", ".mp3 .mp2 .mpa .mpega "                       },
-  { "*.mjpg", ".mjpg "                                                             },
-  { "*.mov, *.qt, *.mp4", ".mov .qt .mp4 "                                         },
-  { "*.m2p", ".m2p "                                                               },
-  { "*.mpg, *.mpeg", ".mpg .mpeg "                                                 },
-  { "*.mpv", ".mpv "                                                               },
-  { "*.mve, *.mv8", ".mve .mv8 "                                                   },
-  { "*.nsf", ".nsf "                                                               },
-  { "*.nsv", ".nsv "                                                               },
-  { "*.ogg, *.ogm, *.spx", ".ogg .ogm .spx "                                       },
-  { "*.pes", ".pes "                                                               },
-  { "*.png, *.mng", ".png .mng "                                                   },
-  { "*.pva", ".pva "                                                               },
-  { "*.ra", ".ra "                                                                 },
-  { "*.rm, *.ram, *.rmvb ", ".rm .ram .rmvb "                                      },
-  { "*.roq", ".roq "                                                               },
-  { "*.str, *.iki, *.ik2, *.dps, *.dat, *.xa1, *.xa2, *.xas, *.xap, *.xa",
-    ".str .iki .ik2 .dps .dat .xa1 .xa2 .xas .xap .xa "                            },
-  { "*.snd, *.au", ".snd .au "                                                     },
-  { "*.ts, *.m2t, *.trp", ".ts .m2t .trp "                                         },
-  { "*.vqa", ".vqa "                                                               },
-  { "*.vob", ".vob "                                                               },
-  { "*.voc", ".voc "                                                               },
-  { "*.vox", ".vox "                                                               },
-  { "*.wav", ".wav "                                                               },
-  { "*.wve", ".wve "                                                               },
-  { "*.y4m", ".y4m "                                                               },
-  { NULL, NULL                                                                     }
+static const char _fb_ext_list[][12 * 4] = {
+  { "4xm " },
+  { "ac3 " },
+  { "aif aiff" },
+  { "asf wmv wma wvx wax " },
+  { "aud " },
+  { "avi " },
+  { "cin " },
+  { "cpk cak film" },
+  { "dv  dif " },
+  { "fli flc " },
+  { "flv " },
+  { "mp3 mp2 mpa mpga" },
+  { "mjpg" },
+  { "mov qt  mp4 mp4amp4v" },
+  { "m2p " },
+  { "mpg mpeg " },
+  { "mpv " },
+  { "mve mv8 " },
+  { "nsf " },
+  { "nsv " },
+  { "ogg ogm spx " },
+  { "pes " },
+  { "png mng " },
+  { "pva " },
+  { "ra  " },
+  { "rm  ram rmvb" },
+  { "roq " },
+  { "str iki ik2 dps dat xa1 xa2 xas xap xa  " },
+  { "snd au  " },
+  { "ts  m2t trp " },
+  { "vqa " },
+  { "vob " },
+  { "voc " },
+  { "vox " },
+  { "wav " },
+  { "wve " },
+  { "y4m " }
 };
 
+static const char *_fb_exts[4 + sizeof (_fb_ext_list) / sizeof (_fb_ext_list[0]) + 1] = {[0] = NULL};
+
+const char **filebrowser_ext_list_get (gGui_t *gui) {
+  (void)gui;
+  if (!_fb_exts[0]) {
+    uint32_t u;
+    _fb_exts[0] = _("All files");
+    _fb_exts[1] = _("All media files");
+    _fb_exts[2] = _("All subtitles");
+    _fb_exts[3] = _("All playlists");
+    for (u = 0; u < sizeof (_fb_ext_list) / sizeof (_fb_ext_list[0]) - 1; u++)
+      _fb_exts[4 + u] = _fb_ext_list[u];
+    _fb_exts[u] = NULL;
+  }
+  return (const char **)_fb_exts;
+}
+
+void filebrowser_ext_list_unget (gGui_t *gui, const char ***list) {
+  (void)gui;
+  *list = NULL;
+}
+
+static uint32_t _fb_ext_from_name (const char *name) {
+  _fb_ext_t ext = {"    "};
+  const uint8_t *s = (const uint8_t *)name, *e = NULL;
+  uint32_t u;
+
+  if (!name)
+    return ext.v;
+
+  while (1) {
+    while (s[0] > '/')
+      s++;
+    if (s[0] == '/')
+      e = NULL;
+    else if (s[0] == '.')
+      e = s;
+    else if (!s[0])
+      break;
+    s++;
+  }
+  if (!e)
+    return ext.v;
+  for (e++, u = 0; e[u] && (u < 4); u++)
+    ext.n[u] = e[u];
+  return ext.v | 0x20202020;
+}
+
+int filebrowser_ext_match (gGui_t *gui, const char *name, uint32_t n) {
+  uint32_t ext, u;
+
+  ext = (n > 0) ? _fb_ext_from_name (name) : 0;
+  switch (n) {
+    case 0: /* all */
+      return 1;
+    case 1: /* media */
+      return xine_sarray_binary_search (gui->playlist.known_media_exts, (void *)(uintptr_t)ext) >= 0;
+    case 2: /* subtitle */
+      return xine_sarray_binary_search (gui->playlist.known_spu_exts, (void *)(uintptr_t)ext) >= 0;
+    case 3: /* playlist */
+      return xine_sarray_binary_search (gui->playlist.known_playlist_exts, (void *)(uintptr_t)ext) >= 0;
+    default:
+      n -= 4;
+      if (n >= sizeof (_fb_ext_list) / sizeof (_fb_ext_list[0]))
+        return 0;
+      for (u = 0; _fb_ext_list[n][u]; u += 4) {
+        _fb_ext_t _ext;
+        memcpy (&_ext.n, &_fb_ext_list[n][u], 4);
+        if (_ext.v == ext)
+          return 1;
+      }
+  }
+  return 0;
+}
+  
 static char *_fb_strldup (const char *s, uint32_t l) {
   char *res = malloc (l + 1);
   if (!res)
@@ -487,31 +556,8 @@ static void fb_create_input_window (filebrowser_t *fb, xitk_string_callback_t cb
 /*
  * Return 1 if file match with current filter, otherwise 0.
  */
-static int is_file_match_to_filter(filebrowser_t *fb, char *file) {
-
-  if(!fb->filter_selected)
-    return 1;
-  else {
-    char *ending;
-
-    if((ending = strrchr(file, '.'))) {
-      char  ext[strlen(ending) + 2];
-      char *p;
-
-      sprintf(ext, "%s ", ending);
-
-      p = ext;
-      while(*p) {
-	*p = tolower(*p);
-	p++;
-      }
-
-      if(strstr(__fb_filters[fb->filter_selected].ending, ext))
-	return 1;
-
-    }
-  }
-  return 0;
+static int is_file_match_to_filter (filebrowser_t *fb, const char *file) {
+  return filebrowser_ext_match (fb->gui, file, fb->filter_selected);
 }
 
 static void fb_update_origin(filebrowser_t *fb) {
@@ -914,7 +960,8 @@ static void fb_exit(xitk_widget_t *w, void *data) {
     fb->xwin = NULL;
     /* xitk_dlist_init (&fb->widget_list->list); */
 
-    free(fb->file_filters);
+    filebrowser_ext_list_unget (fb->gui, &fb->file_filters);
+    fb->file_filters = NULL;
 
     SAFE_FREE(fb->cbb[0].label);
     SAFE_FREE(fb->cbb[1].label);
@@ -1117,7 +1164,7 @@ filebrowser_t *create_filebrowser (gGui_t *gui, const char *window_title, const 
   xitk_button_widget_t        b;
   xitk_combo_widget_t         cmb;
   xitk_widget_t              *widget;
-  int                         i, x, y, w;
+  int                         x, y, w;
 
   if (!gui)
     return NULL;
@@ -1190,12 +1237,7 @@ filebrowser_t *create_filebrowser (gGui_t *gui, const char *window_title, const 
   }
   fb_extract_path_and_file(fb, filepathname);
 
-  fb->file_filters = (const char **) malloc(sizeof(filebrowser_filter_t) * ((sizeof(__fb_filters) / sizeof(__fb_filters[0])) + 1));
-
-  for(i = 0; __fb_filters[i].ending; i++)
-    fb->file_filters[i] = _(__fb_filters[i].name);
-
-  fb->file_filters[i] = NULL;
+  fb->file_filters = filebrowser_ext_list_get (fb->gui);
   fb->filter_selected = 0;
 
   fb->widget_list = xitk_window_widget_list(fb->xwin);

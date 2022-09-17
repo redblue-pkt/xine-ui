@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2021 the xine project
+ * Copyright (C) 2000-2022 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -21,6 +21,11 @@
 
 #ifndef __FILE_BROWSER_H__
 #define __FILE_BROWSER_H__
+
+/** filter files by ext */
+const char **filebrowser_ext_list_get (gGui_t *gui);
+void filebrowser_ext_list_unget (gGui_t *gui, const char ***list);
+int filebrowser_ext_match (gGui_t *gui, const char *name, uint32_t n);
 
 typedef void (*filebrowser_callback_t) (filebrowser_t *fb, void *userdata);
 typedef int (*hidden_file_toggle_t)(void *data, int action, int value);
@@ -45,6 +50,5 @@ char *filebrowser_get_current_dir(filebrowser_t *);
 char *filebrowser_get_current_filename(filebrowser_t *);
 char *filebrowser_get_full_filename(filebrowser_t *);
 char **filebrowser_get_all_files(filebrowser_t *);
-
 
 #endif

@@ -29,6 +29,7 @@
 
 #include "common.h"
 #include "mrl_browser.h"
+#include "file_browser.h"
 #include "panel.h"
 #include "playlist.h"
 #include "videowin.h"
@@ -42,6 +43,8 @@ typedef void (*select_cb_t) (xitk_widget_t *w, void *mrlb, int, int);
 struct xui_mrlb_st {
   gGui_t *gui;
   xitk_widget_t *w;
+
+  const char **filter_names;
 };
 
 /*
@@ -125,8 +128,9 @@ void destroy_mrl_browser (xui_mrlb_t *mrlb) {
       }
       xitk_widgets_delete (&mrlb->w, 1);
     }
-    mrlb->gui->mrlb = NULL;
+    filebrowser_ext_list_unget (mrlb->gui, &mrlb->filter_names);
     video_window_set_input_focus (mrlb->gui->vwin);
+    mrlb->gui->mrlb = NULL;
     free (mrlb);
   }
 }
@@ -156,70 +160,14 @@ static void mrl_browser_kill(xitk_widget_t *w, void *data) {
   }
 }
 
-static xitk_mrlbrowser_filter_t **mrl_browser_get_valid_mrl_ending (xui_mrlb_t *mrlb) {
-  xitk_mrlbrowser_filter_t **filters = NULL;
-  int                        num_endings = 0;
-  char                      *mrl_exts, *pmrl_exts, *p, *pp;
-
-  filters                      = (xitk_mrlbrowser_filter_t **)
-    calloc((num_endings + 2), sizeof(xitk_mrlbrowser_filter_t *));
-  filters[num_endings]         = (xitk_mrlbrowser_filter_t *)
-    xitk_xmalloc(sizeof(xitk_mrlbrowser_filter_t));
-  filters[num_endings]->name   = strdup("All");
-  filters[num_endings]->ending = strdup("*");
-
-  mrl_exts = xine_get_file_extensions (mrlb->gui->xine);
-  if(mrl_exts) {
-    char  patterns[2048];
-    char *e;
-
-    p = strdup(mrl_exts);
-
-    num_endings++;
-
-    pp = p;
-    while(*p != '\0') {
-      if(*p == ' ')
-	*p = ',';
-      p++;
-    }
-
-    filters[num_endings]         = (xitk_mrlbrowser_filter_t *) xitk_xmalloc(sizeof(xitk_mrlbrowser_filter_t));
-    filters[num_endings]->name   = strdup(_("All extensions"));
-    filters[num_endings]->ending = pp;
-
-    pmrl_exts = mrl_exts;
-    while((e = xine_strsep(&pmrl_exts, " ")) != NULL) {
-
-      snprintf(patterns, sizeof(patterns), "*.%s", e);
-
-      num_endings++;
-
-      filters                      = (xitk_mrlbrowser_filter_t **)
-	realloc(filters, sizeof(xitk_mrlbrowser_filter_t *) * (num_endings + 2));
-
-      filters[num_endings]         = (xitk_mrlbrowser_filter_t *)
-	xitk_xmalloc(sizeof(xitk_mrlbrowser_filter_t));
-
-      filters[num_endings]->name   = strdup(patterns);
-      filters[num_endings]->ending = strdup(e);
-    }
-
-    free(mrl_exts);
-  }
-
-  filters[num_endings + 1]         = (xitk_mrlbrowser_filter_t *)
-    xitk_xmalloc(sizeof(xitk_mrlbrowser_filter_t));
-  filters[num_endings + 1]->name   = NULL;
-  filters[num_endings + 1]->ending = NULL;
-
-  return filters;
-}
-
-
 static void mrl_browser_rpwin (void *data, xitk_window_t *xwin) {
   gGui_t *gui = data;
   reparent_window (gui, xwin);
+}
+
+static int mrl_browser_match (void *data, const char *name, uint32_t n) {
+  xui_mrlb_t *mrlb = (xui_mrlb_t *)data;
+  return filebrowser_ext_match (mrlb->gui, name, n);
 }
 
 /*
@@ -230,7 +178,6 @@ static xui_mrlb_t *mrl_browser (gGui_t *gui,
   xui_mrlb_t *mrlb;
   xitk_mrlbrowser_widget_t     mb;
   const char *const           *ip_availables;
-  xitk_mrlbrowser_filter_t   **mrl_filters;
 
   if (!gui)
     return NULL;
@@ -246,8 +193,9 @@ static xui_mrlb_t *mrl_browser (gGui_t *gui,
     return NULL;
   mrlb->gui = gui;
 
+  mrlb->filter_names = filebrowser_ext_list_get (mrlb->gui);
+
   ip_availables = xine_get_browsable_input_plugin_ids (mrlb->gui->xine);
-  mrl_filters = mrl_browser_get_valid_mrl_ending (mrlb);
 
   XITK_WIDGET_INIT (&mb);
 
@@ -316,23 +264,13 @@ static xui_mrlb_t *mrl_browser (gGui_t *gui,
 
   mb.combo.skin_element_name               = "MrlFilt";
 
-  mb.mrl_filters                           = mrl_filters;
+  mb.filter.names                          = mrlb->filter_names;
+  mb.filter.match                          = mrl_browser_match;
+  mb.filter.data                           = mrlb;
 
   mrlb->w = xitk_mrlbrowser_create (mrlb->gui->xitk, mrlb->gui->skin_config, &mb);
 
   video_window_set_transient_for(mrlb->gui->vwin, xitk_mrlbrowser_get_window(mrlb->w));
-
-  if(mrl_filters) {
-    int i;
-
-    for(i = 0; mrl_filters[i] && (mrl_filters[i]->name && mrl_filters[i]->ending); i++) {
-      free(mrl_filters[i]->name);
-      free(mrl_filters[i]->ending);
-      free(mrl_filters[i]);
-    }
-    free(mrl_filters[i]);
-    free(mrl_filters);
-  }
 
   mrlb->gui->mrlb = mrlb;
   return mrlb;
