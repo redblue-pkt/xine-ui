@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: it\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2022-09-09 19:24+0200\n"
+"POT-Creation-Date: 2022-09-17 19:30+0200\n"
 "PO-Revision-Date: 2007-12-31 01:35+0100\n"
 "Last-Translator: Diego 'Flameeyes' Pettenò <flameeyes@gmail.com>\n"
 "Language-Team: Italian\n"
@@ -757,11 +757,15 @@ msgstr "Chiudi"
 msgid "All files"
 msgstr "Tutti i file"
 
-msgid "All known subtitles"
+#, fuzzy
+msgid "All media files"
 msgstr "Tutti i sottotitoli conosciuti"
 
-msgid "All known playlists"
-msgstr "Tutte le playlist note"
+msgid "All subtitles"
+msgstr "Tutti i sottotitoli"
+
+msgid "All playlists"
+msgstr "Tutte le playlist"
 
 msgid "Apply"
 msgstr "Applica"
@@ -2534,9 +2538,6 @@ msgstr "Reimposta le opzioni video"
 msgid "Video Control"
 msgstr "Controllo video"
 
-msgid "All extensions"
-msgstr "Tutte le estensioni"
-
 msgid "xine MRL Browser"
 msgstr "Navigatore MRL di xine"
 
@@ -2594,6 +2595,9 @@ msgstr "Non muto"
 #, c-format
 msgid "Audio: %s"
 msgstr "Audio: %s"
+
+msgid "More sources..."
+msgstr "Altro..."
 
 msgid "gui panel visibility"
 msgstr "Visibilità pannello GUI"
@@ -3191,6 +3195,9 @@ msgstr "visualizzatore log di xine"
 msgid "Refresh"
 msgstr "Aggiorna"
 
+#~ msgid "All extensions"
+#~ msgstr "Tutte le estensioni"
+
 #~ msgid "Do you really want to delete the file '%s%s%s' ?"
 #~ msgstr "Vuoi veramente cancellare il file: '%s%s%s' ?"
 
@@ -3273,9 +3280,6 @@ msgstr "Aggiorna"
 #~ msgstr "Ohi, skin non trovata, uso la riserva '%s'.\n"
 
 #~ msgid "..."
-#~ msgstr "Altro..."
-
-#~ msgid "More sources..."
 #~ msgstr "Altro..."
 
 #~ msgid "New Filter"

@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eo\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2022-09-09 19:24+0200\n"
+"POT-Creation-Date: 2022-09-17 19:30+0200\n"
 "PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Antonio Codazzi <f_sophia@libero.it>\n"
 "Language-Team: Esperanto\n"
@@ -756,10 +756,16 @@ msgstr "Fermu"
 msgid "All files"
 msgstr "Ĉiuj dosieroj"
 
-msgid "All known subtitles"
+#, fuzzy
+msgid "All media files"
 msgstr "Ĉiuj konataj surkribaĵoj"
 
-msgid "All known playlists"
+#, fuzzy
+msgid "All subtitles"
+msgstr "Ĉiuj konataj surkribaĵoj"
+
+#, fuzzy
+msgid "All playlists"
 msgstr "Ĉiuj konataj legolistoj"
 
 msgid "Apply"
@@ -2516,9 +2522,6 @@ msgstr "Reŝargu agordordojn de video"
 msgid "Video Control"
 msgstr "Videoregiloj"
 
-msgid "All extensions"
-msgstr "Ĉiuj finaĵoj"
-
 msgid "xine MRL Browser"
 msgstr "Foliumilo por MRL de xine"
 
@@ -2576,6 +2579,9 @@ msgstr "Malmutigita"
 #, c-format
 msgid "Audio: %s"
 msgstr "Aŭdo: %s"
+
+msgid "More sources..."
+msgstr "Pli..."
 
 msgid "gui panel visibility"
 msgstr "montru panelon de GUI"
@@ -3164,6 +3170,9 @@ msgstr "Vidigilo de protokolo de xine"
 msgid "Refresh"
 msgstr "Ĝisdatigu"
 
+#~ msgid "All extensions"
+#~ msgstr "Ĉiuj finaĵoj"
+
 #~ msgid "Do you really want to delete the file '%s%s%s' ?"
 #~ msgstr "Ĉu vi volas ja forigi la dosieron: '%s%s%s'"
 
@@ -3241,9 +3250,6 @@ msgstr "Ĝisdatigu"
 #~ msgstr "Huj, la etoso ne estis trovita, do uzu anstataŭan '%s'.\n"
 
 #~ msgid "..."
-#~ msgstr "Pli..."
-
-#~ msgid "More sources..."
 #~ msgstr "Pli..."
 
 #~ msgid "New Filter"

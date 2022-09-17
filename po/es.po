@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui.es\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2022-09-09 19:24+0200\n"
+"POT-Creation-Date: 2022-09-17 19:30+0200\n"
 "PO-Revision-Date: 2015-10-18 01:37+0200\n"
 "Last-Translator: Carlos E. Robinson <carlos.e.r@opensuse.org>\n"
 "Language-Team: Spanish <xine-devel@lists.sourceforge.net>\n"
@@ -753,11 +753,15 @@ msgstr "Cerrar"
 msgid "All files"
 msgstr "Todos los ficheros"
 
-msgid "All known subtitles"
+#, fuzzy
+msgid "All media files"
 msgstr "Todos los subtítulos conocidos"
 
-msgid "All known playlists"
-msgstr "Todas las listas conocidas"
+msgid "All subtitles"
+msgstr "Todos los subtítulos"
+
+msgid "All playlists"
+msgstr "Todas las listas"
 
 msgid "Apply"
 msgstr "Aplicar"
@@ -2543,9 +2547,6 @@ msgstr "Reiniciar los ajustes de vídeo"
 msgid "Video Control"
 msgstr "Control de vídeo"
 
-msgid "All extensions"
-msgstr "Todas las extensiones"
-
 msgid "xine MRL Browser"
 msgstr "Navegador MRL de xine"
 
@@ -2603,6 +2604,9 @@ msgstr "No mudo"
 #, c-format
 msgid "Audio: %s"
 msgstr "Audio: %s"
+
+msgid "More sources..."
+msgstr "Más..."
 
 msgid "gui panel visibility"
 msgstr "visibilidad del panel del IGU"
@@ -3204,6 +3208,9 @@ msgstr "Visor del registro de xine"
 msgid "Refresh"
 msgstr "Refrescar"
 
+#~ msgid "All extensions"
+#~ msgstr "Todas las extensiones"
+
 # CER El signo de cierre de interrogación está en el código fuente.
 #~ msgid "Do you really want to delete the file '%s%s%s' ?"
 #~ msgstr "¿Realmente quiere borrar el fichero: '%s%s%s' ?"
@@ -3289,9 +3296,6 @@ msgstr "Refrescar"
 #~ msgstr "Reducción de ruido"
 
 #~ msgid "..."
-#~ msgstr "Más..."
-
-#~ msgid "More sources..."
 #~ msgstr "Más..."
 
 #~ msgid "New Filter"

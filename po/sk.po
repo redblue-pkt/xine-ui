@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.24\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2022-09-09 19:24+0200\n"
+"POT-Creation-Date: 2022-09-17 19:30+0200\n"
 "PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Daniel Bena <Daniel.Bena at dm-drogeriemarkt dot sk>\n"
 "Language-Team: Slovak <sk-i18n@list.linux.sk>\n"
@@ -721,11 +721,15 @@ msgstr "Zavrieť"
 msgid "All files"
 msgstr "Všetky súbory"
 
-msgid "All known subtitles"
+#, fuzzy
+msgid "All media files"
 msgstr "Všetky známe titulky"
 
-msgid "All known playlists"
-msgstr "Všetky známe playlisty"
+msgid "All subtitles"
+msgstr "Všetky titulky"
+
+msgid "All playlists"
+msgstr "Všetky playlisty"
 
 msgid "Apply"
 msgstr "Použiť"
@@ -2384,9 +2388,8 @@ msgstr "Nastavenia/Editor kl.mapy..."
 msgid "Settings/Video..."
 msgstr "Nastavenia/Video..."
 
-#, fuzzy
 msgid "Settings/Audio..."
-msgstr "Nastavenia/Video..."
+msgstr "Nastavenia/Audio..."
 
 msgid "Settings/TV Analog..."
 msgstr "Nastavenia/TV Analog..."
@@ -2458,9 +2461,6 @@ msgstr ""
 msgid "Video Control"
 msgstr ""
 
-msgid "All extensions"
-msgstr "Všetky prípony"
-
 msgid "xine MRL Browser"
 msgstr "xine MRL prehliadač"
 
@@ -2518,6 +2518,10 @@ msgstr "So zvukom"
 #, c-format
 msgid "Audio: %s"
 msgstr "Audio: %s"
+
+#, fuzzy
+msgid "More sources..."
+msgstr "Viac..."
 
 msgid "gui panel visibility"
 msgstr "viditeľnosť gui panelu"
@@ -3094,6 +3098,9 @@ msgstr "xine prehliadač logov"
 
 msgid "Refresh"
 msgstr "Obnoviť"
+
+#~ msgid "All extensions"
+#~ msgstr "Všetky prípony"
 
 #~ msgid "XF86VidMode Extension (%d.%d) detected, trying to use it.\n"
 #~ msgstr "XF86VidMode Extension (%d.%d) detekovaná, skúšam ju použiť.\n"

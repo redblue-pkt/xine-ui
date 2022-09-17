@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine 0.99.6+hg\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2022-09-09 19:24+0200\n"
+"POT-Creation-Date: 2022-09-17 19:30+0200\n"
 "PO-Revision-Date: 2010-07-31 00:32+0700\n"
 "Last-Translator: Takeshi Hamasaki <hmatrjp@users.sourceforge.jp>\n"
 "Language-Team: Japanese <translation-team-ja@lists.sourceforge.net>\n"
@@ -737,10 +737,16 @@ msgstr "閉じる"
 msgid "All files"
 msgstr "すべてのファイル"
 
-msgid "All known subtitles"
+#, fuzzy
+msgid "All media files"
 msgstr "すべての既知の字幕"
 
-msgid "All known playlists"
+#, fuzzy
+msgid "All subtitles"
+msgstr "すべての既知の字幕"
+
+#, fuzzy
+msgid "All playlists"
 msgstr "すべての既知の再生リスト"
 
 msgid "Apply"
@@ -2488,9 +2494,6 @@ msgstr "ビデオ設定をリセット"
 msgid "Video Control"
 msgstr "ビデオコントロール"
 
-msgid "All extensions"
-msgstr "全ての拡張"
-
 msgid "xine MRL Browser"
 msgstr "xine MRL ブラウザ"
 
@@ -2548,6 +2551,9 @@ msgstr "ミュート解除"
 #, c-format
 msgid "Audio: %s"
 msgstr "音声: %s"
+
+msgid "More sources..."
+msgstr "もっと..."
 
 msgid "gui panel visibility"
 msgstr "GUI パネルの表示/非表示"
@@ -3134,6 +3140,9 @@ msgstr "xine ログビュアー"
 msgid "Refresh"
 msgstr "再描画"
 
+#~ msgid "All extensions"
+#~ msgstr "全ての拡張"
+
 #~ msgid "Do you really want to delete the file '%s%s%s' ?"
 #~ msgstr "本当にこのファイルを削除しますか: '%s%s%s'"
 
@@ -3213,9 +3222,6 @@ msgstr "再描画"
 #~ msgstr "ノイズ低減度"
 
 #~ msgid "..."
-#~ msgstr "もっと..."
-
-#~ msgid "More sources..."
 #~ msgstr "もっと..."
 
 #~ msgid "New Filter"

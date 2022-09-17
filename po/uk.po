@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.8\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2022-09-09 19:24+0200\n"
+"POT-Creation-Date: 2022-09-17 19:30+0200\n"
 "PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Sergiy Kudryk <linux_ua@yahoo.com>\n"
 "Language-Team: Ukrainian <linux@linux.org.ua>\n"
@@ -768,11 +768,16 @@ msgstr "Закрити"
 msgid "All files"
 msgstr ""
 
-msgid "All known subtitles"
+msgid "All media files"
 msgstr ""
 
-msgid "All known playlists"
+msgid "All subtitles"
 msgstr ""
+
+# src/xitk/panel.c:832
+#, fuzzy
+msgid "All playlists"
+msgstr "Зберегти список"
 
 msgid "Apply"
 msgstr ""
@@ -2535,9 +2540,6 @@ msgstr ""
 msgid "Video Control"
 msgstr "Управління"
 
-msgid "All extensions"
-msgstr ""
-
 # src/xitk/mrl_browser.c:185
 #, fuzzy
 msgid "xine MRL Browser"
@@ -2608,6 +2610,9 @@ msgstr ""
 
 #, c-format
 msgid "Audio: %s"
+msgstr ""
+
+msgid "More sources..."
 msgstr ""
 
 msgid "gui panel visibility"

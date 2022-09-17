@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.99.13\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2022-09-09 19:24+0200\n"
+"POT-Creation-Date: 2022-09-17 19:30+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -691,10 +691,13 @@ msgstr ""
 msgid "All files"
 msgstr ""
 
-msgid "All known subtitles"
+msgid "All media files"
 msgstr ""
 
-msgid "All known playlists"
+msgid "All subtitles"
+msgstr ""
+
+msgid "All playlists"
 msgstr ""
 
 msgid "Apply"
@@ -2293,9 +2296,6 @@ msgstr ""
 msgid "Video Control"
 msgstr ""
 
-msgid "All extensions"
-msgstr ""
-
 msgid "xine MRL Browser"
 msgstr ""
 
@@ -2352,6 +2352,9 @@ msgstr ""
 
 #, c-format
 msgid "Audio: %s"
+msgstr ""
+
+msgid "More sources..."
 msgstr ""
 
 msgid "gui panel visibility"

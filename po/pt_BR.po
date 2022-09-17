@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.9\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2022-09-09 19:24+0200\n"
+"POT-Creation-Date: 2022-09-17 19:30+0200\n"
 "PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Lucas Clemente Vella <lvella@triang.com.br>\n"
 "Language-Team: Portuguese (Brazilian) <pt_BR@li.org>\n"
@@ -747,10 +747,16 @@ msgstr "Fechar"
 msgid "All files"
 msgstr "Todos os arquivos"
 
-msgid "All known subtitles"
+#, fuzzy
+msgid "All media files"
 msgstr "Todas as legendas conhecidas"
 
-msgid "All known playlists"
+#, fuzzy
+msgid "All subtitles"
+msgstr "Todas as legendas conhecidas"
+
+#, fuzzy
+msgid "All playlists"
 msgstr "Todas as playlists conhecidas"
 
 msgid "Apply"
@@ -2503,9 +2509,6 @@ msgstr ""
 msgid "Video Control"
 msgstr "Controle"
 
-msgid "All extensions"
-msgstr "Todas as extenções"
-
 msgid "xine MRL Browser"
 msgstr "Selecionador de MRL xine"
 
@@ -2563,6 +2566,9 @@ msgstr "Não Mudo"
 #, c-format
 msgid "Audio: %s"
 msgstr "Áudio: %s"
+
+msgid "More sources..."
+msgstr "Mais..."
 
 msgid "gui panel visibility"
 msgstr "visibilidade do painel da interface de usuário"
@@ -3152,6 +3158,9 @@ msgstr "Visualizador de log xine"
 msgid "Refresh"
 msgstr "Redesenha"
 
+#~ msgid "All extensions"
+#~ msgstr "Todas as extenções"
+
 #~ msgid "XF86VidMode Extension (%d.%d) detected, trying to use it.\n"
 #~ msgstr "Extenção XF86VidMode (%d.%d) detectado, tentando usá-la.\n"
 
@@ -3226,9 +3235,6 @@ msgstr "Redesenha"
 
 #~ msgid "..."
 #~ msgstr "..."
-
-#~ msgid "More sources..."
-#~ msgstr "Mais..."
 
 #~ msgid "New Filter"
 #~ msgstr "Novo Filtro"

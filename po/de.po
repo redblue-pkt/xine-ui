@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.99.5\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2022-09-10 12:40+0200\n"
+"POT-Creation-Date: 2022-09-17 19:30+0200\n"
 "PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Torsten Jager <t.jager@gmx.de>\n"
 "Language-Team: German <de@li.org>\n"
@@ -746,11 +746,14 @@ msgstr "Schließen"
 msgid "All files"
 msgstr "Alle Dateien"
 
-msgid "All known subtitles"
-msgstr "Alle bekannten Untertitel"
+msgid "All media files"
+msgstr "Alle Mediendateien"
 
-msgid "All known playlists"
-msgstr "Alle bekannten Playlisten"
+msgid "All subtitles"
+msgstr "Alle Untertitel"
+
+msgid "All playlists"
+msgstr "Alle Playlisten"
 
 msgid "Apply"
 msgstr "Anwenden"
@@ -2514,9 +2517,6 @@ msgstr "Videoeinstellungen zurücksetzen"
 msgid "Video Control"
 msgstr "Videosteuerung"
 
-msgid "All extensions"
-msgstr "Alle Dateitypen"
-
 msgid "xine MRL Browser"
 msgstr "xine MRL Browser"
 
@@ -3169,6 +3169,9 @@ msgstr "xine Log-Betrachter"
 
 msgid "Refresh"
 msgstr "Aktualisieren"
+
+#~ msgid "All extensions"
+#~ msgstr "Alle Dateitypen"
 
 #~ msgid "Do you really want to delete the file '%s%s%s' ?"
 #~ msgstr "Datei '%s%s%s' wirklich löschen?"

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pl\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2022-09-09 19:24+0200\n"
+"POT-Creation-Date: 2022-09-17 19:30+0200\n"
 "PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Bartłomiej Muryn <bmuryn@gmail.com>\n"
 "Language-Team:  <pl@li.org>\n"
@@ -729,11 +729,15 @@ msgstr "Koniec"
 msgid "All files"
 msgstr "Wszystkie pliki"
 
-msgid "All known subtitles"
+#, fuzzy
+msgid "All media files"
 msgstr "Wszystkie znane napisy"
 
-msgid "All known playlists"
-msgstr "Wszystkie znane listy"
+msgid "All subtitles"
+msgstr "Wszystkie napisy"
+
+msgid "All playlists"
+msgstr "Wszystkie listy"
 
 msgid "Apply"
 msgstr "Zastosuj"
@@ -2492,9 +2496,6 @@ msgstr ""
 msgid "Video Control"
 msgstr ""
 
-msgid "All extensions"
-msgstr "Wszystkie rozszerzenia"
-
 msgid "xine MRL Browser"
 msgstr "Przeglądarka MRL xine"
 
@@ -2552,6 +2553,10 @@ msgstr "Dźwięk włączony"
 #, c-format
 msgid "Audio: %s"
 msgstr "Dźwięk: %s"
+
+#, fuzzy
+msgid "More sources..."
+msgstr "Więcej..."
 
 msgid "gui panel visibility"
 msgstr "wyświetlanie panela gui"
@@ -3139,6 +3144,9 @@ msgstr "Podgląd logów xine"
 
 msgid "Refresh"
 msgstr "Odświeżanie"
+
+#~ msgid "All extensions"
+#~ msgstr "Wszystkie rozszerzenia"
 
 #~ msgid "Do you really want to delete the file '%s%s%s' ?"
 #~ msgstr "Czy naprawdę chcesz skasować plik: %s%s%s"
