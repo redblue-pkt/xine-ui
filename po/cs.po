@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui-0.99.7\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2022-09-09 19:24+0200\n"
+"POT-Creation-Date: 2022-09-17 19:30+0200\n"
 "PO-Revision-Date: 2010-10-14 23:58+0200\n"
 "Last-Translator: František Dvořák <valtri@civ.zcu.cz>\n"
 "Language-Team: Czech <cs@li.org>\n"
@@ -748,11 +748,15 @@ msgstr "Zavřít"
 msgid "All files"
 msgstr "Všechny soubory"
 
-msgid "All known subtitles"
+#, fuzzy
+msgid "All media files"
 msgstr "Všechny známé titulky"
 
-msgid "All known playlists"
-msgstr "Všechny známé playlisty"
+msgid "All subtitles"
+msgstr "Všechny titulky"
+
+msgid "All playlists"
+msgstr "Všechny playlisty"
 
 msgid "Apply"
 msgstr "Použít"
@@ -2515,9 +2519,6 @@ msgstr "Vynulovat nastavení videa"
 msgid "Video Control"
 msgstr "Ovládání videa"
 
-msgid "All extensions"
-msgstr "Všechny přípony"
-
 # window title
 msgid "xine MRL Browser"
 msgstr "Prohlížeč MRL xine"
@@ -2576,6 +2577,9 @@ msgstr "není ztlumen"
 #, c-format
 msgid "Audio: %s"
 msgstr "Zvuk: %s"
+
+msgid "More sources..."
+msgstr "Více ..."
 
 msgid "gui panel visibility"
 msgstr "Viditelnost GUI panelu"
@@ -3171,6 +3175,9 @@ msgstr "Prohlížeč zpráv xine"
 msgid "Refresh"
 msgstr "Obnovit"
 
+#~ msgid "All extensions"
+#~ msgstr "Všechny přípony"
+
 #~ msgid "Do you really want to delete the file '%s%s%s' ?"
 #~ msgstr "Opravdu chcete smazat soubor '%s%s%s'?"
 
@@ -3250,9 +3257,6 @@ msgstr "Obnovit"
 #~ msgstr "Redukce šumu"
 
 #~ msgid "..."
-#~ msgstr "Více ..."
-
-#~ msgid "More sources..."
 #~ msgstr "Více ..."
 
 #~ msgid "New Filter"

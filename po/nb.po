@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2022-09-09 19:24+0200\n"
+"POT-Creation-Date: 2022-09-17 19:30+0200\n"
 "PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Alexander Nicolaysen Sørnes <alex@thehandofagony.com>\n"
 "Language-Team:  <nb@li.org>\n"
@@ -737,11 +737,15 @@ msgstr "Lukk"
 msgid "All files"
 msgstr "Alle filer"
 
-msgid "All known subtitles"
+#, fuzzy
+msgid "All media files"
 msgstr "Alle kjente tekstingsfiler"
 
-msgid "All known playlists"
-msgstr "Alle kjente spillelister"
+msgid "All subtitles"
+msgstr "Alle tekstingsfiler"
+
+msgid "All playlists"
+msgstr "Alle spillelister"
 
 msgid "Apply"
 msgstr "Bruk"
@@ -2487,9 +2491,6 @@ msgstr ""
 msgid "Video Control"
 msgstr "Kontroller Video"
 
-msgid "All extensions"
-msgstr "Alle utvidelser"
-
 msgid "xine MRL Browser"
 msgstr "xines MRL-finner"
 
@@ -2547,6 +2548,9 @@ msgstr "Slutt på stillhet"
 #, c-format
 msgid "Audio: %s"
 msgstr "Lyd: %s"
+
+msgid "More sources..."
+msgstr "Mer . . ."
 
 msgid "gui panel visibility"
 msgstr "Visning av grensesnittpanel"
@@ -3134,6 +3138,9 @@ msgstr "Loggviser for xine"
 msgid "Refresh"
 msgstr "Oppdater"
 
+#~ msgid "All extensions"
+#~ msgstr "Alle utvidelser"
+
 #~ msgid "Do you really want to delete the file '%s%s%s' ?"
 #~ msgstr "Virkelig slette filen «%s%s%s»?"
 
@@ -3214,9 +3221,6 @@ msgstr "Oppdater"
 #~ msgstr "Den huden ble ikke funnet, nei; faller tilbake på «%s».\n"
 
 #~ msgid "..."
-#~ msgstr "Mer . . ."
-
-#~ msgid "More sources..."
 #~ msgstr "Mer . . ."
 
 #~ msgid "New Filter"

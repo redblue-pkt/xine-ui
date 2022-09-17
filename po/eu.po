@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui-eu\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2022-09-09 19:24+0200\n"
+"POT-Creation-Date: 2022-09-17 19:30+0200\n"
 "PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Piarres Beobide  <pi@beobide.net>\n"
 "Language-Team: Librezale.org <librezale@librezale.org>\n"
@@ -744,10 +744,16 @@ msgstr "Itxi"
 msgid "All files"
 msgstr "Fitxategi guztiak"
 
-msgid "All known subtitles"
+#, fuzzy
+msgid "All media files"
 msgstr "Azpititulu ezagun guztiak"
 
-msgid "All known playlists"
+#, fuzzy
+msgid "All subtitles"
+msgstr "Azpititulu ezagun guztiak"
+
+#, fuzzy
+msgid "All playlists"
 msgstr "Erreprodukzio-zerrenda ezagun guztiak"
 
 msgid "Apply"
@@ -2498,9 +2504,6 @@ msgstr ""
 msgid "Video Control"
 msgstr ""
 
-msgid "All extensions"
-msgstr "Luzapen guztiak"
-
 msgid "xine MRL Browser"
 msgstr "xine MRL arakatzailea"
 
@@ -2558,6 +2561,9 @@ msgstr "Mututu gabe"
 #, c-format
 msgid "Audio: %s"
 msgstr "Audioa: %s"
+
+msgid "More sources..."
+msgstr "Gehiago..."
 
 msgid "gui panel visibility"
 msgstr "gui panelaren ikusgaitasuna"
@@ -3154,6 +3160,9 @@ msgstr "xine erregistro-ikustailea"
 msgid "Refresh"
 msgstr "Freskatu"
 
+#~ msgid "All extensions"
+#~ msgstr "Luzapen guztiak"
+
 #~ msgid "Do you really want to delete the file '%s%s%s' ?"
 #~ msgstr "Benetan fitxategi hau ezabatu nahi duzula: '%s%s%s'"
 
@@ -3234,9 +3243,6 @@ msgstr "Freskatu"
 #~ msgstr "Azala ez da aurkitu, erabili segurtasuneko '%s'.\n"
 
 #~ msgid "..."
-#~ msgstr "Gehiago..."
-
-#~ msgid "More sources..."
 #~ msgstr "Gehiago..."
 
 #~ msgid "New Filter"

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui-1.96\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2022-09-09 19:24+0200\n"
+"POT-Creation-Date: 2022-09-17 19:30+0200\n"
 "PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Pavel Maryanov <acid_jack@ukr.net>\n"
 "Language-Team: Russian <docteam@lafox.net>\n"
@@ -744,11 +744,15 @@ msgstr "Закрыть"
 msgid "All files"
 msgstr "Все файлы"
 
-msgid "All known subtitles"
+#, fuzzy
+msgid "All media files"
 msgstr "Все известные субтитры"
 
-msgid "All known playlists"
-msgstr "Все известные плейлисты"
+msgid "All subtitles"
+msgstr "Все субтитры"
+
+msgid "All playlists"
+msgstr "Все плейлисты"
 
 msgid "Apply"
 msgstr "Применить"
@@ -2442,9 +2446,8 @@ msgstr "Параметры/Редактор карты клавиш..."
 msgid "Settings/Video..."
 msgstr "Параметры/Видео..."
 
-#, fuzzy
 msgid "Settings/Audio..."
-msgstr "Параметры/Видео..."
+msgstr "Параметры/Аудио..."
 
 msgid "Settings/TV Analog..."
 msgstr "Параметры/Аналоговое ТВ..."
@@ -2516,9 +2519,6 @@ msgstr ""
 msgid "Video Control"
 msgstr ""
 
-msgid "All extensions"
-msgstr "Все расширения"
-
 msgid "xine MRL Browser"
 msgstr "MRL-браузер xine"
 
@@ -2576,6 +2576,10 @@ msgstr "вкл."
 #, c-format
 msgid "Audio: %s"
 msgstr "Звук: %s"
+
+#, fuzzy
+msgid "More sources..."
+msgstr "Больше..."
 
 msgid "gui panel visibility"
 msgstr "видимость панели gui"
@@ -3170,6 +3174,9 @@ msgstr "просмотр журнала xine"
 
 msgid "Refresh"
 msgstr "Обновить"
+
+#~ msgid "All extensions"
+#~ msgstr "Все расширения"
 
 #~ msgid "Do you really want to delete the file '%s%s%s' ?"
 #~ msgstr "Вы действительно хотите удалить файл: '%s%s%s'"

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.21\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2022-09-09 19:24+0200\n"
+"POT-Creation-Date: 2022-09-17 19:30+0200\n"
 "PO-Revision-Date: 2021-10-14 12:59+0200\n"
 "Last-Translator: Xavier Bachelot <xavier@bachelot.org>\n"
 "Language-Team: French <fr@li.org>\n"
@@ -749,11 +749,15 @@ msgstr "Fermer"
 msgid "All files"
 msgstr "Tous les fichiers"
 
-msgid "All known subtitles"
+#, fuzzy
+msgid "All media files"
 msgstr "Tous les sous-titres connus"
 
-msgid "All known playlists"
-msgstr "Toutes les listes de lecture connues"
+msgid "All subtitles"
+msgstr "Tous les sous-titres"
+
+msgid "All playlists"
+msgstr "Toutes les listes de lecture"
 
 msgid "Apply"
 msgstr "Appliquer"
@@ -2546,9 +2550,6 @@ msgstr "Remise à zéro des paramètres vidéo"
 msgid "Video Control"
 msgstr "Contrôle Vidéo"
 
-msgid "All extensions"
-msgstr "Toutes les extensions"
-
 msgid "xine MRL Browser"
 msgstr "Navigateur de MRL de xine."
 
@@ -2606,6 +2607,9 @@ msgstr "Bruyant"
 #, c-format
 msgid "Audio: %s"
 msgstr "Audio: %s"
+
+msgid "More sources..."
+msgstr "Plus..."
 
 msgid "gui panel visibility"
 msgstr "visibilité du panneau"
@@ -3211,6 +3215,9 @@ msgstr "Visualiseur des journaux de xine"
 msgid "Refresh"
 msgstr "Rafraîchir"
 
+#~ msgid "All extensions"
+#~ msgstr "Toutes les extensions"
+
 #~ msgid "Do you really want to delete the file '%s%s%s' ?"
 #~ msgstr "Voulez-vous réellement supprimer le fichier: '%s%s%s' ?"
 
@@ -3297,9 +3304,6 @@ msgstr "Rafraîchir"
 #~ msgstr "Réduction du bruit"
 
 #~ msgid "..."
-#~ msgstr "Plus..."
-
-#~ msgid "More sources..."
 #~ msgstr "Plus..."
 
 #~ msgid "New Filter"
