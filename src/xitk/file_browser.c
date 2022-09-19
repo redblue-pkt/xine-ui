@@ -120,19 +120,22 @@ static const char _fb_ext_list[][12 * 4] = {
   { "y4m " }
 };
 
-static const char *_fb_exts[4 + sizeof (_fb_ext_list) / sizeof (_fb_ext_list[0]) + 1] = {[0] = NULL};
+static const char *_fb_exts[XUI_EXTS_LAST + sizeof (_fb_ext_list) / sizeof (_fb_ext_list[0]) + 1] = {[0] = NULL};
 
 const char **filebrowser_ext_list_get (gGui_t *gui) {
   (void)gui;
   if (!_fb_exts[0]) {
     uint32_t u;
-    _fb_exts[0] = _("All files");
-    _fb_exts[1] = _("All media files");
-    _fb_exts[2] = _("All subtitles");
-    _fb_exts[3] = _("All playlists");
+    _fb_exts[XUI_EXTS_ANY] = _("All");
+    _fb_exts[XUI_EXTS_MEDIA] = _("Media");
+    _fb_exts[XUI_EXTS_AUDIO] = _("Audio");
+    _fb_exts[XUI_EXTS_VIDEO] = _("Video");
+    _fb_exts[XUI_EXTS_IMAGE] = _("Images");
+    _fb_exts[XUI_EXTS_SUBTITLE] = _("Subtitles");
+    _fb_exts[XUI_EXTS_PLAYLIST] = _("Playlists");
     for (u = 0; u < sizeof (_fb_ext_list) / sizeof (_fb_ext_list[0]) - 1; u++)
-      _fb_exts[4 + u] = _fb_ext_list[u];
-    _fb_exts[u] = NULL;
+      _fb_exts[XUI_EXTS_LAST + u] = _fb_ext_list[u];
+    _fb_exts[XUI_EXTS_LAST + u] = NULL;
   }
   return (const char **)_fb_exts;
 }
@@ -171,18 +174,19 @@ static uint32_t _fb_ext_from_name (const char *name) {
 int filebrowser_ext_match (gGui_t *gui, const char *name, uint32_t n) {
   uint32_t ext, u;
 
-  ext = (n > 0) ? _fb_ext_from_name (name) : 0;
+  ext = (n > XUI_EXTS_ANY) ? _fb_ext_from_name (name) : 0;
   switch (n) {
-    case 0: /* all */
+    case XUI_EXTS_ANY:
       return 1;
-    case 1: /* media */
-      return xine_sarray_binary_search (gui->playlist.known_media_exts, (void *)(uintptr_t)ext) >= 0;
-    case 2: /* subtitle */
-      return xine_sarray_binary_search (gui->playlist.known_spu_exts, (void *)(uintptr_t)ext) >= 0;
-    case 3: /* playlist */
-      return xine_sarray_binary_search (gui->playlist.known_playlist_exts, (void *)(uintptr_t)ext) >= 0;
+    case XUI_EXTS_MEDIA:
+    case XUI_EXTS_AUDIO:
+    case XUI_EXTS_VIDEO:
+    case XUI_EXTS_IMAGE:
+    case XUI_EXTS_SUBTITLE:
+    case XUI_EXTS_PLAYLIST:
+      return xine_sarray_binary_search (gui->playlist.exts[n], (void *)(uintptr_t)ext) >= 0;
     default:
-      n -= 4;
+      n -= XUI_EXTS_LAST;
       if (n >= sizeof (_fb_ext_list) / sizeof (_fb_ext_list[0]))
         return 0;
       for (u = 0; _fb_ext_list[n][u]; u += 4) {
@@ -961,7 +965,6 @@ static void fb_exit(xitk_widget_t *w, void *data) {
     /* xitk_dlist_init (&fb->widget_list->list); */
 
     filebrowser_ext_list_unget (fb->gui, &fb->file_filters);
-    fb->file_filters = NULL;
 
     SAFE_FREE(fb->cbb[0].label);
     SAFE_FREE(fb->cbb[1].label);
@@ -1275,11 +1278,11 @@ filebrowser_t *create_filebrowser (gGui_t *gui, const char *window_title, const 
   br.browser.skin_element_name     = NULL;
   br.browser.max_displayed_entries = MAX_DISP_ENTRIES;
   br.userdata                      = (void *)fb;
+  br.callback                      = fb_select;
+  br.dbl_click_callback            = fb_dbl_select;
 
   br.browser.num_entries           = fb->dir_list.used;
   br.browser.entries               = (const char *const *)fb->dir_list.array;
-  br.callback                      = fb_select;
-  br.dbl_click_callback            = fb_dbl_select;
   fb->w[_W_directories_browser] = xitk_noskin_browser_create (fb->widget_list, &br,
     x + 2, y + 2, w - 4 - 12, 20, 12, fontname);
   xitk_add_widget (fb->widget_list, fb->w[_W_directories_browser], XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
@@ -1288,11 +1291,11 @@ filebrowser_t *create_filebrowser (gGui_t *gui, const char *window_title, const 
 
   y -= 15;
 
-  b.skin_element_name = NULL;
   b.userdata          = (void *)fb;
-
   b.state_callback    = NULL;
   b.callback          = fb_sort;
+
+  b.skin_element_name = NULL;
   fb->w[_W_directories_sort] = xitk_noskin_button_create (fb->widget_list, &b, x, y, w, 15);
   xitk_add_widget (fb->widget_list, fb->w[_W_directories_sort], XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
@@ -1301,8 +1304,6 @@ filebrowser_t *create_filebrowser (gGui_t *gui, const char *window_title, const 
 
   br.browser.num_entries           = fb->file_list.used;
   br.browser.entries               = (const char * const *)fb->file_list.array;
-  br.callback                      = fb_select;
-  br.dbl_click_callback            = fb_dbl_select;
   fb->w[_W_files_browser] = xitk_noskin_browser_create (fb->widget_list, &br,
     x + 2, y + 2, w - 4 - 12, 20, 12, fontname);
   xitk_add_widget (fb->widget_list, fb->w[_W_files_browser], XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
@@ -1311,7 +1312,6 @@ filebrowser_t *create_filebrowser (gGui_t *gui, const char *window_title, const 
 
   y -= 15;
 
-  b.callback          = fb_sort;
   fb->w[_W_files_sort] = xitk_noskin_button_create (fb->widget_list, &b, x, y, w, 15);
   xitk_add_widget (fb->widget_list, fb->w[_W_files_sort], XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
@@ -1432,7 +1432,6 @@ filebrowser_t *create_filebrowser (gGui_t *gui, const char *window_title, const 
   b.skin_element_name = "XITK_NOSKIN_CHECK";
   b.callback          = NULL;
   b.state_callback    = fb_hidden_files;
-  b.userdata          = (void *) fb;
   fb->w[_W_show_hidden] = xitk_noskin_button_create (fb->widget_list, &b, x, y+5, 10, 10);
   xitk_add_widget (fb->widget_list, fb->w[_W_show_hidden], XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
   xitk_button_set_state (fb->w[_W_show_hidden], fb->show_hidden_files);

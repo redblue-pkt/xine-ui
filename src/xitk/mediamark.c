@@ -80,42 +80,6 @@ struct xui_mmkedit_s {
   xitk_register_key_t           widget_key;
 };
 
-/** tools ******************************************************************************/
-
-static inline uint32_t _find_byte (const char *s, uint32_t byte) {
-  const uint32_t eor = ~((byte << 24) | (byte << 16) | (byte << 8) | byte);
-  const uint32_t left = (uintptr_t)s & 3;
-  const uint32_t *p = (const uint32_t *)(s - left);
-  static const union {
-    uint8_t b[4];
-    uint32_t v;
-  } mask[4] = {
-    {{0xff, 0xff, 0xff, 0xff}},
-    {{0x00, 0xff, 0xff, 0xff}},
-    {{0x00, 0x00, 0xff, 0xff}},
-    {{0x00, 0x00, 0x00, 0xff}},
-  };
-  static const uint8_t rest[32] = {
-    0, 1, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, /* big wndian */
-    0, 4, 3, 4, 2, 4, 3, 4, 1, 4, 3, 4, 2, 4, 3, 4  /* little endian */
-  };
-  const union {
-    uint32_t v;
-    uint8_t b[4];
-  } endian = {16};
-  uint32_t w = (*p++ ^ eor) & mask[left].v;
-  while (1) {
-    w = w & 0x80808080 & ((w & 0x7f7f7f7f) + 0x01010101);
-    if (w)
-      break;
-    w = *p++ ^ eor;
-  }
-  /* bits 31, 23, 15, 7 -> 3, 2, 1, 0 */
-  w = (w * 0x00204081) & 0xffffffff;
-  w >>= 28;
-  return ((const char *)p - s) - rest[endian.b[0] + w];
-}
-
 /** mrl_buf handling *******************************************************************/
 
 static const uint8_t tab_unhex[256] = {
@@ -142,7 +106,7 @@ static size_t _gui_string_unescape (char *_s, size_t len) {
 
   memcpy (save, e, 2);
   memset (e, '%', 2);
-  s += _find_byte ((char *)s, '%');
+  s += xitk_find_byte ((char *)s, '%');
   d = s;
   while (s < e) {
     uint8_t a = tab_unhex[s[1]], b = tab_unhex[s[2]];
@@ -170,7 +134,7 @@ void mrl_buf_init (mrl_buf_t *mrlb) {
 
 static void _mrl_buf_working_dir (mrl_buf_t *mrlb) {
   if (getcwd (mrlb->start, mrlb->max - mrlb->start)) {
-    mrlb->args = mrlb->start + _find_byte (mrlb->start, 0);
+    mrlb->args = mrlb->start + xitk_find_byte (mrlb->start, 0);
     mrlb->start[-1] = '/';
     if (mrlb->args[-1] != '/') {
       memcpy (mrlb->args, "/", 2);
@@ -193,7 +157,7 @@ static int _mrl_buf_mkdir_p (mrl_buf_t *path) {
   if (p[0] == '/')
     p++;
   while (p < path->lastpart) {
-    p += _find_byte (p, '/');
+    p += xitk_find_byte (p, '/');
     p[0] = 0;
     if (!stat (path->root, &sbuf)) {
       if (!S_ISDIR (sbuf.st_mode)) {
@@ -285,7 +249,7 @@ int mrl_buf_set (mrl_buf_t *mrlb, mrl_buf_t *base, const char *name) {
     return 0;
 
   mrlb->start = mrlb->buf + 8;
-  size = _find_byte (name, 0);
+  size = xitk_find_byte (name, 0);
   if ((int)size > mrlb->max - mrlb->start)
     size = mrlb->max - mrlb->start;
   memcpy (mrlb->start, name, size + 1);
@@ -328,12 +292,12 @@ int mrl_buf_set (mrl_buf_t *mrlb, mrl_buf_t *base, const char *name) {
   }
   /* extra info */
   mrlb->end[0] = '#';
-  mrlb->info = scan_args + _find_byte (scan_args, '#');
+  mrlb->info = scan_args + xitk_find_byte (scan_args, '#');
   mrlb->end[0] = 0;
   /* args */
   save = mrlb->info[0];
   mrlb->info[0] = '?';
-  mrlb->args = scan_args + _find_byte (scan_args, '?');
+  mrlb->args = scan_args + xitk_find_byte (scan_args, '?');
   mrlb->info[0] = save;
   /* file:// */
   if ((plen == 4) && !memcmp (prot, "file", 4)) {
@@ -464,7 +428,7 @@ static int _mediamark_new_from_mrl_buf (mediamark_t **m, const char *ident, mrl_
   }
 
   n->ident = n->mrl;
-  l = ident ? _find_byte (ident, 0) : 0;
+  l = ident ? xitk_find_byte (ident, 0) : 0;
   if (!l) {
     ident = mrl->lastpart;
     l = mrl->args - mrl->lastpart;
@@ -796,23 +760,27 @@ typedef union {
   uint32_t v;
 } known_ext_t;
 
-static const known_ext_t _media_exts[] = {
-  {"4xm "}, {"ac3 "}, {"aif "}, {"aiff"}, {"asf "}, {"au  "}, {"aud "}, {"avi "},
-  {"cak "}, {"cin "}, {"cpk "}, {"dat "}, {"dif "}, {"dps "}, {"dv  "}, {"film"},
-  {"flc "}, {"fli "}, {"flv "}, {"ik2 "}, {"iki "}, {"jpeg"}, {"jpg "}, {"m2p "},
-  {"m2t "}, {"mjpg"}, {"mkv "}, {"mng "}, {"mov "}, {"mp2 "}, {"mp3 "}, {"mp4 "},
-  {"mp4a"}, {"mp4v"}, {"mpa "}, {"mpeg"}, {"mpg "}, {"mpv "}, {"mv8 "}, {"mve "},
-  {"nsf "}, {"nsv "}, {"ogg "}, {"ogm "}, {"opus"}, {"pes "}, {"png "}, {"pva "},
-  {"qt  "}, {"ra  "}, {"ram "}, {"rm  "}, {"rmvb"}, {"roq "}, {"snd "}, {"spx "},
-  {"str "}, {"trp "}, {"ts  "}, {"wav "}, {"voc "}, {"vob "}, {"vox "}, {"wax "},
-  {"wma "}, {"wmv "}, {"vqa "}, {"wve "}, {"wvx "}, {"xa  "}, {"xa1 "}, {"xa2 "},
-  {"xap "}, {"xas "}, {"y4m "}
+static const known_ext_t _audio_exts[] = {
+  {"aac "}, {"ac3 "}, {"aif "}, {"aiff"}, {"au  "}, {"aud "}, {"mp2 "}, {"mp3 "},
+  {"mp4a"}, {"mpa "}, {"nsf "}, {"ogg "}, {"ogm "}, {"opus"}, {"pva "}, {"ra  "},
+  {"snd "}, {"spx "}, {"wav "}, {"voc "}, {"vox "}, {"wma "}, {"vqa "}, {"xa  "},
+  {"xa1 "}, {"xa2 "}, {"xap "}, {"xas "}
 };
-
+static const known_ext_t _video_exts[] = {
+  {"4xm "}, {"asf "}, {"avi "}, {"cak "}, {"cin "}, {"cpk "}, {"dat "}, {"dif "},
+  {"dps "}, {"dv  "}, {"film"}, {"flc "}, {"fli "}, {"flv "}, {"ik2 "}, {"iki "},
+  {"m2p "}, {"m2t "}, {"mjpg"}, {"mkv "}, {"mng "}, {"mov "}, {"mp4 "}, {"mp4v"},
+  {"mpeg"}, {"mpg "}, {"mpv "}, {"mv8 "}, {"mve "}, {"nsv "}, {"pes "}, {"qt  "},
+  {"ram "}, {"rm  "}, {"rmvb"}, {"roq "}, {"str "}, {"trp "}, {"ts  "}, {"vob "},
+  {"wax "}, {"webm"}, {"wmv "}, {"wve "}, {"wvx "}, {"y4m "}
+};
+static const known_ext_t _image_exts[] = {
+  {"bmp "}, {"gif "}, {"iff "}, {"jpeg"}, {"jpg "}, {"png "}, {"tif "}, {"tiff"},
+  {"webp"}
+};
 static const known_ext_t _spu_exts[] = {
   {"asc "}, {"ass "}, {"smi "}, {"srt "}, {"ssa "}, {"sub "}, {"txt "}
 };
-
 static const known_ext_t _playlist_exts[] = {
   {"asx "}, {"fxd "}, {"m3u "}, {"pls "}, {"sfv "}, {"smi "}, {"smil"}, {"tox "},
   {"xml "}
@@ -824,15 +792,23 @@ static int _known_ext_cmp (void *a, void *b) {
   return (int)d - (int)e;
 }
 
+#if defined(XINE_SARRAY) && (XINE_SARRAY >= 3)
+static unsigned int _known_ext_hash (void *a) {
+  uint32_t v = (uintptr_t)a;
+  v ^= v >> 16;
+  v ^= v >> 8;
+  return v & 31;
+}
+#endif
+
 static xine_sarray_t *_set_known_exts (const known_ext_t *exts, uint32_t n) {
   xine_sarray_t *a = xine_sarray_new (n, _known_ext_cmp);
-
-  if (a) {
-    uint32_t u;
-
-    for (u = 0; u < n; u++)
-      xine_sarray_add (a, (void *)(uintptr_t)exts[u].v);
-  }
+  uint32_t u;
+#if defined(XINE_SARRAY) && (XINE_SARRAY >= 3)
+  xine_sarray_set_hash (a, _known_ext_hash, 32);
+#endif
+  for (u = 0; u < n; u++)
+    xine_sarray_add (a, (void *)(uintptr_t)exts[u].v);
   return a;
 }
 
@@ -855,8 +831,12 @@ static uint32_t _get_ext_val (const char *s, uint32_t l) {
 }
 
 void gui_playlist_init (gGui_t *gui) {
+  int i;
+  void *v;
+
   if (!gui)
     return;
+
   gui->playlist.mmk = NULL;
   gui->playlist.max = 0;
   gui->playlist.num = 0;
@@ -864,33 +844,54 @@ void gui_playlist_init (gGui_t *gui) {
   gui->playlist.ref_append = 0;
   gui->playlist.loop = PLAYLIST_LOOP_NO_LOOP;
   gui->playlist.control = 0;
-  gui->playlist.known_playlist_exts = _set_known_exts (_playlist_exts, sizeof (_playlist_exts) / sizeof (_playlist_exts[0]));
-  gui->playlist.known_media_exts = _set_known_exts (_media_exts, sizeof (_media_exts) / sizeof (_media_exts[0]));
-  gui->playlist.known_spu_exts = _set_known_exts (_spu_exts, sizeof (_spu_exts) / sizeof (_spu_exts[0]));
+
+  gui->playlist.exts[XUI_EXTS_ANY] = NULL;
+  gui->playlist.exts[XUI_EXTS_AUDIO] = _set_known_exts (_audio_exts, sizeof (_audio_exts) / sizeof (_audio_exts[0]));
+  gui->playlist.exts[XUI_EXTS_VIDEO] = _set_known_exts (_video_exts, sizeof (_video_exts) / sizeof (_video_exts[0]));
+  gui->playlist.exts[XUI_EXTS_IMAGE] = _set_known_exts (_image_exts, sizeof (_image_exts) / sizeof (_image_exts[0]));
+
+  gui->playlist.exts[XUI_EXTS_MEDIA] = xine_sarray_new (
+    xine_sarray_size (gui->playlist.exts[XUI_EXTS_VIDEO]) +
+    xine_sarray_size (gui->playlist.exts[XUI_EXTS_AUDIO]) +
+    xine_sarray_size (gui->playlist.exts[XUI_EXTS_IMAGE]),
+    _known_ext_cmp);
+#if defined(XINE_SARRAY) && (XINE_SARRAY >= 3)
+  xine_sarray_set_hash (gui->playlist.exts[XUI_EXTS_MEDIA], _known_ext_hash, 32);
+#endif
+  for (i = 0; (v = xine_sarray_get (gui->playlist.exts[XUI_EXTS_VIDEO], i)) != NULL; i++)
+    xine_sarray_add (gui->playlist.exts[XUI_EXTS_MEDIA], v);
+  for (i = 0; (v = xine_sarray_get (gui->playlist.exts[XUI_EXTS_AUDIO], i)) != NULL; i++)
+    xine_sarray_add (gui->playlist.exts[XUI_EXTS_MEDIA], v);
+  for (i = 0; (v = xine_sarray_get (gui->playlist.exts[XUI_EXTS_IMAGE], i)) != NULL; i++)
+    xine_sarray_add (gui->playlist.exts[XUI_EXTS_MEDIA], v);
+
+  gui->playlist.exts[XUI_EXTS_PLAYLIST] = _set_known_exts (_playlist_exts, sizeof (_playlist_exts) / sizeof (_playlist_exts[0]));
+  gui->playlist.exts[XUI_EXTS_SUBTITLE] = _set_known_exts (_spu_exts, sizeof (_spu_exts) / sizeof (_spu_exts[0]));
 }
 
 void gui_playlist_deinit (gGui_t *gui) {
+  int i;
+
   if (!gui)
     return;
-  if (gui->playlist.mmk) {
-    int i;
 
+  if (gui->playlist.mmk) {
     for (i = gui->playlist.num - 1; i >= 0; i--)
       mediamark_free (gui->playlist.mmk + i);
     SAFE_FREE (gui->playlist.mmk);
   }
+
   gui->playlist.max = 0;
   gui->playlist.num = 0;
   gui->playlist.cur = -1;
   gui->playlist.ref_append = 0;
   gui->playlist.loop = 0;
   gui->playlist.control = 0;
-  xine_sarray_delete (gui->playlist.known_playlist_exts);
-  gui->playlist.known_playlist_exts = NULL;
-  xine_sarray_delete (gui->playlist.known_media_exts);
-  gui->playlist.known_media_exts = NULL;
-  xine_sarray_delete (gui->playlist.known_spu_exts);
-  gui->playlist.known_spu_exts = NULL;
+
+  for (i = XUI_EXTS_ANY; i < XUI_EXTS_LAST; i++) {
+    xine_sarray_delete (gui->playlist.exts[i]);
+    gui->playlist.exts[i] = NULL;
+  }
 }
 
 int mrl_look_like_playlist (gGui_t *gui, const char *mrl) {
@@ -903,7 +904,7 @@ int mrl_look_like_playlist (gGui_t *gui, const char *mrl) {
     return 0;
   if ((mrlb.ext >= mrlb.args) || (mrlb.ext + 5 < mrlb.args))
     return 0;
-  return _is_known_ext (gui->playlist.known_playlist_exts, _get_ext_val (mrlb.ext, mrlb.args - mrlb.ext));
+  return _is_known_ext (gui->playlist.exts[XUI_EXTS_PLAYLIST], _get_ext_val (mrlb.ext, mrlb.args - mrlb.ext));
 #else
   /* TJ. I dont know whether someone really needs to treat
    * "foo/bar.m3under/the/table" as an m3u playlist.
@@ -1098,7 +1099,7 @@ static int _lf_split_lines (_lf_t *lf) {
       lf->lines = n;
       have += 128;
     }
-    lend = line + _find_byte (line, '\n');
+    lend = line + xitk_find_byte (line, '\n');
     nextline = lend + 1;
     lend[0] = 0;
     if (lend[-1] == '\r')
@@ -1567,7 +1568,7 @@ static void xml_asx_playlist (_lf_t *lf, xml_node_t *xml_tree) {
             real_title = malloc (len);
             strcpy (real_title, atitle);
             if (aauthor && aauthor[0]) {
-              int rtl = _find_byte (real_title, 0);
+              int rtl = xitk_find_byte (real_title, 0);
 
               snprintf (real_title + rtl, len - rtl, " (%s)", aauthor);
             }
@@ -2136,7 +2137,7 @@ static void smil_properties(smil_t *smil, smil_node_t **snode,
 	if(sprop && sprop->anchor)
 	  (*snode)->mmk->mrl = strdup(sprop->anchor);
 	else {
-            size_t l1 = smil->base ? _find_byte (smil->base, 0) : 0, l2 = _find_byte (prop->value, 0) + 1;
+            size_t l1 = smil->base ? xitk_find_byte (smil->base, 0) : 0, l2 = xitk_find_byte (prop->value, 0) + 1;
           char *p = malloc (l1 + l2 + 1);
           (*snode)->mmk->mrl = p;
           if (p) {
@@ -2836,7 +2837,7 @@ int gui_playlist_insert (gGui_t *gui, int index, const char *mrl, const char *id
       if((ending = strrchr(autosub, '.')))
 	ending++;
       else {
-	ending = autosub + _find_byte (autosub, 0);
+	ending = autosub + xitk_find_byte (autosub, 0);
 	*ending++ = '.';
       }
 
@@ -2845,7 +2846,7 @@ int gui_playlist_insert (gGui_t *gui, int index, const char *mrl, const char *id
       pvsubs = vsubs;
       while((ext = xine_strsep(&pvsubs, ",")) && !sub) {
 	strcpy(ending, ext);
-	*(ending + _find_byte (ext, 0) + 1) = '\0';
+	*(ending + xitk_find_byte (ext, 0) + 1) = '\0';
 
 	if(((stat(autosub, &pstat)) > -1) && (S_ISREG(pstat.st_mode)) && strcmp(autosub, _mrl))
 	  sub = autosub;
@@ -2868,7 +2869,7 @@ int gui_playlist_insert (gGui_t *gui, int index, const char *mrl, const char *id
 
         if((dir = opendir(path))) {
           while((dentry = readdir(dir))) {
-            if( (strncmp(dentry->d_name, d_name, _find_byte (d_name, 0)) == 0) &&
+            if( (strncmp(dentry->d_name, d_name, xitk_find_byte (d_name, 0)) == 0) &&
                 (ending = strrchr(dentry->d_name, '.')) ) {
 
               if( strstr(know_subs, ending+1) ) {
@@ -3104,7 +3105,7 @@ static void _gui_playlist_add_lf (gGui_t *gui, _lf_t *lf) {
         char *start = lf->mmk[i]->mrl;
         if (start[0] == '/') {
           char *lastpart;
-          for (lastpart = start + _find_byte (start, 0); lastpart[-1] != '/'; lastpart--) ;
+          for (lastpart = start + xitk_find_byte (start, 0); lastpart[-1] != '/'; lastpart--) ;
           lf->mmk[i]->ident = strdup (lastpart);
         }
       }
@@ -3223,7 +3224,7 @@ void gui_playlist_save (gGui_t *gui, const char *filename) {
     char buf[4 * 32], *p;
 
     fwrite ("\nentry {\n\tidentifier = ", 1, 23, fd);
-    fwrite (gui->playlist.mmk[i]->ident, 1, _find_byte (gui->playlist.mmk[i]->ident, 0), fd);
+    fwrite (gui->playlist.mmk[i]->ident, 1, xitk_find_byte (gui->playlist.mmk[i]->ident, 0), fd);
     mrl_buf_set (&item, &base, gui->playlist.mmk[i]->mrl);
     mrl_buf_merge (&full, &base, &item);
     fwrite (";\n\tmrl = ", 1, 9, fd);
@@ -3412,7 +3413,7 @@ int gui_playlist_add_item (gGui_t *gui, const char *filepathname, int max_levels
 
     if (max_levels) {
       if (((vext == 0x20202020) && (itemtype == GUI_ITEM_TYPE_PLAYLIST))
-        || _is_known_ext (gui->playlist.known_playlist_exts, vext)) {
+        || _is_known_ext (gui->playlist.exts[XUI_EXTS_PLAYLIST], vext)) {
         int n = _gui_playlist_add_playlist (gui, mrlb, replace);
 
         if (n > 0)
@@ -3519,7 +3520,7 @@ int gui_playlist_add_item (gGui_t *gui, const char *filepathname, int max_levels
         mrlb->ext = ext;
         vext = _get_ext_val (ext, stop - ext);
       }
-      type = _is_known_ext (gui->playlist.known_playlist_exts, vext) ? 1 : 0;
+      type = _is_known_ext (gui->playlist.exts[XUI_EXTS_PLAYLIST], vext) ? 1 : 0;
 
       /* playlist file ? */
       if ((level < max_levels - 1) && type) {
@@ -3533,7 +3534,7 @@ int gui_playlist_add_item (gGui_t *gui, const char *filepathname, int max_levels
       /* want all files ? */
       if (!all_files) {
         /* media file ? */
-        if (!type && _is_known_ext (gui->playlist.known_media_exts, vext))
+        if (!type && _is_known_ext (gui->playlist.exts[XUI_EXTS_MEDIA], vext))
           type = 2;
         if (!type)
           continue;
@@ -3661,29 +3662,27 @@ static void _mmkedit_apply (xitk_widget_t *w, void *data, int state) {
   (void)w;
   (void)state;
   if (mmkedit->mmk) {
-    const char *r, *sub;
-    char *ident, *mrl;
-    int start, end, av_offset, spu_offset;
+    const char *r;
+    char buf[2048];
+    int start, end;
 
     r = xitk_inputtext_get_text (mmkedit->mrl);
     if (r && r[0]) {
-      mrl = strdup (r);
-      str_unquote (mrl);
-    } else {
-      mrl = strdup ((*mmkedit->mmk)->mrl);
+      strlcpy (buf, r, sizeof (buf));
+      str_unquote (buf);
+      mediamark_set_str_val (mmkedit->mmk, buf, MMK_VAL_MRL);
     }
 
     r = xitk_inputtext_get_text (mmkedit->ident);
     if (r && r[0]) {
-      ident = strdup (r);
-      str_unquote (ident);
-    } else {
-      ident = strdup (mrl);
+      strlcpy (buf, r, sizeof (buf));
+      str_unquote (buf);
+      r = buf;
     }
+    mediamark_set_str_val (mmkedit->mmk, r, MMK_VAL_IDENT);
 
-    sub = xitk_inputtext_get_text (mmkedit->sub);
-    if (sub && (!sub[0]))
-      sub = NULL;
+    r = xitk_inputtext_get_text (mmkedit->sub);
+    mediamark_set_str_val (mmkedit->mmk, r, MMK_VAL_SUB);
 
     if ((start = xitk_intbox_get_value (mmkedit->start)) < 0)
       start = 0;
@@ -3693,22 +3692,13 @@ static void _mmkedit_apply (xitk_widget_t *w, void *data, int state) {
     else if (end < start)
       end = start + 1;
 
-    av_offset  = xitk_intbox_get_value (mmkedit->av_offset);
-    spu_offset = xitk_intbox_get_value (mmkedit->spu_offset);
-
-    mediamark_set_str_val (mmkedit->mmk, mrl, MMK_VAL_MRL);
-    mediamark_set_str_val (mmkedit->mmk, ident, MMK_VAL_IDENT);
-    mediamark_set_str_val (mmkedit->mmk, sub, MMK_VAL_SUB);
     (*mmkedit->mmk)->start = start;
     (*mmkedit->mmk)->end   = end;
-    (*mmkedit->mmk)->av_offset = av_offset;
-    (*mmkedit->mmk)->spu_offset = spu_offset;
+    (*mmkedit->mmk)->av_offset  = xitk_intbox_get_value (mmkedit->av_offset);
+    (*mmkedit->mmk)->spu_offset = xitk_intbox_get_value (mmkedit->spu_offset);
 
     if (mmkedit->callback)
       mmkedit->callback (mmkedit->user_data);
-
-    free (mrl);
-    free (ident);
   }
 }
 
@@ -3951,4 +3941,3 @@ void mmk_edit_mediamark (gGui_t *gui, mediamark_t **mmk, apply_callback_t callba
   raise_window (mmkedit->gui, mmkedit->xwin, 1, 1);
   xitk_window_set_input_focus (mmkedit->xwin);
 }
-
