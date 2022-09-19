@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui-0.99.7\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2022-09-17 19:30+0200\n"
+"POT-Creation-Date: 2022-09-17 23:50+0200\n"
 "PO-Revision-Date: 2010-10-14 23:58+0200\n"
 "Last-Translator: František Dvořák <valtri@civ.zcu.cz>\n"
 "Language-Team: Czech <cs@li.org>\n"
@@ -745,18 +745,24 @@ msgstr "Posílání událostí"
 msgid "Close"
 msgstr "Zavřít"
 
-msgid "All files"
-msgstr "Všechny soubory"
+msgid "All"
+msgstr "Vše"
 
 #, fuzzy
-msgid "All media files"
-msgstr "Všechny známé titulky"
+msgid "Media"
+msgstr "je ztlumen"
 
-msgid "All subtitles"
-msgstr "Všechny titulky"
+msgid "Video"
+msgstr "Video"
 
-msgid "All playlists"
-msgstr "Všechny playlisty"
+msgid "Images"
+msgstr ""
+
+msgid "Subtitles"
+msgstr "Titulky"
+
+msgid "Playlists"
+msgstr "Playlisty"
 
 msgid "Apply"
 msgstr "Použít"
@@ -2347,9 +2353,6 @@ msgstr "Sekvence/Informace..."
 msgid "Stream/Information (OSD)"
 msgstr "Sekvence/Informace (OSD)"
 
-msgid "Video"
-msgstr "Video"
-
 msgid "Video/Deinterlace"
 msgstr "Video/Korekce prokládání"
 
@@ -3174,6 +3177,19 @@ msgstr "Prohlížeč zpráv xine"
 
 msgid "Refresh"
 msgstr "Obnovit"
+
+#~ msgid "All files"
+#~ msgstr "Všechny soubory"
+
+#, fuzzy
+#~ msgid "All media files"
+#~ msgstr "Všechny známé titulky"
+
+#~ msgid "All subtitles"
+#~ msgstr "Všechny titulky"
+
+#~ msgid "All playlists"
+#~ msgstr "Všechny playlisty"
 
 #~ msgid "All extensions"
 #~ msgstr "Všechny přípony"

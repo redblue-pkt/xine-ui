@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.99.13\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2022-09-17 19:30+0200\n"
+"POT-Creation-Date: 2022-09-17 23:50+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -688,16 +688,22 @@ msgstr ""
 msgid "Close"
 msgstr ""
 
-msgid "All files"
+msgid "All"
 msgstr ""
 
-msgid "All media files"
+msgid "Media"
 msgstr ""
 
-msgid "All subtitles"
+msgid "Video"
 msgstr ""
 
-msgid "All playlists"
+msgid "Images"
+msgstr ""
+
+msgid "Subtitles"
+msgstr ""
+
+msgid "Playlists"
 msgstr ""
 
 msgid "Apply"
@@ -2122,9 +2128,6 @@ msgid "Stream/Information..."
 msgstr ""
 
 msgid "Stream/Information (OSD)"
-msgstr ""
-
-msgid "Video"
 msgstr ""
 
 msgid "Video/Deinterlace"

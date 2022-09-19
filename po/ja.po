@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine 0.99.6+hg\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2022-09-17 19:30+0200\n"
+"POT-Creation-Date: 2022-09-17 23:50+0200\n"
 "PO-Revision-Date: 2010-07-31 00:32+0700\n"
 "Last-Translator: Takeshi Hamasaki <hmatrjp@users.sourceforge.jp>\n"
 "Language-Team: Japanese <translation-team-ja@lists.sourceforge.net>\n"
@@ -734,20 +734,27 @@ msgstr "xine イベント送信"
 msgid "Close"
 msgstr "閉じる"
 
-msgid "All files"
-msgstr "すべてのファイル"
+#, fuzzy
+msgid "All"
+msgstr "Alt"
 
 #, fuzzy
-msgid "All media files"
-msgstr "すべての既知の字幕"
+msgid "Media"
+msgstr "ミュート"
+
+msgid "Video"
+msgstr "動画"
+
+msgid "Images"
+msgstr ""
 
 #, fuzzy
-msgid "All subtitles"
-msgstr "すべての既知の字幕"
+msgid "Subtitles"
+msgstr "字幕"
 
 #, fuzzy
-msgid "All playlists"
-msgstr "すべての既知の再生リスト"
+msgid "Playlists"
+msgstr "再生リスト"
 
 msgid "Apply"
 msgstr "適用"
@@ -2322,9 +2329,6 @@ msgstr "ストリーム/情報..."
 msgid "Stream/Information (OSD)"
 msgstr "ストリーム/情報 (OSD)"
 
-msgid "Video"
-msgstr "動画"
-
 msgid "Video/Deinterlace"
 msgstr "動画/インターレース解除"
 
@@ -3139,6 +3143,21 @@ msgstr "xine ログビュアー"
 
 msgid "Refresh"
 msgstr "再描画"
+
+#~ msgid "All files"
+#~ msgstr "すべてのファイル"
+
+#, fuzzy
+#~ msgid "All media files"
+#~ msgstr "すべての既知の字幕"
+
+#, fuzzy
+#~ msgid "All subtitles"
+#~ msgstr "すべての既知の字幕"
+
+#, fuzzy
+#~ msgid "All playlists"
+#~ msgstr "すべての既知の再生リスト"
 
 #~ msgid "All extensions"
 #~ msgstr "全ての拡張"
