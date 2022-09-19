@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2022-09-17 19:30+0200\n"
+"POT-Creation-Date: 2022-09-17 23:50+0200\n"
 "PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Alexander Nicolaysen Sørnes <alex@thehandofagony.com>\n"
 "Language-Team:  <nb@li.org>\n"
@@ -734,18 +734,27 @@ msgstr "xines hendelsessender"
 msgid "Close"
 msgstr "Lukk"
 
-msgid "All files"
-msgstr "Alle filer"
+#, fuzzy
+msgid "All"
+msgstr "Alt"
 
 #, fuzzy
-msgid "All media files"
-msgstr "Alle kjente tekstingsfiler"
+msgid "Media"
+msgstr "Stillhet"
 
-msgid "All subtitles"
-msgstr "Alle tekstingsfiler"
+msgid "Video"
+msgstr "Video"
 
-msgid "All playlists"
-msgstr "Alle spillelister"
+msgid "Images"
+msgstr ""
+
+#, fuzzy
+msgid "Subtitles"
+msgstr "Teksting"
+
+#, fuzzy
+msgid "Playlists"
+msgstr "Spilleliste"
 
 msgid "Apply"
 msgstr "Bruk"
@@ -2319,9 +2328,6 @@ msgstr "Strøm/Informasjon . . ."
 msgid "Stream/Information (OSD)"
 msgstr "Strøm/Informasjon (tekst på skjermen)"
 
-msgid "Video"
-msgstr "Video"
-
 msgid "Video/Deinterlace"
 msgstr "Video/Avflett"
 
@@ -3137,6 +3143,19 @@ msgstr "Loggviser for xine"
 
 msgid "Refresh"
 msgstr "Oppdater"
+
+#~ msgid "All files"
+#~ msgstr "Alle filer"
+
+#, fuzzy
+#~ msgid "All media files"
+#~ msgstr "Alle kjente tekstingsfiler"
+
+#~ msgid "All subtitles"
+#~ msgstr "Alle tekstingsfiler"
+
+#~ msgid "All playlists"
+#~ msgstr "Alle spillelister"
 
 #~ msgid "All extensions"
 #~ msgstr "Alle utvidelser"

@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui.es\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2022-09-17 19:30+0200\n"
+"POT-Creation-Date: 2022-09-17 23:50+0200\n"
 "PO-Revision-Date: 2015-10-18 01:37+0200\n"
 "Last-Translator: Carlos E. Robinson <carlos.e.r@opensuse.org>\n"
 "Language-Team: Spanish <xine-devel@lists.sourceforge.net>\n"
@@ -750,18 +750,24 @@ msgstr "Emisor de eventos de xine"
 msgid "Close"
 msgstr "Cerrar"
 
-msgid "All files"
-msgstr "Todos los ficheros"
+msgid "All"
+msgstr "Todos"
 
 #, fuzzy
-msgid "All media files"
-msgstr "Todos los subtítulos conocidos"
+msgid "Media"
+msgstr "Mudo"
 
-msgid "All subtitles"
-msgstr "Todos los subtítulos"
+msgid "Video"
+msgstr "Vídeo"
 
-msgid "All playlists"
-msgstr "Todas las listas"
+msgid "Images"
+msgstr ""
+
+msgid "Subtitles"
+msgstr "Subtítulos"
+
+msgid "Playlists"
+msgstr "Listas de reproducción"
 
 msgid "Apply"
 msgstr "Aplicar"
@@ -2375,9 +2381,6 @@ msgstr "Flujo/Información..."
 msgid "Stream/Information (OSD)"
 msgstr "Flujo/Información (VEP)"
 
-msgid "Video"
-msgstr "Vídeo"
-
 msgid "Video/Deinterlace"
 msgstr "Vídeo/Desentrelazar"
 
@@ -3207,6 +3210,19 @@ msgstr "Visor del registro de xine"
 
 msgid "Refresh"
 msgstr "Refrescar"
+
+#~ msgid "All files"
+#~ msgstr "Todos los ficheros"
+
+#, fuzzy
+#~ msgid "All media files"
+#~ msgstr "Todos los subtítulos conocidos"
+
+#~ msgid "All subtitles"
+#~ msgstr "Todos los subtítulos"
+
+#~ msgid "All playlists"
+#~ msgstr "Todas las listas"
 
 #~ msgid "All extensions"
 #~ msgstr "Todas las extensiones"

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui-eu\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2022-09-17 19:30+0200\n"
+"POT-Creation-Date: 2022-09-17 23:50+0200\n"
 "PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Piarres Beobide  <pi@beobide.net>\n"
 "Language-Team: Librezale.org <librezale@librezale.org>\n"
@@ -741,20 +741,27 @@ msgstr "xine Gertaera Bidaltzailea"
 msgid "Close"
 msgstr "Itxi"
 
-msgid "All files"
-msgstr "Fitxategi guztiak"
+#, fuzzy
+msgid "All"
+msgstr "Alt"
 
 #, fuzzy
-msgid "All media files"
-msgstr "Azpititulu ezagun guztiak"
+msgid "Media"
+msgstr "Mutututa"
+
+msgid "Video"
+msgstr "Bideoa"
+
+msgid "Images"
+msgstr ""
 
 #, fuzzy
-msgid "All subtitles"
-msgstr "Azpititulu ezagun guztiak"
+msgid "Subtitles"
+msgstr "Azpititulua"
 
 #, fuzzy
-msgid "All playlists"
-msgstr "Erreprodukzio-zerrenda ezagun guztiak"
+msgid "Playlists"
+msgstr "Erreprodukzio-zerrenda"
 
 msgid "Apply"
 msgstr "Aplikatu"
@@ -2332,9 +2339,6 @@ msgstr "Korrontea/informazioa..."
 msgid "Stream/Information (OSD)"
 msgstr "Korrontea/informazioa (OSD)"
 
-msgid "Video"
-msgstr "Bideoa"
-
 msgid "Video/Deinterlace"
 msgstr "Bideoa/gurutzelarkatuak bereizi"
 
@@ -3159,6 +3163,21 @@ msgstr "xine erregistro-ikustailea"
 
 msgid "Refresh"
 msgstr "Freskatu"
+
+#~ msgid "All files"
+#~ msgstr "Fitxategi guztiak"
+
+#, fuzzy
+#~ msgid "All media files"
+#~ msgstr "Azpititulu ezagun guztiak"
+
+#, fuzzy
+#~ msgid "All subtitles"
+#~ msgstr "Azpititulu ezagun guztiak"
+
+#, fuzzy
+#~ msgid "All playlists"
+#~ msgstr "Erreprodukzio-zerrenda ezagun guztiak"
 
 #~ msgid "All extensions"
 #~ msgstr "Luzapen guztiak"

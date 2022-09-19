@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.99.5\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2022-09-17 19:30+0200\n"
+"POT-Creation-Date: 2022-09-17 23:50+0200\n"
 "PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Torsten Jager <t.jager@gmx.de>\n"
 "Language-Team: German <de@li.org>\n"
@@ -743,17 +743,23 @@ msgstr "xine Ereignissender"
 msgid "Close"
 msgstr "Schließen"
 
-msgid "All files"
-msgstr "Alle Dateien"
+msgid "All"
+msgstr "Alles"
 
-msgid "All media files"
-msgstr "Alle Mediendateien"
+msgid "Media"
+msgstr "Medien"
 
-msgid "All subtitles"
-msgstr "Alle Untertitel"
+msgid "Video"
+msgstr "Video"
 
-msgid "All playlists"
-msgstr "Alle Playlisten"
+msgid "Images"
+msgstr "Bilder"
+
+msgid "Subtitles"
+msgstr "Untertitel"
+
+msgid "Playlists"
+msgstr "Playlisten"
 
 msgid "Apply"
 msgstr "Anwenden"
@@ -2345,9 +2351,6 @@ msgstr "Datenstrom/Informationen..."
 msgid "Stream/Information (OSD)"
 msgstr "Datenstrom/Informationen (OSD)"
 
-msgid "Video"
-msgstr "Video"
-
 msgid "Video/Deinterlace"
 msgstr "Video/Deinterlace"
 
@@ -3169,6 +3172,18 @@ msgstr "xine Log-Betrachter"
 
 msgid "Refresh"
 msgstr "Aktualisieren"
+
+#~ msgid "All files"
+#~ msgstr "Alle Dateien"
+
+#~ msgid "All media files"
+#~ msgstr "Alle Mediendateien"
+
+#~ msgid "All subtitles"
+#~ msgstr "Alle Untertitel"
+
+#~ msgid "All playlists"
+#~ msgstr "Alle Playlisten"
 
 #~ msgid "All extensions"
 #~ msgstr "Alle Dateitypen"

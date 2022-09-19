@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pl\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2022-09-17 19:30+0200\n"
+"POT-Creation-Date: 2022-09-17 23:50+0200\n"
 "PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Bartłomiej Muryn <bmuryn@gmail.com>\n"
 "Language-Team:  <pl@li.org>\n"
@@ -726,18 +726,27 @@ msgstr "Wysyłacz wydarzeń xine"
 msgid "Close"
 msgstr "Koniec"
 
-msgid "All files"
-msgstr "Wszystkie pliki"
+#, fuzzy
+msgid "All"
+msgstr "Alt"
 
 #, fuzzy
-msgid "All media files"
-msgstr "Wszystkie znane napisy"
+msgid "Media"
+msgstr "Wyciszone"
 
-msgid "All subtitles"
-msgstr "Wszystkie napisy"
+msgid "Video"
+msgstr "Obraz"
 
-msgid "All playlists"
-msgstr "Wszystkie listy"
+msgid "Images"
+msgstr ""
+
+#, fuzzy
+msgid "Subtitles"
+msgstr "Napisy"
+
+#, fuzzy
+msgid "Playlists"
+msgstr "Lista odtwarzania"
 
 msgid "Apply"
 msgstr "Zastosuj"
@@ -2324,9 +2333,6 @@ msgstr "Strumień/Informacja..."
 msgid "Stream/Information (OSD)"
 msgstr "Strumień/Informacja (OSD)"
 
-msgid "Video"
-msgstr "Obraz"
-
 msgid "Video/Deinterlace"
 msgstr "Obraz/Usuwanie przeplotu"
 
@@ -3144,6 +3150,19 @@ msgstr "Podgląd logów xine"
 
 msgid "Refresh"
 msgstr "Odświeżanie"
+
+#~ msgid "All files"
+#~ msgstr "Wszystkie pliki"
+
+#, fuzzy
+#~ msgid "All media files"
+#~ msgstr "Wszystkie znane napisy"
+
+#~ msgid "All subtitles"
+#~ msgstr "Wszystkie napisy"
+
+#~ msgid "All playlists"
+#~ msgstr "Wszystkie listy"
 
 #~ msgid "All extensions"
 #~ msgstr "Wszystkie rozszerzenia"

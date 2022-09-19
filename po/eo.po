@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eo\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2022-09-17 19:30+0200\n"
+"POT-Creation-Date: 2022-09-17 23:50+0200\n"
 "PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Antonio Codazzi <f_sophia@libero.it>\n"
 "Language-Team: Esperanto\n"
@@ -753,20 +753,27 @@ msgstr "Sinkronigilo de eventoj por xine"
 msgid "Close"
 msgstr "Fermu"
 
-msgid "All files"
-msgstr "Ĉiuj dosieroj"
+#, fuzzy
+msgid "All"
+msgstr "Alt"
 
 #, fuzzy
-msgid "All media files"
-msgstr "Ĉiuj konataj surkribaĵoj"
+msgid "Media"
+msgstr "Mutigita"
+
+msgid "Video"
+msgstr "Video"
+
+msgid "Images"
+msgstr ""
 
 #, fuzzy
-msgid "All subtitles"
-msgstr "Ĉiuj konataj surkribaĵoj"
+msgid "Subtitles"
+msgstr "Surskribaĵoj"
 
 #, fuzzy
-msgid "All playlists"
-msgstr "Ĉiuj konataj legolistoj"
+msgid "Playlists"
+msgstr "Legolisto"
 
 msgid "Apply"
 msgstr "Apliku"
@@ -2350,9 +2357,6 @@ msgstr "Datumstrio/Informoj..."
 msgid "Stream/Information (OSD)"
 msgstr "Datumstrio/Informoj (OSD)"
 
-msgid "Video"
-msgstr "Video"
-
 msgid "Video/Deinterlace"
 msgstr "Video/Malplektado"
 
@@ -3169,6 +3173,21 @@ msgstr "Vidigilo de protokolo de xine"
 
 msgid "Refresh"
 msgstr "Ĝisdatigu"
+
+#~ msgid "All files"
+#~ msgstr "Ĉiuj dosieroj"
+
+#, fuzzy
+#~ msgid "All media files"
+#~ msgstr "Ĉiuj konataj surkribaĵoj"
+
+#, fuzzy
+#~ msgid "All subtitles"
+#~ msgstr "Ĉiuj konataj surkribaĵoj"
+
+#, fuzzy
+#~ msgid "All playlists"
+#~ msgstr "Ĉiuj konataj legolistoj"
 
 #~ msgid "All extensions"
 #~ msgstr "Ĉiuj finaĵoj"
