@@ -136,6 +136,17 @@ typedef enum {
 
 typedef struct skins_locations_s skins_locations_t;
 
+typedef enum {
+  XUI_EXTS_ANY = 0,
+  XUI_EXTS_MEDIA,
+  XUI_EXTS_AUDIO,
+  XUI_EXTS_VIDEO,
+  XUI_EXTS_IMAGE,
+  XUI_EXTS_SUBTITLE,
+  XUI_EXTS_PLAYLIST,
+  XUI_EXTS_LAST
+} xui_exts_t;
+
 struct gGui_st {
   struct gGui_st           *nextprev[3];
 
@@ -254,9 +265,7 @@ struct gGui_st {
     int                     loop;       /** << see PLAYLIST_LOOP_* */
     int                     control;    /** << see PLAYLIST_CONTROL_* */
 
-    xine_sarray_t          *known_playlist_exts; /** << internal use by playlist_add_* () */
-    xine_sarray_t          *known_media_exts;
-    xine_sarray_t          *known_spu_exts;
+    xine_sarray_t          *exts[XUI_EXTS_LAST];
   } playlist;
 
 
